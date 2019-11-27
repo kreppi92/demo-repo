@@ -7,6 +7,9 @@ import PropTypes from 'prop-types'
 // Material UI
 import { withStyles } from '@material-ui/core/styles'
 
+// Local
+import Signin from './Signin'
+
 const styles = {
   container: {
     alignItems: 'center',
@@ -26,8 +29,8 @@ class Main extends Component {
     const { classes } = this.props
     
     return (
-      <div className={classes.container}>
-        Main
+      <div>
+        <Signin />
       </div>
     )
   } 
