@@ -7,6 +7,11 @@ export const palette = {
     '-1': '#f2f2f2',
     '0': '#DADCE0',
   },
+
+  blue: {
+    '0': '#19a0db'
+  },
+
   white: {
     '0': '#ffffff',
   },
@@ -54,15 +59,22 @@ export const mainTheme = createMuiTheme({
         letterSpacing: 0.5,
         height: '56px',
         boxShadow: 'none',
-        fontWeight: 'bold',
+        fontWeight: '700',
         fontSize: 14,
         textShadow: 'none',
       },
+
       sizeLarge: {
         fontSize: 18,
-        fontWeight: 'normal',
+        fontWeight: '700',
         color: 'white'
       },
+
+      sizeSmall: {
+        fontSize: 16,
+        fontWeight: '700',
+        color: 'white'
+      }
     },
     MuiCard: {
       root: {
@@ -79,8 +91,8 @@ export const mainTheme = createMuiTheme({
 
         '&$h4': {
           textAlign: 'left',
-          fontWeight: 600,
-          fontSize: 28,
+          fontWeight: 700,
+          fontSize: 22,
         },
         '&$h6': {
           textAlign: 'left',

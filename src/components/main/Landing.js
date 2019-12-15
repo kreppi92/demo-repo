@@ -20,6 +20,7 @@ const styles = {
 
 class Landing extends Component {
   state = {
+    
   }
 
   render() {
