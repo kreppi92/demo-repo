@@ -6,6 +6,7 @@ export const palette = {
     '-2': '#f3f3f3',
     '-1': '#f2f2f2',
     '0': '#DADCE0',
+    '1': '#9e9e9e'
   },
 
   blue: {
@@ -18,7 +19,7 @@ export const palette = {
 
   black: {
     '-2': '#212121',
-    '-1': '#f5f5f5',
+    '-1': '#fafafa',
     '0': '#000000'
   }
 }

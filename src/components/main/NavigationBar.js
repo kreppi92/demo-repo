@@ -5,7 +5,7 @@ import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
-import { isMobile } from 'react-device-detect'
+import { useMediaQuery } from 'react-responsive'
 import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo-full.png'
@@ -16,13 +16,27 @@ import Footer from './Footer'
 
 var QRCode = require('qrcode.react')
 
+const options = ["Wallet", "Buy Bitcoin", "Education", "Resources", "Sign out"]
+
+const Mobile = ({ children }) => {
+  const isMobile = useMediaQuery({ maxWidth: 767 })
+  return isMobile ? children : null
+}
+
+const Default = ({ children }) => {
+  const isNotMobile = useMediaQuery({ minWidth: 768 })
+  return isNotMobile ? children : null
+}
+
 const styles = {
   button: {
+    color: palette.gray[1],
     padding: '0 15px 0 15px',
     textDecoration: 'none'
   },
 
   selectedButton: {
+    color: palette.blue[0],
     padding: '0 15px 0 15px',
     textDecoration: 'underline'
   },
@@ -72,7 +86,7 @@ const styles = {
   },
 
   menuOptionsContainer: {
-    margin: '0 20px 0 0',
+    margin: '0 20px 0 0'
   },
 
   iconButton: {
@@ -82,6 +96,7 @@ const styles = {
 
   menuIcon: {
     color: palette.blue[0],
+    margin: '0 20px 0 0'
   },
 
   paperContainer: {
@@ -129,36 +144,115 @@ const styles = {
 
   address: {
     fontSize: '13px'
+  },
+
+  expandedOption: {
+    alignItems: 'center',
+    background: palette.black[-1],
+    cursor: 'pointer',
+    display: 'flex',
+    flexDirection: 'row',
+    height: '60px',
+    width: '100vw'
+  },
+
+  expandedOptionTextUnselected: {
+    color: palette.gray[1],
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '700',
+    padding: '0 20px 0 20px'
+  },
+
+  expandedOptionTextSelected: {
+    color: palette.blue[0],
+    cursor: 'pointer',
+    fontSize: '16px',
+    fontWeight: '700',
+    padding: '0 20px 0 20px'
   }
 }
 
 class NavigationBar extends Component {
+  state = {
+    isExpanded: false,
+    selectedOption: options[0]
+  }
+
+  handleOptionChange = (option) => {
+    console.log("Option", option)
+    this.setState({
+      selectedOption: option
+    })
+  }
+
+  handleMenuClick = () => {
+    const { isExpanded } = this.state
+
+    this.setState({
+      isExpanded: !isExpanded
+    })
+  }
 
   render() {
+    const { isExpanded, selectedOption } = this.state
     const { classes } = this.props
 
     return (
       <div className={classes.container}>
         <div className={classes.appBarContainer}>
           <img src={logoIcon} className={classes.logoIcon} alt="" />
-          {
-            (isMobile) 
-            ? 
-            < IconButton aria-label="menu" className = { classes.menuIcon } >
-              <img src={menuIcon} className={classes.iconButton} alt="" />
-            </IconButton >
-            :
-            <div className={classes.menuOptionsContainer}>
-              <Button className={classes.selectedButton}>Wallet</Button>
-              <Button className={classes.button}>Buy Bitcoin</Button>
-              <Button className={classes.button}>Education</Button>
-              <Button className={classes.button}>Sign out</Button>
-            </div>   
-          }
-        </div>
-        <Divider />
+          <Mobile>
+            {
+              isExpanded ?
 
-        <div className = {classes.paperContainer}>
+                < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
+                  <img src={closeIcon} className={classes.iconButton} alt="" />
+                </IconButton >
+
+                :
+
+                < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
+                  <img src={menuIcon} className={classes.iconButton} alt="" />
+                </IconButton >
+            }
+
+          </Mobile>
+          <Default>
+            <div className={classes.menuOptionsContainer}>
+              {
+                options.map(function(option, i){
+                  return (
+                  <Button key={option} className={ option === selectedOption ? classes.selectedButton : classes.button } onClick={() => this.handleOptionChange(option)}>
+                    {option}
+                  </Button>
+                  )
+                }.bind(this))
+              }
+            </div>
+          </Default>
+        </div>
+        <Mobile>
+          {
+            isExpanded ?
+              options.map(function(option, i){
+                return (
+                  <div key={option} onClick={() => this.handleOptionChange(option)}>
+                    <div className={classes.expandedOption}>
+                      <div className={ option === selectedOption ? classes.expandedOptionTextSelected : classes.expandedOptionTextUnselected }>
+                        {option}
+                      </div>
+                    </div>
+                    <Divider />
+                  </div>
+                )
+              }.bind(this))
+              :
+              <div />
+          }
+
+        </Mobile>
+        <div className={classes.paperContainer}>
           <Paper className={classes.paper}>
             <div className={classes.contentContainer}>
               <Typography variant="h4" gutterBottom>
@@ -166,12 +260,12 @@ class NavigationBar extends Component {
               </Typography>
 
               <QRCode className={classes.qrCode} size={200} value="1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9" />
-              <div className={classes.address}>1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9</div> 
+              <div className={classes.address}>1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9</div>
               <div className={classes.qrButtonContainer}>
-                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary"onClick={this.handleOnClick}>
+                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleOnClick}>
                   Copy address
                 </Button>
-                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary"onClick={this.handleOnClick}>
+                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleOnClick}>
                   Send funds
                 </Button>
               </div>
@@ -187,7 +281,7 @@ class NavigationBar extends Component {
               No recent transactions
             </div>
           </Paper>
-        </div>  
+        </div>
         <Footer />
       </div>
     )
