@@ -8,6 +8,7 @@ import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
 
 // Local
+import Navigation from './NavigationBar'
 import Signin from './Signin'
 
 const styles = {
@@ -23,14 +24,22 @@ const styles = {
 
 class Main extends Component {
   state = {
+    isSignedIn: false
+  }
+
+  completedSignIn = () => {
+    this.setState({ isSignedIn: true})
   }
 
   render() {
     const { classes } = this.props
+    const { isSignedIn } = this.state
     
     return (
       <div>
-        <Signin />
+        {
+          isSignedIn ? <Navigation /> : <Signin completedSignIn={this.completedSignIn}/>
+        }
       </div>
     )
   } 

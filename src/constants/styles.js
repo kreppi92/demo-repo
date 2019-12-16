@@ -15,6 +15,12 @@ export const palette = {
   white: {
     '0': '#ffffff',
   },
+
+  black: {
+    '-2': '#212121',
+    '-1': '#f5f5f5',
+    '0': '#000000'
+  }
 }
 
 export const mainTheme = createMuiTheme({

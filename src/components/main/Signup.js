@@ -8,6 +8,7 @@ import TextField from '@material-ui/core/TextField'
 import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo.png'
+import Footer from './Footer'
 
 const styles = {
   button: {
@@ -245,6 +246,7 @@ class Signup extends Component {
 
           </div>
         </Paper>
+        <Footer />
       </div>
     )
   }
