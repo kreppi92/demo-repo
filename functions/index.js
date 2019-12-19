@@ -10,15 +10,30 @@ exports.signUp = functions.https.onCall((data, context) => {
   const email = data.email
   const password = data.password
 
-  let userData = { email: email, password: password, verified: false }
-
-  return admin.firestore().collection('users').add(userData)
-  .then(writeResult => {
-    return { "success": true, email: email }
-  })
-  .catch(err => {
-    return { "success": false, "error": "There was an error signing up. Please try again later." }
-  })
+  return admin.firestore().collection("users").where("email", "==", email)
+    .get()
+    .then(function (querySnapshot) {
+      var documentId = ""
+      querySnapshot.forEach(function (doc) {
+        documentId = doc.id
+      })
+      if (documentId === "") {
+        let userData = { email: email, password: password, verified: false }
+        
+        return admin.firestore().collection('users').add(userData)
+        .then(writeResult => {
+          return { "success": true, email: email }
+        })
+        .catch(err => {
+          return { "success": false, "error": "There was an error signing up. Please try again later." }
+        })
+      } else {
+        return { "success": false, "error": "A user with this email address already exits. Please try signing up instead." }
+      }
+    })
+    .catch(err => {
+      return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+    })  
 })
 
 exports.signIn = functions.https.onCall((data, context) => {
@@ -39,7 +54,7 @@ exports.signIn = functions.https.onCall((data, context) => {
       return { "success": false, error: "A user with this email and password combination was not found. Please check that you have entered the right email and password." }
     } else {
       if (verified) {
-        var token = jwt.sign({ email: email, password, password }, jwtKey)
+        var token = jwt.sign({ email: email, password, password }, jwtToken)
         return { "success": true, "id": documentId, "token": token }
       } else{
         if (verify) {
