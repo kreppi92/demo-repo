@@ -9,8 +9,13 @@ import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo.png'
 import Footer from './Footer'
+import Firebase from '../../constants/firebase'
 
 const styles = {
+  boldText: {
+    fontWeight: 700
+  },
+
   button: {
     margin: '30px 0 0 0'
   },
@@ -18,7 +23,7 @@ const styles = {
   container: {
     display: 'flex',
     justifyContent: 'center'
-  }, 
+  },
 
   contentContainer: {
     display: 'flex',
@@ -55,6 +60,15 @@ const styles = {
     width: '100%'
   },
 
+  linkContainerVerification: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    margin: '25px 0 0 0',
+    width: '100%'
+  },
+
   link: {
     color: palette.blue[0],
     fontWeight: 700,
@@ -75,27 +89,30 @@ const styles = {
 
   textField: {
     marginTop: '25px'
+  },
+
+  verificationText: {
+    fontSize: '15px',
+    margin: '30px 0 40px 0',
+    letterSpacing: 0.3,
+    lineHeight: '20px',
   }
 }
 
 class Signup extends Component {
   state = {
-    name: '',
-    nameHelperText: '',
-    nameError: false,
     email: '',
     emailHelperText: '',
     emailError: false,
     password: '',
     passwordHelperText: '',
-    passwordError: false
+    passwordError: false,
+    verificationSent: false
   }
 
   handleChange = name => event => {
     this.setState({
       [name]: event.target.value,
-      nameHelperText: '',
-      nameError: false,
       emailHelperText: '',
       emailError: false,
       passwordHelperText: '',
@@ -107,21 +124,13 @@ class Signup extends Component {
     this.validateForms()
   }
 
-  validateForms() { 
-    const { name, email, password } = this.state
-
-    var nameHasError = false
-    var nameErrorText = ""
-    
-    if (name === "") { 
-      nameHasError = true
-      nameErrorText = "Please enter your full name."
-    }
+  validateForms() {
+    const { email, password } = this.state
 
     var emailHasError = false
     var emailErrorText = ""
-    
-    if (email === "") { 
+
+    if (email === "") {
       emailHasError = true
       emailErrorText = "Please enter a valid email."
     }
@@ -129,22 +138,20 @@ class Signup extends Component {
     var passwordHasError = false
     var passwordErrorText = ""
 
-    if (password === "") { 
+    if (password === "") {
       passwordHasError = true
       passwordErrorText = "Please enter a password."
     }
 
-    if (nameHasError || emailHasError || passwordHasError) {
-      this.displayFormError(nameHasError, nameErrorText, emailHasError, emailErrorText, passwordHasError, passwordErrorText)
+    if (emailHasError || passwordHasError) {
+      this.displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText)
     } else {
-      this.createAccount()
+      this.createAccount(email, password)
     }
   }
 
-  displayFormError(nameHasError, nameErrorText, emailHasError, emailErrorText, passwordHasError, passwordErrorText) { 
+  displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText) {
     this.setState({
-      nameError: nameHasError,
-      nameHelperText: nameErrorText,
       emailError: emailHasError,
       emailHelperText: emailErrorText,
       passwordError: passwordHasError,
@@ -152,20 +159,38 @@ class Signup extends Component {
     })
   }
 
-  createAccount() { 
+  createAccount = (email, password) => {
     this.setState({ isLoading: true })
 
-    setTimeout(
-      function() {
-        //this.props.completedSignIn()
-      }.bind(this),
-      1000,
-    )
+    var signUp = Firebase.functions().httpsCallable('signUp')
+    signUp({ email: email, password: password }).then(function (result) {
+      if (result.data.success) {
+        this.sendEmail()
+      } else {
+        alert(result.data.error)
+        this.setState({ isLoading: false })
+      }
+    }.bind(this))
+  }
+
+  sendEmail = () => {
+    const { email } = this.state
+
+    var sendEmail = Firebase.functions().httpsCallable('sendEmail')
+    sendEmail({ email: email }).then(function (result) {
+      if (result.data.success) {
+        this.setState({ verificationSent: true})
+      } else {
+        alert(result.data.error)
+      }
+
+      this.setState({ isLoading: false })
+    }.bind(this))
   }
 
   render() {
     const { classes } = this.props
-    const { name, nameHelperText, nameError, email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading } = this.state
+    const { email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading, verificationSent } = this.state
 
     return (
       <div className={classes.container}>
@@ -173,77 +198,86 @@ class Signup extends Component {
           <div className={classes.contentContainer}>
             <img src={logoIcon} className={classes.logoIcon} alt="" />
 
-            <Typography variant="h4" gutterBottom>
-              Create an account
-            </Typography>
+            {
+              verificationSent ?
 
-            <TextField
-              fullWidth
-              error={nameError}
-              className={classes.textField}
-              id="outlined-name"
-              label="Full name"
-              name="name"
-              type="name"
-              helperText={nameHelperText}
-              value={name}
-              onChange={this.handleChange('name')}
-              variant="outlined"
-            />
+              <div>
+                <Typography variant="h4" gutterBottom>
+                  Thank you for signing up.
+                </Typography>
 
-            <TextField
-              fullWidth
-              error={emailError}
-              className={classes.textField}
-              id="outlined-email"
-              label="Email"
-              name="email"
-              type="email"
-              helperText={emailHelperText}
-              value={email}
-              onChange={this.handleChange('email')}
-              variant="outlined"
-            />
+                <div className={classes.verificationText}>
+                  We just sent a confirmation link to <span className={classes.boldText}>{email}</span>.<br /><br />If you did not receive it in your main inbox, please check your junk folder.
+                </div>
 
-            <TextField
-              fullWidth
-              error={passwordError}
-              className={classes.textField}
-              id="outlined-password"
-              label="Password"
-              name="password"
-              type="password"
-              value={password}
-              helperText={passwordHelperText}
-              onChange={this.handleChange('password')}
-              variant="outlined"
-            /> 
-                  
-            <Button
-              className={classes.button}
-              size="large"
-              variant={'contained'}
-              color="primary"
-              fullWidth
-              onClick={this.handleOnClick}
-            >
-            {isLoading ? (
-                <CircularProgress
-                  variant="indeterminate"
-                  disableShrink
-                  size={24}
-                  thickness={4}
+                <div className={classes.linkContainerVerification}>
+                  <a className={classes.link} href={"#"} onClick={this.sendEmail}>Resend confirmation email?</a>
+                  <a className={classes.link} href={"/"}>Sign in</a>
+                </div>
+              </div>
+
+              :
+
+              <div>
+                <Typography variant="h4" gutterBottom>
+                  Create an account
+                </Typography>
+
+                <TextField
+                  fullWidth
+                  error={emailError}
+                  className={classes.textField}
+                  id="outlined-email"
+                  label="Email"
+                  name="email"
+                  type="email"
+                  helperText={emailHelperText}
+                  value={email}
+                  onChange={this.handleChange('email')}
+                  variant="outlined"
                 />
-              ) : (
-                'Create account'
-              )}
-            </Button>
 
-            <div className={classes.linkContainer}>
-              <div />
-              <a className={classes.link} href={"/"}>Existing account? Sign in now</a>
-            </div>
+                <TextField
+                  fullWidth
+                  error={passwordError}
+                  className={classes.textField}
+                  id="outlined-password"
+                  label="Password"
+                  name="password"
+                  type="password"
+                  value={password}
+                  helperText={passwordHelperText}
+                  onChange={this.handleChange('password')}
+                  variant="outlined"
+                />
 
+                <Button
+                  className={classes.button}
+                  size="large"
+                  variant={'contained'}
+                  color="primary"
+                  fullWidth
+                  onClick={this.handleOnClick}
+                >
+                  {isLoading ? (
+                    <CircularProgress
+                      variant="indeterminate"
+                      disableShrink
+                      size={24}
+                      thickness={4}
+                    />
+                  ) : (
+                      'Create account'
+                    )}
+                </Button>
+
+                <div className={classes.linkContainer}>
+                  <div />
+                  <a className={classes.link} href={"/"}>Existing account? Sign in now</a>
+                </div>
+
+              </div>
+            }
           </div>
         </Paper>
         <Footer />

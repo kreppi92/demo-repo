@@ -9,6 +9,7 @@ import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo.png'
 import Footer from './Footer'
+import Firebase from '../../constants/firebase'
 
 const styles = {
   button: {
@@ -124,7 +125,7 @@ class Signin extends Component {
     if (emailHasError || passwordHasError) {
       this.displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText)
     } else {
-      this.signUserIn()
+      this.signUserIn(email, password)
     }
   }
 
@@ -137,15 +138,18 @@ class Signin extends Component {
     })
   }
 
-  signUserIn() { 
+  signUserIn(email, password) { 
     this.setState({ isLoading: true })
 
-    setTimeout(
-      function() {
-        this.props.completedSignIn()
-      }.bind(this),
-      1000,
-    )
+    var signIn = Firebase.functions().httpsCallable('signIn')
+    signIn({ email: email, password: password, verify: true}).then(function (result) {
+      if (result.data.success) {
+        alert(result.data.token)
+      } else {
+        alert(result.data.error)
+      }
+      this.setState({ isLoading: false })
+    }.bind(this))
   }
 
   render() {
