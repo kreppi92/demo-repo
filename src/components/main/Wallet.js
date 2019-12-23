@@ -34,7 +34,7 @@ class Wallet extends Component {
       <div className={classes.container}>
         Wallet
         <PDFDownloadLink
-          document={<Certificate />}
+          document={<Certificate email="test@test.com" amount="1000"/>}
           fileName="certificate.pdf"
         >
           Download Your Certificate

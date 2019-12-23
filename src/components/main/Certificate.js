@@ -1,107 +1,154 @@
 import React from "react";
-import {
-  Text,
-  View,
-  Document,
-  StyleSheet,
-  Image,
-  Page
-} from "@react-pdf/renderer";
-import image from "../../assets/logo.png";
+import { Text, Document, Font } from "@react-pdf/renderer";
+import logo from "../../assets/logo.png";
+import bitcoinImage from "../../assets/bitcoin-image.png";
+import courierFont from "../../assets/CourierPrime-Regular.ttf";
+import robotoBoldFont from "../../assets/Roboto-Bold.ttf";
 import styled from "@react-pdf/styled-components";
 
-// Create styles
-const styles = StyleSheet.create({
-  page: {
-    flexDirection: "column",
-    justifyContent: "center",
-    textAlign: "center",
-    fontSize: 10
-  },
-  section: {
-    margin: 10,
-    padding: 10,
-    justifyContent: "center",
-    textAlign: "center"
-  },
-  image: {
-    maxHeight: 75,
-    maxWidth: 300
-  },
-  textOutline: {
-    borderRadius: 25,
-    borderSize: 2,
-    borderColor: `#000`,
-    borderStyle: "solid",
-    padding: 20
-  }
-});
+Font.register({ family: "Courier Prime", src: courierFont });
+Font.register({ family: "Roboto Bold", src: robotoBoldFont });
 
-const TextBox = styled.Text`
-  margin: 10px;
+const PageEl = styled.Page`
+  display: flex;
+  flex-direction: column;
   font-size: 10px;
-  font-family: "Helvetica";
-  border-size: 2;
-  border-color: #000000;
-  border-style: solid;
+  padding: 25px;
+  border: 5px;
 `;
 
-const OutlinedText = styled.View`
-  border-size: 2;
-  border-color: #000000;
-  border-style: solid;
+const Border = styled.View`
+  border: 5px;
+  border-style: dashed;
+  border-color: #5cb2f5;
+  padding: 20px;
+  flex-grow: 1;
+`;
+
+const Cointainer = styled.View`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  flex-grow: 1;
 `;
 
 const CenterDiv = styled.View`
+  display: flex;
   justify-content: center;
+  align-items: center;
   text-align: center;
 `;
 
-// Create Document Component
-const MyDocument = () => (
-  <Document>
-    <Page size="A4" style={styles.page}>
-      <CenterDiv>
-        <Image source={image} style={styles.image} />
-      </CenterDiv>
-      <CenterDiv>
-        <Text>BitCoin Gift Certificate</Text>
-      </CenterDiv>
-    </Page>
-    <Page size="A4" style={styles.page}>
-      <View style={styles.section}>
-        <OutlinedText>
-          <TextBox>`EMAIL PROP PASSED HERE`</TextBox>
-          <Text>Email Address</Text>
-        </OutlinedText>
-        <OutlinedText>
-          <TextBox>`AMOUNT PROP PASSED HERE`</TextBox>
-          <Text>Amount</Text>
-        </OutlinedText>
-        <View>
-          <Text>Claim Your Bitcoin at SatStreet.com</Text>
-        </View>
+const Logo = styled.Image`
+  max-height: 75px;
+  max-width: 300px;
+`;
 
-        <View>
-          <Text>Claim your BitCoin in 3 Easy Steps:</Text>
-          <Text>1. Visit Our Website at https://www.satstreet.com</Text>
-          <Text>
-            2. Create your account using the above email address and enter a
-            secure password
-          </Text>
-          <Text>
-            3. Verify your email address by entering the code that was sent to
-            you
-          </Text>
-          <Text>
-            Congrats! You now own BitCoin. Explore our website to learn more.
-          </Text>
-        </View>
-        <View>
-          <Text>Satstreet Inc &copy; 2019</Text>
-        </View>
-      </View>
-    </Page>
+const BitcoinImage = styled.Image`
+  max-height: 200px;
+  max-width: 300px;
+`;
+
+const HeaderEl = styled.View`
+  width: 500px;
+`;
+
+const Header = styled.Text`
+  font-size: 30px;
+  font-family: "Roboto Bold";
+  margin: 20px;
+`;
+
+const OutlinedText = styled.View`
+  padding: 5px;
+  margin: 10px;
+  width: 350px;
+  border: 2px;
+  border-radius: 5px;
+  border-color: #5cb2f5;
+`;
+
+const TextFields = styled.Text`
+  font-size: 20px;
+  font-family: "Courier Prime";
+  border-bottom: 1px;
+  border-color: #eee;
+  width: 100%;
+`;
+
+const SubTextFields = styled.Text`
+  font-size: 10px;
+  font-family: "Helvetica";
+  opacity: 0.5;
+`;
+
+const Instructions = styled.View`
+  width: 500px;
+  text-align: left;
+  margin: 10px;
+  opacity: 0.5;
+`;
+
+const Copyright = styled.View`
+  opacity: 0.5;
+`;
+
+// Create Document Component
+const MyDocument = ({ email, amount }) => (
+  <Document>
+    <PageEl>
+      <Border>
+        <Cointainer>
+          <CenterDiv>
+            <Logo source={logo} />
+          </CenterDiv>
+          <CenterDiv>
+            <BitcoinImage source={bitcoinImage} />
+          </CenterDiv>
+          <CenterDiv>
+            <HeaderEl>
+              <Header>BitCoin Gift Certificate</Header>
+            </HeaderEl>
+          </CenterDiv>
+          <CenterDiv>
+            <OutlinedText>
+              <TextFields>{email}</TextFields>
+              <SubTextFields>Email Address</SubTextFields>
+            </OutlinedText>
+          </CenterDiv>
+          <CenterDiv>
+            <OutlinedText>
+              <TextFields>{amount} sats</TextFields>
+              <SubTextFields>Amount</SubTextFields>
+            </OutlinedText>
+          </CenterDiv>
+        </Cointainer>
+        <CenterDiv>
+          <HeaderEl>
+            <Instructions>
+              <Text>Claim your BitCoin in 3 Easy Steps:</Text>
+              <Text>1. Visit our website at https://www.satstreet.com</Text>
+              <Text>
+                2. Create your account using the above email address and enter a
+                secure password
+              </Text>
+              <Text>
+                3. Verify your email address by entering the code that was sent
+                to you
+              </Text>
+              <Text>
+                Congrats! You now own BitCoin. Explore our website to learn
+                more.
+              </Text>
+            </Instructions>
+            <Copyright>
+              <Text>Satstreet Inc &copy; 2019</Text>
+            </Copyright>
+          </HeaderEl>
+        </CenterDiv>
+      </Border>
+    </PageEl>
   </Document>
 );
 
