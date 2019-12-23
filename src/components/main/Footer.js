@@ -16,14 +16,11 @@ import mailIcon from '../../images/mail.svg'
 // Styles
 const styles = ({
   container: {
-    alignItems: 'center',
     background: palette.black[-2],
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
-    position: 'absolute',
     textAlign: 'center',
-    top: '100%',
     width: '100%'
   },
 
@@ -33,8 +30,16 @@ const styles = ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    margin: '50px 0 150px 0',
-    width: '100%'
+    margin: '50px 0 calc(100vh / 3) 0',
+    width: '100%',
+
+    '@media (min-height: 2000px)': {
+      margin: '50px 0 calc(100vh / 2) 0'
+    },
+
+    '@media (min-height: 3000px)': {
+      margin: '50px 0 calc(100vh / 1.5) 0'
+    },
   },
 
   leftFooter: {
@@ -141,11 +146,9 @@ class Footer extends Component {
               <img src={twitterIcon} className={classes.linkIcon} alt="" />
               <Link className={classes.linkWithIcon} href={"https://twitter.com/satstreet"} color="inherit" target="_blank">Twitter</Link>
             </div>
-            <Link className={classes.link} href={"/"} color="inherit" target="_blank">FAQ</Link>
             <Link className={classes.link} href={"/"} color="inherit" target="_blank">Terms of use</Link>
             <Link className={classes.link} href={"/"} color="inherit" target="_blank">Privacy policy</Link>
           </div>
-          
         </div>
       </div>
     )

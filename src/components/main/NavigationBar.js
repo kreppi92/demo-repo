@@ -3,18 +3,15 @@ import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
-import Paper from '@material-ui/core/Paper'
-import Typography from '@material-ui/core/Typography'
 import { useMediaQuery } from 'react-responsive'
 import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo-full.png'
 import menuIcon from '../../images/menu.svg'
 import closeIcon from '../../images/close.svg'
-import bitcoinIcon from '../../images/bitcoin.svg'
 import Footer from './Footer'
+import Wallet from './Wallet'
 
-var QRCode = require('qrcode.react')
 
 const options = ["Wallet", "Buy Bitcoin", "Education", "Resources", "Sign out"]
 
@@ -29,16 +26,20 @@ const Default = ({ children }) => {
 }
 
 const styles = {
+  appBarContainer: {
+    alignItems: 'center',
+    background: palette.black[-1],
+    display: 'flex',
+    justifyContent: 'space-between',
+    flexDirection: 'row',
+    height: '80px',
+    width: '100%'
+  },
+
   button: {
     color: palette.gray[1],
     padding: '0 15px 0 15px',
     textDecoration: 'none'
-  },
-
-  selectedButton: {
-    color: palette.blue[0],
-    padding: '0 15px 0 15px',
-    textDecoration: 'underline'
   },
 
   container: {
@@ -47,42 +48,18 @@ const styles = {
     flexDirection: 'column',
   },
 
-  appBarContainer: {
-    alignItems: 'center',
-    background: palette.black[-1],
-    display: 'flex',
-    justifyContent: 'space-between',
-    flexDirection: 'row',
-    height: '80px',
-    width: '100%',
-
-    '@media (min-width:500px)': {
-
-    },
+  divider: {
+    width: '100%'
   },
 
-  contentContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    flexDirection: 'column',
-    alignItems: 'center',
-    padding: '40px 20px 40px 20px',
-
-    '@media (min-width:780px)': {
-      padding: '40px 40px 40px 40px',
-    },
+  footer: {
+    width: '100%'
   },
 
   logoIcon: {
-    margin: '0 0 0 20px',
+    margin: '0 0 0 30px',
     objectFit: 'contain',
     height: '30px',
-  },
-
-  bitcoinIcon: {
-    opacity: 0.2,
-    margin: '80px 0 20px 0',
-    width: '100px'
   },
 
   menuOptionsContainer: {
@@ -97,53 +74,6 @@ const styles = {
   menuIcon: {
     color: palette.blue[0],
     margin: '0 20px 0 0'
-  },
-
-  paperContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    flexWrap: 'wrap',
-    width: '100%',
-
-    '@media (min-width:780px)': {
-      width: '80%',
-    },
-  },
-
-  paper: {
-    boxShadow: 'none',
-    borderRadius: '5px',
-    width: '100%',
-
-    '@media (min-width:780px)': {
-      border: '1px solid',
-      borderColor: palette.gray[0],
-      margin: '90px 0 50px 0',
-      width: '500px'
-    },
-  },
-
-  qrButtonContainer: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    padding: '50px 20px 10px 20px',
-    width: '100%'
-  },
-
-  qrButton: {
-    height: '50px',
-    width: '45%'
-  },
-
-  qrCode: {
-    margin: '30px 0 20px 0'
-  },
-
-  address: {
-    fontSize: '13px'
   },
 
   expandedOption: {
@@ -170,6 +100,19 @@ const styles = {
     fontSize: '16px',
     fontWeight: '700',
     padding: '0 20px 0 20px'
+  },
+
+  mainContent: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    width: '100%'
+  },
+
+  selectedButton: {
+    color: palette.blue[0],
+    padding: '0 15px 0 15px',
+    textDecoration: 'underline'
   }
 }
 
@@ -180,7 +123,6 @@ class NavigationBar extends Component {
   }
 
   handleOptionChange = (option) => {
-    console.log("Option", option)
     this.setState({
       selectedOption: option
     })
@@ -248,41 +190,22 @@ class NavigationBar extends Component {
                 )
               }.bind(this))
               :
-              <div />
+              <Divider className={classes.divider} />
           }
 
         </Mobile>
-        <div className={classes.paperContainer}>
-          <Paper className={classes.paper}>
-            <div className={classes.contentContainer}>
-              <Typography variant="h4" gutterBottom>
-                Balance: 0 Sats
-              </Typography>
+        <Default>
+          <Divider className={classes.divider} />
+        </Default>
 
-              <QRCode className={classes.qrCode} size={200} value="1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9" />
-              <div className={classes.address}>1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9</div>
-              <div className={classes.qrButtonContainer}>
-                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleOnClick}>
-                  Copy address
-                </Button>
-                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleOnClick}>
-                  Send funds
-                </Button>
-              </div>
-            </div>
-          </Paper>
-
-          <Paper className={classes.paper}>
-            <div className={classes.contentContainer}>
-              <Typography variant="h4" gutterBottom>
-                Recent transactions
-              </Typography>
-              <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
-              No recent transactions
-            </div>
-          </Paper>
+        <div className={classes.mainContent}>
+          <Wallet />
         </div>
-        <Footer />
+        
+        
+        <div className={classes.footer}>
+          <Footer />
+        </div>
       </div>
     )
   }

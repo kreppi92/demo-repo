@@ -32,6 +32,11 @@ const styles = {
     },
   },
 
+  footer: {
+    margin: '95vh 0 0 0',
+    width: '100%'
+  },
+
   paper: {
     position: 'absolute',
     width: '100%',
@@ -188,7 +193,9 @@ class ForgotPassword extends Component {
 
           </div>
         </Paper>
-        <Footer />
+        <div className={classes.footer}>
+          <Footer />
+        </div>
       </div>
     )
   }

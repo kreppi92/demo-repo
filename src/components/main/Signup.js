@@ -26,15 +26,20 @@ const styles = {
   },
 
   contentContainer: {
+    alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
-    alignItems: 'center',
     padding: '40px 20px 40px 20px',
 
     '@media (min-width:780px)': {
       padding: '40px 40px 40px 40px',
     },
+  },
+
+  footer: {
+    margin: '95vh 0 0 0',
+    width: '100%'
   },
 
   paper: {
@@ -44,7 +49,7 @@ const styles = {
     borderRadius: '5px',
 
     '@media (min-width:780px)': {
-      top: '20%',
+      top: '16%',
       width: '500px',
       border: '1px solid',
       borderColor: palette.gray[0]
@@ -195,13 +200,11 @@ class Signup extends Component {
     return (
       <div className={classes.container}>
         <Paper className={classes.paper}>
-          <div className={classes.contentContainer}>
-            <img src={logoIcon} className={classes.logoIcon} alt="" />
-
             {
               verificationSent ?
 
-              <div>
+              <div className={classes.contentContainer}>
+                <img src={logoIcon} className={classes.logoIcon} alt="" />
                 <Typography variant="h4" gutterBottom>
                   Thank you for signing up.
                 </Typography>
@@ -218,7 +221,8 @@ class Signup extends Component {
 
               :
 
-              <div>
+              <div className={classes.contentContainer}>
+                <img src={logoIcon} className={classes.logoIcon} alt="" />
                 <Typography variant="h4" gutterBottom>
                   Create an account
                 </Typography>
@@ -278,9 +282,10 @@ class Signup extends Component {
 
               </div>
             }
-          </div>
         </Paper>
-        <Footer />
+        <div className={classes.footer}>
+          <Footer />
+        </div>
       </div>
     )
   }

@@ -22,15 +22,20 @@ const styles = {
   }, 
 
   contentContainer: {
+    alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
     flexDirection: 'column',
-    alignItems: 'center',
     padding: '40px 20px 40px 20px',
 
     '@media (min-width:780px)': {
       padding: '40px 40px 40px 40px',
     },
+  },
+
+  footer: {
+    margin: '95vh 0 0 0',
+    width: '100%'
   },
 
   paper: {
@@ -40,7 +45,7 @@ const styles = {
     borderRadius: '5px',
 
     '@media (min-width:780px)': {
-      top: '20%',
+      top: '16%',
       width: '500px',
       border: '1px solid',
       borderColor: palette.gray[0]
@@ -221,7 +226,9 @@ class Signin extends Component {
 
           </div>
         </Paper>
-        <Footer />
+        <div className={classes.footer}>
+          <Footer />
+        </div>
       </div>
     )
   }

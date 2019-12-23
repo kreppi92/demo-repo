@@ -8,6 +8,7 @@ import Main from './components/main/Main'
 import Signup from './components/main/Signup'
 import ForgotPassword from './components/main/ForgotPassword'
 import Terms from './components/main/Terms'
+import NavigationBar from './components/main/NavigationBar'
 
 ReactDOM.render((
   <MuiThemeProvider theme={mainTheme}>
@@ -17,6 +18,7 @@ ReactDOM.render((
         <Route exact path='/create_account' component={() => <Signup />} />
         <Route exact path='/forgot_password' component={() => <ForgotPassword />} />
         <Route exact path='/terms' component={() => <Terms />} />
+        <Route exact path='/home' component={() => <NavigationBar />} />
       </Switch>
     </BrowserRouter>
   </MuiThemeProvider>
