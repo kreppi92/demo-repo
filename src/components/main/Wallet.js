@@ -18,9 +18,10 @@ import Deposit from './Transactions/Deposit'
 import Transaction from './Transactions/Transaction'
 import Firebase from '../../constants/firebase'
 import CustomSnackbar from '../shared/CustomSnackbar'
-import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver";
-import Certificate from "./Certificate";
+import { pdf } from "@react-pdf/renderer"
+import { saveAs } from "file-saver"
+import { CopyToClipboard } from 'react-copy-to-clipboard'
+import Certificate from "./Certificate"
 
 var bitcoinConverter = require('bitcoin-units')
 var currencyFormatter = require('currency-formatter')
@@ -657,7 +658,8 @@ class Wallet extends Component {
 
               <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value={address} />
               <div className={classes.address}>{address}</div>
-              <a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a>
+              <CopyToClipboard text={address}><a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a></CopyToClipboard>
+              
               <div className={classes.qrButtonContainer}>
                 <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
                   Send
