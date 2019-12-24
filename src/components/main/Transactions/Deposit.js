@@ -4,6 +4,8 @@ import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../../constants/styles'
 
+const moment = require('moment')
+
 const styles = {
   blueText: {
     color: palette.blue[0],
@@ -99,11 +101,11 @@ class Deposit extends Component {
       <div className={classes.container}>
         <div className={classes.contentContainer}>
           <div className={classes.leftContent}>
-            <div className={classes.topLeftContent}>{deposit.date} {deposit.confirmed ? <span className ={classes.greenText}> • Confirmed</span> : <span className ={classes.blueText}> • Pending</span>}</div>
-             <div className={classes.bottomLeftContent}>{deposit.from}</div>
+            <div className={classes.topLeftContent}>{moment(deposit.date).format("MMM D, YYYY")} {deposit.state === "confirmed" ? <span className ={classes.greenText}> • Confirmed</span> : <span className ={classes.blueText}> • Pending</span>}</div>
+             <div className={classes.bottomLeftContent}>{deposit.inputs[0].address}</div>
           </div>
           <div className={classes.rightContent}>
-            {deposit.amount} Sats
+            {deposit.valueString} Sats
         </div>
         </div>
         <Divider />
