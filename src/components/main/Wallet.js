@@ -16,9 +16,11 @@ import closeIcon from '../../images/close.svg'
 import Chart from './Chart'
 import Deposit from './Transactions/Deposit'
 import Transaction from './Transactions/Transaction'
+import Firebase from '../../constants/firebase'
 import CustomSnackbar from '../shared/CustomSnackbar'
 
 var QRCode = require('qrcode.react')
+var store = require('store')
 
 const EMAIL = "email"
 const GIFT = "gift"
@@ -26,6 +28,10 @@ const GIFT = "gift"
 const styles = {
   address: {
     fontSize: '13px'
+  },
+
+  circularProgress: {
+    color: palette.blue[0]
   },
 
   bitcoinIcon: {
@@ -148,6 +154,23 @@ const styles = {
     },
   },
 
+  paperOptionsEmpty: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    minHeight: '500px',
+    minWidth: '300px',
+    width: '100%',
+
+    '@media (min-width:780px)': {
+      border: '1px solid',
+      borderColor: palette.gray[0],
+      margin: '10vh 0 10vh 0',
+      width: '30%'
+    },
+  },
+
   paperChart: {
     boxShadow: 'none',
     borderRadius: '5px',
@@ -213,6 +236,7 @@ const styles = {
 
 class Wallet extends Component {
   state = {
+    address: '',
     email: '',
     emailHelperText: '',
     emailError: false,
@@ -231,6 +255,32 @@ class Wallet extends Component {
     snackbarIsOpen: false,
     snackbarVariant: 'success',
     snackbarMessage: ''
+  }
+
+  componentDidMount() {
+    if (store.get('token')) {
+      this.getWalletAddress(store.get('token'))
+    }
+  }
+
+  getWalletAddress = (token) => {
+    var checkAddress = Firebase.functions().httpsCallable('checkAddress')
+    checkAddress({ token: token }).then(function (result) {
+      if (result.data.success) {
+        this.setState({ address: result.data.address })
+      } else {
+        this.displaySnackbar('error', result.data.error)
+      }
+      this.setState({ isLoading: false })
+    }.bind(this))
+  }
+
+  displaySnackbar = (variant, message) => {
+    this.setState({
+      snackbarIsOpen: true,
+      snackbarVariant: variant,
+      snackbarMessage: message
+    })
   }
 
   handleCopyCode = () => {
@@ -298,18 +348,16 @@ class Wallet extends Component {
 
     setTimeout(
       function () {
-        this.setState({
-          sendDialogOpen: false,
-          email: '',
-          amount: '',
-          pendingConfirmation: false,
-          isLoading: false
-        })
-
         // for gift
         if (transactionType === GIFT) {
           this.downloadGift()
-        } 
+        }
+
+        this.setState({
+          sendDialogOpen: false,
+          pendingConfirmation: false,
+          isLoading: false
+        })
 
       }.bind(this),
       1000,
@@ -369,18 +417,18 @@ class Wallet extends Component {
 
     if (transactionListType === "sent") {
       if (sentList.length === 0) {
-        return(
+        return (
           <div className={classes.listEmpty}>
             <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
             No sent transactions
           </div>
         )
       } else {
-        return(
+        return (
           <div className={classes.list}>
             {
-              sentList.map((transaction, index) => 
-                <Transaction key={index} transaction={transaction}/>
+              sentList.map((transaction, index) =>
+                <Transaction key={index} transaction={transaction} />
               )
             }
           </div>
@@ -389,18 +437,18 @@ class Wallet extends Component {
     } else if (transactionListType === "received") {
 
       if (receivedList.length === 0) {
-        return(
+        return (
           <div className={classes.listEmpty}>
             <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
             No received transactions
           </div>
         )
       } else {
-        return(
+        return (
           <div className={classes.list}>
             {
-              receivedList.map((transaction, index) => 
-                <Transaction key={index} transaction={transaction}/>
+              receivedList.map((transaction, index) =>
+                <Transaction key={index} transaction={transaction} />
               )
             }
           </div>
@@ -408,18 +456,18 @@ class Wallet extends Component {
       }
     } else if (transactionListType === "deposits") {
       if (depositList.length === 0) {
-        return(
+        return (
           <div className={classes.listEmpty}>
             <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
             No deposits
           </div>
         )
       } else {
-        return(
+        return (
           <div className={classes.list}>
             {
-              depositList.map((deposit, index) => 
-                <Deposit key={index} deposit={deposit}/>
+              depositList.map((deposit, index) =>
+                <Deposit key={index} deposit={deposit} />
               )
             }
           </div>
@@ -429,31 +477,44 @@ class Wallet extends Component {
   }
 
   render() {
-    const { email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
+    const { address, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
     const { classes } = this.props
 
     return (
       <div className={classes.container}>
-        <Paper className={classes.paperOptions}>
-          <div className={classes.contentContainer}>
-            <Typography variant="h4" gutterBottom>
-              0 Sats
-            </Typography>
+        {address !== "" ?
+          <Paper className={classes.paperOptions}>
+            <div className={classes.contentContainer}>
+              <Typography variant="h4" gutterBottom>
+                0 Sats
+              </Typography>
               0 BTC - $0.00
 
-            <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value="1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9" />
-            <div className={classes.address}>1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9</div>
-            <a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a>
-            <div className={classes.qrButtonContainer}>
-              <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
-                Send
-                </Button>
-              <Button className={classes.qrButton} size="small" variant={'contained'} color="secondary" onClick={this.handleViewTransactions}>
-                View transactions
-                </Button>
+              <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value={address} />
+              <div className={classes.address}>{address}</div>
+              <a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a>
+              <div className={classes.qrButtonContainer}>
+                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
+                  Send
+                  </Button>
+                <Button className={classes.qrButton} size="small" variant={'contained'} color="secondary" onClick={this.handleViewTransactions}>
+                  View transactions
+                  </Button>
+              </div>
             </div>
-          </div>
-        </Paper>
+          </Paper>
+          :
+          <Paper className={classes.paperOptionsEmpty}>
+            <CircularProgress
+              className={classes.circularProgress}
+              variant="indeterminate"
+              disableShrink
+              size={24}
+              thickness={4}
+            />
+          </Paper>
+        }
+
 
         <Paper className={classes.paperChart}>
           <Chart />
@@ -577,7 +638,7 @@ class Wallet extends Component {
           <div className={classes.dialogContent}>
             <div className={classes.dialogTitleContainer}>
               Transactions
-              
+
               <IconButton aria-label="menu" className={classes.closeIcon} onClick={this.handleTransactionDialogClose}>
                 <img src={closeIcon} className={classes.iconButton} alt="" />
               </IconButton >
@@ -598,13 +659,13 @@ class Wallet extends Component {
                 Deposits
               </ToggleButton>
             </ToggleButtonGroup>
-            
-            { this.getTransactions() }
+
+            {this.getTransactions()}
 
           </div>
         </Dialog>
 
-        <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose}/>
+        <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose} />
 
       </div>
     )

@@ -6,6 +6,7 @@ var rp = require('request-promise')
 
 const jwtToken = functions.config().jwt.token
 const sendgridKey = functions.config().sendgrid.key
+const satstreetToken = functions.config().satstreet.token
 
 admin.initializeApp()
 
@@ -146,7 +147,7 @@ exports.signUp = functions.https.onCall((data, context) => {
       })
       if (documentId === "") {
         var hash = bcrypt.hashSync(password, 10)
-        let userData = { email: email, password: hash, verified: true }
+        let userData = { email: email, password: hash, verified: true, address: "" }
         
         return admin.firestore().collection('users').add(userData)
         .then(writeResult => {
@@ -197,46 +198,71 @@ exports.signIn = functions.https.onCall((data, context) => {
   })
 })
 
-exports.sendEmail = functions.https.onCall((data, context) => {
-  const email = data.email
+exports.checkAddress = functions.https.onCall((data, context) => {
+  const token = data.token
 
-  let authorization = "Bearer " + sendgridKey
-  let url = 'https://api.sendgrid.com/v3/mail/send'
-  let options = {
-    method: 'POST',
-    url: url,
-    headers: {
-      Authorization: authorization
-    },
-    json: true
-  }
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const email = decoded.email
+      return admin.firestore().collection("users").where("email", "==", email).get()
+      .then(function (querySnapshot) {
+        var address = ""
+        var documentId = ""
+        querySnapshot.forEach(function (doc) {
+          documentId = doc.id
+          address = doc.data().address
+        })
 
-  options.body = {
-    from: {
-      email:'info@satstreet.com'
-    },
-    template_id:'d-5b71dd36091c4720bca38449b16d4808',
-    personalizations:[
-      {
-        to:[
-          {
-             email:email
+        if (documentId === "") {
+          // User not found
+          return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+        } else {
+          if (address === "") {
+            let authorization = satstreetToken
+            let url = 'https://bitgo.satstreetservices.com/getAddress'
+            let options = {
+              method: 'GET',
+              url: url,
+              headers: {
+                Authorization: authorization
+              },
+              json: true
+            }
+
+            options.body = {
+              walletId: "5df0646eb1138b4807c67ce3a37d9eea"
+            }
+
+            return rp(options).then(function (response) {
+              const generatedAddress = response.address
+              console.log("Generated address", generatedAddress)
+              let userData = { address: generatedAddress }
+              return admin.firestore().collection('users').doc(documentId).update(userData)
+              .then(writeResult => {
+                return rp(options).then(function (response) {
+                  return { "success": true, address: generatedAddress }
+                })
+                .catch(function (error) {
+                  console.log("Error is", error)
+                  return { "success": false , error: "There was an error generating the wallet address. Please try again later."}
+                })
+              })
+            })
+            .catch(function (error) {
+              console.log("Error is", error)
+              return { "success": false , error: "There was an error generating the wallet address. Please try again later."}
+            })
+          } else {
+            // Return the existing address
+            return { "success": true, address: address }
           }
-        ],
-        dynamic_template_data: {
-          link:"http://localhost:3000?verify=true",
         }
-      }
-    ]
-  }
-
-  return rp(options).then(function (response) {
-    return { "success": true }
-  })
-  .catch(function (error) {
-    console.log("Error is", error)
-    return { "success": false , error: "There was an error sending the verification email. Please try again later."}
+      })
+      .catch(err => {
+        return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
   })
 })
-
-
