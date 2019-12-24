@@ -1,4 +1,3 @@
-// React
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { withStyles } from '@material-ui/core/styles'
@@ -14,22 +13,23 @@ const styles = {
   }
 }
 
-class Landing extends Component {
+class Chart extends Component {
   state = {
   }
 
   render() {
     const { classes } = this.props
-    
+
     return (
-      <div>
+      <div className={classes.container}>
+        <iframe src="https://widget.coinlib.io/widget?type=chart&theme=light&coin_id=859&pref_coin_id=1507" width="99%" height="490px" scrolling="auto" marginwidth="0" marginheight="0" frameborder="0" border="0"></iframe>
       </div>
     )
-  } 
+  }
 }
 
-Landing.propTypes = {
+Chart.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Landing)
+export default withStyles(styles)(Chart)
