@@ -6,7 +6,8 @@ export const palette = {
     '-2': '#f3f3f3',
     '-1': '#f2f2f2',
     '0': '#DADCE0',
-    '1': '#9e9e9e'
+    '1': '#9e9e9e',
+    '2': BlueGrey[500]
   },
 
   blue: {

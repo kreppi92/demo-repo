@@ -346,7 +346,7 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
             transactions.push(transaction)
           })
 
-          return { "success": false, "transactions": transactions }
+          return { "success": true, "transactions": transactions }
         })
         .catch(err => {
           return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
@@ -407,7 +407,7 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
 
       options.body = {
         from: {
-          email: fromEmail
+          email: 'info@satstreet.com'
         },
         template_id: 'd-337cfdfd328248f68c24d1b28df89bcf',
         personalizations: [
@@ -418,6 +418,7 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
               }
             ],
             dynamic_template_data: {
+              senderEmail: fromEmail,
               satAmount: amount,
               btcAmount: btcAmount
             }
@@ -432,7 +433,29 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
         console.log("Error is", error)
         return { "success": false, error: "There was an error sending the email. Please try again later." }
       })
-
     }
+  })
+})
+
+exports.getRate = functions.https.onCall((data, context) => {
+  const currency = data.currency
+
+  let authorization = "Bearer " + sendgridKey
+  let url = 'https://api.coindesk.com/v1/bpi/currentprice/' + currency +'.json'
+  let options = {
+    method: 'GET',
+    url: url,
+    headers: {
+      Authorization: authorization
+    },
+    json: true
+  }
+
+  return rp(options).then(function (response) {
+    return { "success": true , rate: response.bpi[currency].rate_float}
+  })
+  .catch(function (error) {
+    console.log("Error is", error)
+    return { "success": false, error: "There was an error sending the email. Please try again later." }
   })
 })
