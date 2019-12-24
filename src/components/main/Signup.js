@@ -2,6 +2,9 @@ import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
 import CircularProgress from '@material-ui/core/CircularProgress'
+import Checkbox from '@material-ui/core/Checkbox'
+import FormControl from '@material-ui/core/FormControl'
+import FormHelperText from '@material-ui/core/FormHelperText'
 import Paper from '@material-ui/core/Paper'
 import Typography from '@material-ui/core/Typography'
 import TextField from '@material-ui/core/TextField'
@@ -23,6 +26,18 @@ const styles = {
     margin: '30px 0 0 0'
   },
 
+  checkBoxContainer: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'row',
+    fontSize: '12px',
+    fontWeight: 'normal',
+    justifyContent: 'flex-start',
+    lineHeight: '16px',
+    letterSpacing: 0.2,
+    margin: '0 0 5px -10px'
+  },
+
   container: {
     display: 'flex',
     justifyContent: 'center'
@@ -38,6 +53,12 @@ const styles = {
     '@media (min-width:780px)': {
       padding: '40px 40px 40px 40px',
     },
+  },
+
+  formHelperText: {
+    fontWeight: 'normal',
+    letterSpacing: 0.2,
+    margin: '10px 0 20px 0'
   },
 
   footer: {
@@ -75,6 +96,11 @@ const styles = {
     justifyContent: 'space-between',
     margin: '25px 0 30px 0',
     width: '100%'
+  },
+
+  linkTerms: {
+    color: palette.gray[2],
+    fontWeight: '700'
   },
 
   link: {
@@ -132,7 +158,22 @@ class Signup extends Component {
       passwordHelperText: '',
       passwordError: false,
       codeHelperText: '',
-      codeError: false
+      codeError: false,
+      terms: false,
+      termsError: false
+    })
+  }
+
+  onKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      this.validateForms()
+    }
+  }
+
+  handleTermsChange = name => event => {
+    this.setState({
+      [name]: event.target.checked,
+      termsError: false
     })
   }
 
@@ -141,10 +182,11 @@ class Signup extends Component {
   }
 
   validateForms() {
-    const { email, password } = this.state
+    const { email, password, terms } = this.state
 
     var emailHasError = false
     var emailErrorText = ""
+    var termsError = !terms
 
     if (email === "") {
       emailHasError = true
@@ -159,19 +201,20 @@ class Signup extends Component {
       passwordErrorText = "Please enter a password."
     }
 
-    if (emailHasError || passwordHasError) {
-      this.displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText)
+    if (emailHasError || passwordHasError || termsError) {
+      this.displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText, termsError)
     } else {
       this.sendVerificationCode()
     }
   }
 
-  displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText) {
+  displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText, termsError) {
     this.setState({
       emailError: emailHasError,
       emailHelperText: emailErrorText,
       passwordError: passwordHasError,
-      passwordHelperText: passwordErrorText
+      passwordHelperText: passwordErrorText,
+      termsError: termsError
     })
   }
 
@@ -255,7 +298,7 @@ class Signup extends Component {
 
   render() {
     const { classes } = this.props
-    const { code, codeError, codeHelperText, email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading, snackbarIsOpen, snackbarMessage, snackbarVariant, verificationSent } = this.state
+    const { code, codeError, codeHelperText, email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading, snackbarIsOpen, snackbarMessage, snackbarVariant, verificationSent, terms, termsError } = this.state
 
     return (
       <div className={classes.container}>
@@ -348,6 +391,15 @@ class Signup extends Component {
                   onChange={this.handleChange('password')}
                   variant="outlined"
                 />
+
+              <FormControl required error={termsError} component="fieldset" fullWidth>
+                <div className={classes.checkBoxContainer}>
+                  <Checkbox checked={terms} onChange={this.handleTermsChange('terms')} value="terms" color="primary" />
+                  <div>I agree to the <a className={classes.linkTerms} href={"/terms"} target="_blank" rel="noopener noreferrer">terms of use</a> and <a className={classes.linkTerms} href={"/privacy"} target="_blank" rel="noopener noreferrer">privacy policy</a>.</div>
+                </div>
+
+                {termsError ? <FormHelperText className={classes.formHelperText} error>You must agree to the terms of use and privacy policy to proceed.</FormHelperText> : <div />}
+              </FormControl>
 
                 <Button
                   className={classes.button}
