@@ -10,6 +10,9 @@ import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo.png'
 import Footer from './Footer'
 import Firebase from '../../constants/firebase'
+import CustomSnackbar from '../shared/CustomSnackbar'
+
+var store = require('store')
 
 const styles = {
   button: {
@@ -91,7 +94,10 @@ class Signin extends Component {
     emailError: false,
     password: '',
     passwordHelperText: '',
-    passwordError: false
+    passwordError: false,
+    snackbarIsOpen: false,
+    snackbarVariant: 'success',
+    snackbarMessage: ''
   }
 
   handleChange = name => event => {
@@ -143,15 +149,31 @@ class Signin extends Component {
     })
   }
 
+  onSnackBarClose = () => {
+    this.setState({
+      snackbarIsOpen: false
+    })
+  }
+
+  displaySnackbar = (variant, message) => {
+    this.setState({
+      snackbarIsOpen: true,
+      snackbarVariant: variant,
+      snackbarMessage: message
+    })
+  }
+
   signUserIn(email, password) { 
     this.setState({ isLoading: true })
 
     var signIn = Firebase.functions().httpsCallable('signIn')
     signIn({ email: email, password: password, verify: true}).then(function (result) {
       if (result.data.success) {
-        alert(result.data.token)
+        store.set('token', result.data.token)
+        this.displaySnackbar('success', 'Successfully signed in.')
+        window.location = '/home'
       } else {
-        alert(result.data.error)
+        this.displaySnackbar('error', result.data.error)
       }
       this.setState({ isLoading: false })
     }.bind(this))
@@ -159,7 +181,7 @@ class Signin extends Component {
 
   render() {
     const { classes } = this.props
-    const { email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading } = this.state
+    const { email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading, snackbarIsOpen, snackbarMessage, snackbarVariant } = this.state
 
     return (
       <div className={classes.container}>
@@ -229,6 +251,8 @@ class Signin extends Component {
         <div className={classes.footer}>
           <Footer />
         </div>
+
+        <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose}/>
       </div>
     )
   }

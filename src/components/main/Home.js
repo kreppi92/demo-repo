@@ -12,6 +12,7 @@ import closeIcon from '../../images/close.svg'
 import Footer from './Footer'
 import Wallet from './Wallet'
 
+var store = require('store')
 
 const options = ["Wallet", "Buy Bitcoin", "Education", "Resources", "Sign out"]
 
@@ -116,13 +117,24 @@ const styles = {
   }
 }
 
-class NavigationBar extends Component {
+class Home extends Component {
+
+  componentWillMount() {
+    if (!store.get('token')) {
+        window.location = '/signin'
+    }
+  }
+
   state = {
     isExpanded: false,
     selectedOption: options[0]
   }
 
   handleOptionChange = (option) => {
+    if (option === "Sign out") {
+      store.clearAll()
+      window.location = '/signin'
+    }
     this.setState({
       selectedOption: option
     })
@@ -141,78 +153,88 @@ class NavigationBar extends Component {
     const { classes } = this.props
 
     return (
-      <div className={classes.container}>
-        <div className={classes.appBarContainer}>
-          <img src={logoIcon} className={classes.logoIcon} alt="" />
+      <div>
+        { store.get('token') ? 
+        
+          <div className={classes.container}>
+          <div className={classes.appBarContainer}>
+            <img src={logoIcon} className={classes.logoIcon} alt="" />
+            <Mobile>
+              {
+                isExpanded ?
+
+                  < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
+                    <img src={closeIcon} className={classes.iconButton} alt="" />
+                  </IconButton >
+
+                  :
+
+                  < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
+                    <img src={menuIcon} className={classes.iconButton} alt="" />
+                  </IconButton >
+              }
+
+            </Mobile>
+            <Default>
+              <div className={classes.menuOptionsContainer}>
+                {
+                  options.map(function(option, i){
+                    return (
+                    <Button key={option} className={ option === selectedOption ? classes.selectedButton : classes.button } onClick={() => this.handleOptionChange(option)}>
+                      {option}
+                    </Button>
+                    )
+                  }.bind(this))
+                }
+              </div>
+            </Default>
+          </div>
           <Mobile>
             {
               isExpanded ?
-
-                < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
-                  <img src={closeIcon} className={classes.iconButton} alt="" />
-                </IconButton >
-
+                options.map(function(option, i){
+                  return (
+                    <div key={option} onClick={() => this.handleOptionChange(option)}>
+                      <div className={classes.expandedOption}>
+                        <div className={ option === selectedOption ? classes.expandedOptionTextSelected : classes.expandedOptionTextUnselected }>
+                          {option}
+                        </div>
+                      </div>
+                      <Divider />
+                    </div>
+                  )
+                }.bind(this))
                 :
-
-                < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
-                  <img src={menuIcon} className={classes.iconButton} alt="" />
-                </IconButton >
+                <Divider className={classes.divider} />
             }
 
           </Mobile>
           <Default>
-            <div className={classes.menuOptionsContainer}>
-              {
-                options.map(function(option, i){
-                  return (
-                  <Button key={option} className={ option === selectedOption ? classes.selectedButton : classes.button } onClick={() => this.handleOptionChange(option)}>
-                    {option}
-                  </Button>
-                  )
-                }.bind(this))
-              }
-            </div>
+            <Divider className={classes.divider} />
           </Default>
-        </div>
-        <Mobile>
-          {
-            isExpanded ?
-              options.map(function(option, i){
-                return (
-                  <div key={option} onClick={() => this.handleOptionChange(option)}>
-                    <div className={classes.expandedOption}>
-                      <div className={ option === selectedOption ? classes.expandedOptionTextSelected : classes.expandedOptionTextUnselected }>
-                        {option}
-                      </div>
-                    </div>
-                    <Divider />
-                  </div>
-                )
-              }.bind(this))
-              :
-              <Divider className={classes.divider} />
-          }
 
-        </Mobile>
-        <Default>
-          <Divider className={classes.divider} />
-        </Default>
-
-        <div className={classes.mainContent}>
-          <Wallet />
+          <div className={classes.mainContent}>
+            <Wallet />
+          </div>
+          
+          
+          <div className={classes.footer}>
+            <Footer />
+          </div>
         </div>
         
-        
-        <div className={classes.footer}>
-          <Footer />
-        </div>
+        :
+
+        <div />
+      }
       </div>
+      
     )
   }
 }
 
-NavigationBar.propTypes = {
+Home.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(NavigationBar)
+export default withStyles(styles)(Home)

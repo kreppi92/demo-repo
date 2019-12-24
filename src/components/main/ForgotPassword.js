@@ -187,7 +187,7 @@ class ForgotPassword extends Component {
             </Button>
 
             <div className={classes.linkContainer}>
-              <a className={classes.link} href={"/"}>Sign in</a>
+              <a className={classes.link} href={"/signin"}>Sign in</a>
               <a className={classes.link} href={"/create_account"}>Create an account</a>
             </div>
 

@@ -20,6 +20,7 @@ const styles = {
 
 class Terms extends Component {
   state = {
+  
   }
 
   render() {

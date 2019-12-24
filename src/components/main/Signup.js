@@ -10,6 +10,9 @@ import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo.png'
 import Footer from './Footer'
 import Firebase from '../../constants/firebase'
+import CustomSnackbar from '../shared/CustomSnackbar'
+
+var store = require('store')
 
 const styles = {
   boldText: {
@@ -70,7 +73,7 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
-    margin: '25px 0 0 0',
+    margin: '25px 0 30px 0',
     width: '100%'
   },
 
@@ -98,7 +101,7 @@ const styles = {
 
   verificationText: {
     fontSize: '15px',
-    margin: '30px 0 40px 0',
+    margin: '30px 0 0 0',
     letterSpacing: 0.3,
     lineHeight: '20px',
   }
@@ -106,13 +109,19 @@ const styles = {
 
 class Signup extends Component {
   state = {
+    code: '',
+    codeHelperText: '',
+    codeError: false,
     email: '',
     emailHelperText: '',
     emailError: false,
     password: '',
     passwordHelperText: '',
     passwordError: false,
-    verificationSent: false
+    verificationSent: false,
+    snackbarIsOpen: false,
+    snackbarVariant: 'success',
+    snackbarMessage: ''
   }
 
   handleChange = name => event => {
@@ -121,7 +130,9 @@ class Signup extends Component {
       emailHelperText: '',
       emailError: false,
       passwordHelperText: '',
-      passwordError: false
+      passwordError: false,
+      codeHelperText: '',
+      codeError: false
     })
   }
 
@@ -151,7 +162,7 @@ class Signup extends Component {
     if (emailHasError || passwordHasError) {
       this.displayFormError(emailHasError, emailErrorText, passwordHasError, passwordErrorText)
     } else {
-      this.createAccount(email, password)
+      this.sendVerificationCode()
     }
   }
 
@@ -164,38 +175,87 @@ class Signup extends Component {
     })
   }
 
-  createAccount = (email, password) => {
+  onSnackBarClose = () => {
+    this.setState({
+      snackbarIsOpen: false
+    })
+  }
+
+  displaySnackbar = (variant, message) => {
+    this.setState({
+      snackbarIsOpen: true,
+      snackbarVariant: variant,
+      snackbarMessage: message,
+      isLoading: false
+    })
+  }
+
+  sendVerificationCode = () => {
+    const { email } = this.state
+
     this.setState({ isLoading: true })
 
-    var signUp = Firebase.functions().httpsCallable('signUp')
-    signUp({ email: email, password: password }).then(function (result) {
+    var generateCode = Firebase.functions().httpsCallable('generateCode')
+    generateCode({ email: email }).then(function (result) {
       if (result.data.success) {
-        this.sendEmail()
+        this.setState({ 
+          verificationSent: true,
+          isLoading: false
+         })
       } else {
-        alert(result.data.error)
-        this.setState({ isLoading: false })
+        this.displaySnackbar('error', result.data.error)
       }
     }.bind(this))
   }
 
-  sendEmail = () => {
-    const { email } = this.state
+  handleCodeVerification = () => {
+    const { email, code } = this.state
 
-    var sendEmail = Firebase.functions().httpsCallable('sendEmail')
-    sendEmail({ email: email }).then(function (result) {
+    var codeHasError = false
+    var codeErrorText = ""
+
+    if (code === "") {
+      codeHasError = true
+      codeErrorText = "Please enter your verification code."
+    }
+
+    if (codeHasError) {
+      this.setState({
+        codeError: codeHasError,
+        codeHelperText: codeErrorText,
+      })
+    } else {
+      this.setState({ isLoading: true })
+
+      var verifyCode = Firebase.functions().httpsCallable('verifyCode')
+      verifyCode({ email: email, code: code }).then(function (result) {
+        if (result.data.success) {
+          this.createAccount()
+        } else {
+          this.displaySnackbar('error', result.data.error)
+        }
+      }.bind(this))
+    }
+  }
+
+  createAccount = () => {
+    const { email, password } = this.state
+
+    var signUp = Firebase.functions().httpsCallable('signUp')
+    signUp({ email: email, password: password }).then(function (result) {
       if (result.data.success) {
-        this.setState({ verificationSent: true})
+        store.set('token', result.data.token)
+        this.displaySnackbar('success', "Account successfully created.")
+        window.location = '/home'
       } else {
-        alert(result.data.error)
+        this.displaySnackbar('error', result.data.error)
       }
-
-      this.setState({ isLoading: false })
     }.bind(this))
   }
 
   render() {
     const { classes } = this.props
-    const { email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading, verificationSent } = this.state
+    const { code, codeError, codeHelperText, email, emailHelperText, emailError, password, passwordHelperText, passwordError, isLoading, snackbarIsOpen, snackbarMessage, snackbarVariant, verificationSent } = this.state
 
     return (
       <div className={classes.container}>
@@ -206,16 +266,50 @@ class Signup extends Component {
               <div className={classes.contentContainer}>
                 <img src={logoIcon} className={classes.logoIcon} alt="" />
                 <Typography variant="h4" gutterBottom>
-                  Thank you for signing up.
+                  Confirm verification
                 </Typography>
 
                 <div className={classes.verificationText}>
-                  We just sent a confirmation link to <span className={classes.boldText}>{email}</span>.<br /><br />If you did not receive it in your main inbox, please check your junk folder.
+                  Please enter the 6 digit verification code sent to <span className={classes.boldText}>{email}</span>.<br /><br />If you did not receive it in your main inbox, please check your junk folder.
                 </div>
 
+                <TextField
+                  fullWidth
+                  error={codeError}
+                  className={classes.textField}
+                  id="outlined-code"
+                  label="Code"
+                  name="code"
+                  type="text"
+                  helperText={codeHelperText}
+                  value={code}
+                  onChange={this.handleChange('code')}
+                  variant="outlined"
+                />
+
+                <Button
+                  className={classes.button}
+                  size="large"
+                  variant={'contained'}
+                  color="primary"
+                  fullWidth
+                  onClick={this.handleCodeVerification}
+                >
+                  {isLoading ? (
+                    <CircularProgress
+                      variant="indeterminate"
+                      disableShrink
+                      size={24}
+                      thickness={4}
+                    />
+                  ) : (
+                      'Verify code'
+                  )}
+                </Button>
+
                 <div className={classes.linkContainerVerification}>
-                  <a className={classes.link} href={"#"} onClick={this.sendEmail}>Resend confirmation email?</a>
-                  <a className={classes.link} href={"/"}>Sign in</a>
+                  <a className={classes.link} href={"#"} onClick={this.sendVerificationCode}>Resend activation code?</a>
+                  <a className={classes.link} href={"/signin"}>Sign in</a>
                 </div>
               </div>
 
@@ -277,7 +371,7 @@ class Signup extends Component {
 
                 <div className={classes.linkContainer}>
                   <div />
-                  <a className={classes.link} href={"/"}>Existing account? Sign in now</a>
+                  <a className={classes.link} href={"/signin"}>Existing account? Sign in now</a>
                 </div>
 
               </div>
@@ -286,6 +380,7 @@ class Signup extends Component {
         <div className={classes.footer}>
           <Footer />
         </div>
+        <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose}/>
       </div>
     )
   }

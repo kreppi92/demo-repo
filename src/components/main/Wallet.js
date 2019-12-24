@@ -14,6 +14,9 @@ import { palette } from '../../constants/styles'
 import bitcoinIcon from '../../images/bitcoin.svg'
 import closeIcon from '../../images/close.svg'
 import Chart from './Chart'
+import Deposit from './Transactions/Deposit'
+import Transaction from './Transactions/Transaction'
+import CustomSnackbar from '../shared/CustomSnackbar'
 
 var QRCode = require('qrcode.react')
 
@@ -115,7 +118,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     overflow: 'auto',
-    height: '350px'
+    height: '340px',
+    margin: '20px 0 0 0'
   },
 
   listEmpty: {
@@ -123,8 +127,9 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'center',
+    margin: '20px 0 0 0',
     overflow: 'auto',
-    height: '350px'
+    height: '340px'
   },
 
   paperOptions: {
@@ -219,7 +224,27 @@ class Wallet extends Component {
     transactionDialogOpen: false,
     pendingConfirmation: false,
     isLoading: false,
-    transactionType: EMAIL
+    transactionType: EMAIL,
+    receivedList: [],
+    sentList: [],
+    depositList: [],
+    snackbarIsOpen: false,
+    snackbarVariant: 'success',
+    snackbarMessage: ''
+  }
+
+  handleCopyCode = () => {
+    this.setState({
+      snackbarIsOpen: true,
+      snackbarVariant: 'success',
+      snackbarMessage: "Your wallet address was successfully copied."
+    })
+  }
+
+  onSnackBarClose = () => {
+    this.setState({
+      snackbarIsOpen: false,
+    })
   }
 
   handleChange = name => event => {
@@ -267,6 +292,8 @@ class Wallet extends Component {
   }
 
   handleConfirmTransaction = () => {
+    const { transactionType } = this.state
+
     this.setState({ isLoading: true })
 
     setTimeout(
@@ -278,9 +305,21 @@ class Wallet extends Component {
           pendingConfirmation: false,
           isLoading: false
         })
+
+        // for gift
+        if (transactionType === GIFT) {
+          this.downloadGift()
+        } 
+
       }.bind(this),
       1000,
     )
+  }
+
+  // Download the gift certificate
+  downloadGift() {
+    const { email, amount } = this.state
+
   }
 
   validateForms(type) {
@@ -324,8 +363,73 @@ class Wallet extends Component {
     })
   }
 
+  getTransactions() {
+    const { transactionListType, sentList, receivedList, depositList } = this.state
+    const { classes } = this.props
+
+    if (transactionListType === "sent") {
+      if (sentList.length === 0) {
+        return(
+          <div className={classes.listEmpty}>
+            <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
+            No sent transactions
+          </div>
+        )
+      } else {
+        return(
+          <div className={classes.list}>
+            {
+              sentList.map((transaction, index) => 
+                <Transaction key={index} transaction={transaction}/>
+              )
+            }
+          </div>
+        )
+      }
+    } else if (transactionListType === "received") {
+
+      if (receivedList.length === 0) {
+        return(
+          <div className={classes.listEmpty}>
+            <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
+            No received transactions
+          </div>
+        )
+      } else {
+        return(
+          <div className={classes.list}>
+            {
+              receivedList.map((transaction, index) => 
+                <Transaction key={index} transaction={transaction}/>
+              )
+            }
+          </div>
+        )
+      }
+    } else if (transactionListType === "deposits") {
+      if (depositList.length === 0) {
+        return(
+          <div className={classes.listEmpty}>
+            <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
+            No deposits
+          </div>
+        )
+      } else {
+        return(
+          <div className={classes.list}>
+            {
+              depositList.map((deposit, index) => 
+                <Deposit key={index} deposit={deposit}/>
+              )
+            }
+          </div>
+        )
+      }
+    }
+  }
+
   render() {
-    const { email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
+    const { email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
     const { classes } = this.props
 
     return (
@@ -339,7 +443,7 @@ class Wallet extends Component {
 
             <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value="1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9" />
             <div className={classes.address}>1P4enaLERffNRpWcHqn5onmYDYZu4hr4p9</div>
-            <a className={classes.link} href={"#"} onClick={this.sendEmail}>Copy</a>
+            <a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a>
             <div className={classes.qrButtonContainer}>
               <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
                 Send
@@ -494,13 +598,13 @@ class Wallet extends Component {
                 Deposits
               </ToggleButton>
             </ToggleButtonGroup>
-            <div className={classes.listEmpty}>
-              <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
-              No recent transactions
-            </div>
+            
+            { this.getTransactions() }
 
           </div>
         </Dialog>
+
+        <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose}/>
 
       </div>
     )
