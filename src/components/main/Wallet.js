@@ -466,7 +466,14 @@ class Wallet extends Component {
   }
   
   sendEmail = () => {
+    const { email, amount } = this.state
 
+    var sendEmailReceipt = Firebase.functions().httpsCallable('sendEmailReceipt')
+    return sendEmailReceipt({ token: store.get('token'), toEmail: email, amount: amount }).then(function (result) {
+      if (result.data.success) {
+        this.displaySnackbar('success', "Your email receipt has been sent.")
+      } 
+    }.bind(this))
   }
 
   // Download the gift certificate
