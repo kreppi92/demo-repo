@@ -3,6 +3,9 @@ import PropTypes from 'prop-types'
 import Button from '@material-ui/core/Button'
 import Divider from '@material-ui/core/Divider'
 import IconButton from '@material-ui/core/IconButton'
+import FormControl from '@material-ui/core/FormControl'
+import Select from '@material-ui/core/Select'
+import MenuItem from '@material-ui/core/MenuItem'
 import { useMediaQuery } from 'react-responsive'
 import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
@@ -14,7 +17,7 @@ import Wallet from './Wallet'
 
 var store = require('store')
 
-const options = ["Wallet", "Buy Bitcoin", "Education", "Resources", "Sign out"]
+const options = ["Currency", "Wallet", "Education", "Resources", "Sign out"]
 
 const Mobile = ({ children }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 })
@@ -114,20 +117,50 @@ const styles = {
     color: palette.blue[0],
     padding: '0 15px 0 15px',
     textDecoration: 'underline'
+  },
+
+  select: {
+    margin: '12px 5px 0 0',
+    verticalAlign: 'center',
+    background: palette.black[-1],
+    fontSize: '15px'
+  },
+
+  selectMobile: {
+    alignItems: 'center',
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    margin: 0,
+    verticalAlign: 'center',
+    background: palette.black[-1],
+    height: '20px',
+    width: '100vw'
   }
 }
+
+const currencies = ["CAD", "USD", "EUR"]
 
 class Home extends Component {
 
   componentWillMount() {
     if (!store.get('token')) {
-        window.location = '/signin'
+      window.location = '/signin'
     }
   }
 
   state = {
     isExpanded: false,
-    selectedOption: options[0]
+    selectedOption: options[0],
+    currency: currencies[0],
+    currencyOption: 0
+  }
+
+  handleCurrencyChange = name => event => {
+    this.setState({
+      currencyOption: event.target.value,
+      currency: currencies[event.target.value]
+    })
   }
 
   handleOptionChange = (option) => {
@@ -149,86 +182,119 @@ class Home extends Component {
   }
 
   render() {
-    const { isExpanded, selectedOption } = this.state
+    const { currency, currencyOption, isExpanded, selectedOption } = this.state
     const { classes } = this.props
 
     return (
       <div>
-        { store.get('token') ? 
-        
+        {store.get('token') ?
+
           <div className={classes.container}>
-          <div className={classes.appBarContainer}>
-            <img src={logoIcon} className={classes.logoIcon} alt="" />
+            <div className={classes.appBarContainer}>
+              <img src={logoIcon} className={classes.logoIcon} alt="" />
+              <Mobile>
+                {
+                  isExpanded ?
+
+                    < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
+                      <img src={closeIcon} className={classes.iconButton} alt="" />
+                    </IconButton >
+
+                    :
+
+                    < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
+                      <img src={menuIcon} className={classes.iconButton} alt="" />
+                    </IconButton >
+                }
+
+              </Mobile>
+              <Default>
+                <div className={classes.menuOptionsContainer}>
+                  {
+                    options.map(function (option, i) {
+                      if (i == 0) {
+                        return (
+                          <FormControl className={classes.select}>
+                            <Select
+                              disableUnderline
+                              value={currencyOption}
+                              onChange={this.handleCurrencyChange('currency')}
+                            >
+                              <MenuItem value={0}>CAD</MenuItem>
+                              <MenuItem value={1}>USD</MenuItem>
+                              <MenuItem value={2}>EUR</MenuItem>
+                            </Select>
+                          </FormControl>
+                        )
+                      } else {
+                        return (
+                          <Button key={option} className={option === selectedOption ? classes.selectedButton : classes.button} onClick={() => this.handleOptionChange(option)}>
+                            {option}
+                          </Button>
+                        )
+                      }
+                      
+                    }.bind(this))
+                  }
+                </div>
+              </Default>
+            </div>
             <Mobile>
               {
                 isExpanded ?
-
-                  < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
-                    <img src={closeIcon} className={classes.iconButton} alt="" />
-                  </IconButton >
-
+                  options.map(function (option, i) {
+                    if (i == 0) {
+                      return (
+                        <div className={classes.selectMobile}>
+                            <Select
+                              disableUnderline
+                              value={currencyOption}
+                              onChange={this.handleCurrencyChange('currency')}
+                            >
+                              <MenuItem value={0}>CAD</MenuItem>
+                              <MenuItem value={1}>USD</MenuItem>
+                              <MenuItem value={2}>EUR</MenuItem>
+                            </Select>
+                          </div>
+                      )
+                    } else {
+                    return (
+                      <div key={option} onClick={() => this.handleOptionChange(option)}>
+                        <div className={classes.expandedOption}>
+                          <div className={option === selectedOption ? classes.expandedOptionTextSelected : classes.expandedOptionTextUnselected}>
+                            {option}
+                          </div>
+                        </div>
+                        <Divider />
+                      </div>
+                      )
+                    }
+                  }.bind(this))
                   :
-
-                  < IconButton aria-label="menu" className={classes.menuIcon} onClick={this.handleMenuClick}>
-                    <img src={menuIcon} className={classes.iconButton} alt="" />
-                  </IconButton >
+                  <Divider className={classes.divider} />
               }
 
             </Mobile>
             <Default>
-              <div className={classes.menuOptionsContainer}>
-                {
-                  options.map(function(option, i){
-                    return (
-                    <Button key={option} className={ option === selectedOption ? classes.selectedButton : classes.button } onClick={() => this.handleOptionChange(option)}>
-                      {option}
-                    </Button>
-                    )
-                  }.bind(this))
-                }
-              </div>
+              <Divider className={classes.divider} />
             </Default>
-          </div>
-          <Mobile>
-            {
-              isExpanded ?
-                options.map(function(option, i){
-                  return (
-                    <div key={option} onClick={() => this.handleOptionChange(option)}>
-                      <div className={classes.expandedOption}>
-                        <div className={ option === selectedOption ? classes.expandedOptionTextSelected : classes.expandedOptionTextUnselected }>
-                          {option}
-                        </div>
-                      </div>
-                      <Divider />
-                    </div>
-                  )
-                }.bind(this))
-                :
-                <Divider className={classes.divider} />
-            }
 
-          </Mobile>
-          <Default>
-            <Divider className={classes.divider} />
-          </Default>
+            <div className={classes.mainContent}>
+              <Wallet currency={currency}/>
+            </div>
 
-          <div className={classes.mainContent}>
-            <Wallet />
-          </div>
-          
-          
-          <div className={classes.footer}>
-            <Footer />
-          </div>
-        </div>
-        
-        :
 
-        <div />
-      }
+            <div className={classes.footer}>
+              <Footer />
+            </div>
+          </div>
+
+          :
+
+          <div />
+        }
       </div>
-      
+
     )
   }
 }

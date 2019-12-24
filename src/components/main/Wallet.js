@@ -22,12 +22,15 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import Certificate from "./Certificate";
 
+var bitcoinConverter = require('bitcoin-units')
+var currencyFormatter = require('currency-formatter')
 var QRCode = require('qrcode.react')
 var store = require('store')
 
 const EMAIL = "email"
 const GIFT = "gift"
 var timerID = null
+var currency = ''
 
 const styles = {
   address: {
@@ -235,12 +238,24 @@ const styles = {
 
   textField: {
     margin: "0 0 25px 0"
+  },
+
+  currencySummary: {
+    alignItems: 'center',
+    color: palette.gray[2],
+    display: 'flex',
+    justifyContent: 'flex-end',
+    width: '100%',
+    fontWeight: '700',
+    fontSize: '13px',
+    margin: '-15px 0 20px 0'
   }
 };
 
 class Wallet extends Component {
   state = {
     address: '',
+    rate: 0,
     balance: '',
     email: '',
     emailHelperText: '',
@@ -262,8 +277,17 @@ class Wallet extends Component {
     snackbarMessage: ""
   };
 
+  componentWillReceiveProps(newProps) {
+    const { address } = this.state
+    if (store.get('token') && address.length > 0) {
+      currency = newProps.currency
+      this.getAllTransactions(store.get('token'), address)
+    }
+  }
+
   componentDidMount() {
     if (store.get('token')) {
+      currency = this.props.currency
       this.getWalletAddress(store.get('token'))
     }
   }
@@ -296,29 +320,28 @@ class Wallet extends Component {
     var onChainTransactions = this.getOnchainTransactions(token, address)
     var sentTransactions = this.getSentTransactions(token)
     var receivedTransactions = this.getReceivedTransactions(token)
+    var currentRate = this.getRate()
 
-    Promise.all([onChainTransactions, sentTransactions, receivedTransactions]).then(responses => {
+    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, currentRate]).then(responses => {
       const deposits = responses[0].transfers
       const sentTransactions = responses[1]
       const receivedTransactions = responses[2]
+      const currentRate = responses[3]
 
       var balance = 0
       
       deposits.map((deposit, index) => {
-        console.log(deposit)
         if (deposit.state === "confirmed" && deposit.type ==="receive") {
           balance += deposit.value
         }
       })
 
       sentTransactions.map((sentTransaction, index) => {
-        console.log(sentTransaction)
         balance -= parseInt(sentTransaction.amount)
       })
 
       receivedTransactions.map((receivedTransaction, index) => {
-        console.log(receivedTransaction)
-        balance -= parseInt(receivedTransaction.amount)
+        balance += parseInt(receivedTransaction.amount)
       })
 
       this.setState({
@@ -326,7 +349,8 @@ class Wallet extends Component {
         depositList: deposits,
         sentList: sentTransactions,
         receivedList: receivedTransactions,
-        balance: balance
+        balance: balance,
+        rate: parseFloat(currentRate)
       })
     })
   }
@@ -358,6 +382,17 @@ class Wallet extends Component {
     return getReceivedTransactions({ token: token }).then(function (result) {
       if (result.data.success) {
         return (result.data.transactions)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getRate = () => {
+    var getRate = Firebase.functions().httpsCallable('getRate')
+    return getRate({ currency: currency }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.rate)
       } else {
         return ([])
       }
@@ -466,7 +501,14 @@ class Wallet extends Component {
   }
   
   sendEmail = () => {
+    const { email, amount } = this.state
 
+    var sendEmailReceipt = Firebase.functions().httpsCallable('sendEmailReceipt')
+    return sendEmailReceipt({ token: store.get('token'), toEmail: email, amount: amount }).then(function (result) {
+      if (result.data.success) {
+        this.displaySnackbar('success', "Your email receipt has been sent.")
+      } 
+    }.bind(this))
   }
 
   // Download the gift certificate
@@ -479,14 +521,14 @@ class Wallet extends Component {
   }
 
   validateForms(type) {
-    const { email, amount } = this.state;
+    const { email, amount, balance } = this.state;
 
     var emailHasError = false;
     var emailErrorText = "";
 
     if (email === "") {
       emailHasError = true;
-      emailErrorText = "Please enter a valid email.";
+      emailErrorText = "Please enter a valid email."
     }
 
     var amountHasError = false;
@@ -494,10 +536,13 @@ class Wallet extends Component {
 
     if (amount === "") {
       amountHasError = true;
-      amountErrorText = "Please enter an amount.";
+      amountErrorText = "Please enter an amount."
     } else if (!/^\d+$/.test(amount)) {
       amountHasError = true;
-      amountErrorText = "This field should only contain numbers.";
+      amountErrorText = "This field should only contain numbers."
+    } else if (parseInt(amount) > balance) {
+      amountHasError = true;
+      amountErrorText = "You cannot send more than your balance."
     }
 
     if (emailHasError || amountHasError) {
@@ -594,8 +639,11 @@ class Wallet extends Component {
   }
 
   render() {
-    const { address, balance, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
+    const { address, balance, rate, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
     const { classes } = this.props
+
+    var btcBalance = bitcoinConverter(parseInt(balance), 'satoshi').to('BTC')
+    var formattedCurrency = currencyFormatter.format(rate * btcBalance, { code: currency })
 
     return (
       <div className={classes.container}>
@@ -605,7 +653,7 @@ class Wallet extends Component {
               <Typography variant="h4" gutterBottom>
                {balance.toString()} Sats
               </Typography>
-                0 BTC - $0.00
+                {btcBalance.toString()} BTC - {formattedCurrency}
 
               <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value={address} />
               <div className={classes.address}>{address}</div>
@@ -634,7 +682,7 @@ class Wallet extends Component {
 
 
         <Paper className={classes.paperChart}>
-          <Chart />
+          <Chart currency={currency}/>
         </Paper>
 
         <Dialog
@@ -688,6 +736,10 @@ class Wallet extends Component {
               onChange={this.handleChange("amount")}
               variant="outlined"
             />
+
+            <div className = {classes.currencySummary}>
+            { bitcoinConverter(parseInt(amount), 'satoshi').to('BTC').toString()} BTC - {currencyFormatter.format(rate * bitcoinConverter(parseInt(amount), 'satoshi').to('BTC'), { code: currency })}
+            </div>
 
             {pendingConfirmation ? (
               <div>
