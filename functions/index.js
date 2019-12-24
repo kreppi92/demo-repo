@@ -64,7 +64,7 @@ exports.generateCode = functions.https.onCall((data, context) => {
           let verificationData = { email: email, code: generatedCode }
 
           return admin.firestore().collection('verification').add(verificationData)
-          .then(writeResult => {
+           .then(writeResult => {
             return rp(options).then(function (response) {
               return { "success": true }
             })
@@ -262,6 +262,119 @@ exports.checkAddress = functions.https.onCall((data, context) => {
       })
       .catch(err => {
         return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
+  })
+})
+
+exports.getOnchainTransactions = functions.https.onCall((data, context) => {
+  const token = data.token
+  const address = data.address
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      let authorization = satstreetToken
+      let url = 'https://bitgo.satstreetservices.com/getTransactions'
+      let options = {
+        method: 'GET',
+        url: url,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      options.body = {
+        walletId: "5df0646eb1138b4807c67ce3a37d9eea",
+        address: address
+      }
+
+      return rp(options).then(function (response) {
+        return { "success": true , response: response }
+      })
+      .catch(function (error) {
+        console.log("Error is", error)
+        return { "success": false , error: "There was an error getting onchain transactions. Please try again later."}
+      })
+    }
+  })
+})
+
+exports.getSentTransactions = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const email = decoded.email
+
+      return admin.firestore().collection("transactions").where("from", "==", email).get()
+      .then(function (querySnapshot) {
+        var transactions = []
+        querySnapshot.forEach(function (doc) {
+          var transaction = {email: doc.data().to, amount: doc.data().amount, date: doc.data().date}
+          transactions.push(transaction)
+        })
+
+        return { "success": true, "transactions": transactions }
+      })
+      .catch(err => {
+        return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
+  })
+})
+
+exports.getReceivedTransactions = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const email = decoded.email
+
+      return admin.firestore().collection("transactions").where("to", "==", email).get()
+      .then(function (querySnapshot) {
+        var transactions = []
+        querySnapshot.forEach(function (doc) {
+          var transaction = {email: doc.data().from, amount: doc.data().amount, date: doc.data().date}
+          transactions.push(transaction)
+        })
+
+        return { "success": false, "transactions": transactions }
+      })
+      .catch(err => {
+        return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
+  })
+})
+
+exports.postTransaction = functions.https.onCall((data, context) => {
+  const token = data.token
+  const toEmail = data.toEmail
+  const amount = data.amount
+  const type = data.type
+  const date = new Date()
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const fromEmail = decoded.email
+
+      let transactionData = { from: fromEmail, to: toEmail, amount: amount, type: type, date: date }
+
+      return admin.firestore().collection('transactions').add(transactionData)
+      .then(writeResult => {
+        return { "success": true }
+      })
+      .catch(err => {
+        return { "success": false, "error": "There was an error posting the transaction. Please try again later." }
       })
     }
   })

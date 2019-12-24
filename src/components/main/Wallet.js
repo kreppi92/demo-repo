@@ -27,6 +27,7 @@ var store = require('store')
 
 const EMAIL = "email"
 const GIFT = "gift"
+var timerID = null
 
 const styles = {
   address: {
@@ -240,6 +241,7 @@ const styles = {
 class Wallet extends Component {
   state = {
     address: '',
+    balance: '',
     email: '',
     emailHelperText: '',
     emailError: false,
@@ -266,15 +268,99 @@ class Wallet extends Component {
     }
   }
 
+  componentDidUnmount() {
+    if(timerID) {
+      clearInterval(timerID)
+    }
+  }
+
   getWalletAddress = (token) => {
     var checkAddress = Firebase.functions().httpsCallable('checkAddress')
     checkAddress({ token: token }).then(function (result) {
       if (result.data.success) {
-        this.setState({ address: result.data.address })
+        this.getAllTransactions(token, result.data.address)
+        this.setTransactionService(token, result.data.address) 
       } else {
         this.displaySnackbar('error', result.data.error)
       }
-      this.setState({ isLoading: false })
+    }.bind(this))
+  }
+
+  setTransactionService = (token, address) => {
+    timerID = setInterval(function() {
+      this.getAllTransactions(token, address)
+    }.bind(this), 30000)
+  }
+
+  getAllTransactions = (token, address) => {
+    var onChainTransactions = this.getOnchainTransactions(token, address)
+    var sentTransactions = this.getSentTransactions(token)
+    var receivedTransactions = this.getReceivedTransactions(token)
+
+    Promise.all([onChainTransactions, sentTransactions, receivedTransactions]).then(responses => {
+      const deposits = responses[0].transfers
+      const sentTransactions = responses[1]
+      const receivedTransactions = responses[2]
+
+      var balance = 0
+      
+      deposits.map((deposit, index) => {
+        console.log(deposit)
+        if (deposit.state === "confirmed" && deposit.type ==="receive") {
+          balance += deposit.value
+        }
+      })
+
+      sentTransactions.map((sentTransaction, index) => {
+        console.log(sentTransaction)
+        balance -= parseInt(sentTransaction.amount)
+      })
+
+      receivedTransactions.map((receivedTransaction, index) => {
+        console.log(receivedTransaction)
+        balance -= parseInt(receivedTransaction.amount)
+      })
+
+      this.setState({
+        address: address,
+        depositList: deposits,
+        sentList: sentTransactions,
+        receivedList: receivedTransactions,
+        balance: balance
+      })
+    })
+  }
+
+  getOnchainTransactions = (token, address) => {
+    var getOnchainTransactions = Firebase.functions().httpsCallable('getOnchainTransactions')
+    return getOnchainTransactions({ token: token, address: address }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.response)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getSentTransactions = (token) => {
+    var getSentTransactions = Firebase.functions().httpsCallable('getSentTransactions')
+    return getSentTransactions({ token: token }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.transactions)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getReceivedTransactions = (token) => {
+    var getReceivedTransactions = Firebase.functions().httpsCallable('getReceivedTransactions')
+    return getReceivedTransactions({ token: token }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.transactions)
+      } else {
+        return ([])
+      }
     }.bind(this))
   }
 
@@ -313,69 +399,84 @@ class Wallet extends Component {
   };
 
   handleTransactionSwitch = (event, newTransactionListType) => {
-    this.setState({ transactionListType: newTransactionListType });
+    this.setState({ transactionListType: newTransactionListType })
   };
 
   handleSendDialogClose = () => {
-    this.setState({ sendDialogOpen: false });
+    this.setState({ 
+      sendDialogOpen: false
+     })
   };
 
   handleSendFunds = () => {
-    this.setState({ sendDialogOpen: true });
+    this.setState({
+      email: '',
+      amount: '',
+      sendDialogOpen: true
+     })
   };
 
   handleDownloadGiftReceipt = () => {
-    this.validateForms(GIFT);
+    this.validateForms(GIFT)
   };
 
   handleSendEmail = () => {
-    this.validateForms(EMAIL);
+    this.validateForms(EMAIL)
   };
 
   handleCancelTransaction = () => {
-    this.setState({ pendingConfirmation: false });
+    this.setState({ pendingConfirmation: false })
   };
 
   handleViewTransactions = () => {
-    this.setState({ transactionDialogOpen: true });
+    this.setState({ transactionDialogOpen: true })
   };
 
   handleTransactionDialogClose = () => {
-    this.setState({ transactionDialogOpen: false });
+    this.setState({ transactionDialogOpen: false })
   };
 
   handleConfirmTransaction = () => {
-    const { transactionType } = this.state;
+    const { transactionType, email, amount, address } = this.state
+    this.setState({ isLoading: true })
 
-    this.setState({ isLoading: true });
-
-    setTimeout(
-      function () {
-        // for gift
+    var postTransaction = Firebase.functions().httpsCallable('postTransaction')
+    return postTransaction({ token: store.get('token'), toEmail: email, amount: amount, type: transactionType }).then(function (result) {
+      if (result.data.success) {
+        this.displaySnackbar('success', "Transaction successfully created.")
+        
         if (transactionType === GIFT) {
           this.downloadGift()
+        } else {
+          this.sendEmail()
         }
 
         this.setState({
           sendDialogOpen: false,
           pendingConfirmation: false,
-          isLoading: false
-        });
+          isLoading: false,
+        })
 
-      }.bind(this),
-      1000
-    );
-  };
+        this.getAllTransactions(store.get('token'), address)
+        
+      } else {
+        this.displaySnackbar('error', result.data.error)
+      }
+    }.bind(this))
+  }
+  
+  sendEmail = () => {
+
+  }
 
   // Download the gift certificate
   downloadGift = async () => {
-    const { email, amount } = this.state;
-    console.log("Does email work?", email, amount)
+    const { email, amount } = this.state
     const blob = await pdf(
       <Certificate email={email} amount={amount} />
     ).toBlob();
     saveAs(blob, "Certificate.pdf");
-  };
+  }
 
   validateForms(type) {
     const { email, amount } = this.state;
@@ -429,13 +530,8 @@ class Wallet extends Component {
   }
 
   getTransactions() {
-    const {
-      transactionListType,
-      sentList,
-      receivedList,
-      depositList
-    } = this.state;
-    const { classes } = this.props;
+    const { transactionListType, sentList, receivedList, depositList } = this.state
+    const { classes } = this.props
 
     if (transactionListType === "sent") {
       if (sentList.length === 0) {
@@ -498,7 +594,7 @@ class Wallet extends Component {
   }
 
   render() {
-    const { address, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
+    const { address, balance, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
     const { classes } = this.props
 
     return (
@@ -507,9 +603,9 @@ class Wallet extends Component {
           <Paper className={classes.paperOptions}>
             <div className={classes.contentContainer}>
               <Typography variant="h4" gutterBottom>
-                0 Sats
+               {balance.toString()} Sats
               </Typography>
-              0 BTC - $0.00
+                0 BTC - $0.00
 
               <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value={address} />
               <div className={classes.address}>{address}</div>
@@ -679,8 +775,6 @@ class Wallet extends Component {
               <ToggleButton value="received">Received</ToggleButton>
               <ToggleButton value="deposits">Deposits</ToggleButton>
             </ToggleButtonGroup>
-
-            {this.getTransactions()}
 
             {this.getTransactions()}
           </div>
