@@ -453,7 +453,7 @@ const Landing = () => {
                 color="primary"
                 className={classes.link}
                 component={Link}
-                to={"/create_user"}
+                to={"/create_account"}
               >
                 SIGN UP
               </Button>
