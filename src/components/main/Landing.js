@@ -44,6 +44,7 @@ const useStyles = makeStyles(theme => ({
     minHeight: "100vh",
     minWidth: "100vw",
     alignItems: "center",
+    overflowX: 'hidden',
     background: "#eef2f3"
   },
   container: {
