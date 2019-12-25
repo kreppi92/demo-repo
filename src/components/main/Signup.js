@@ -170,6 +170,12 @@ class Signup extends Component {
     }
   }
 
+  onCodeKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      this.handleCodeVerification()
+    }
+  }
+
   handleTermsChange = name => event => {
     this.setState({
       [name]: event.target.checked,
@@ -317,6 +323,7 @@ class Signup extends Component {
                 </div>
 
                 <TextField
+                  onKeyPress={this.onCodeKeyPress}
                   fullWidth
                   error={codeError}
                   className={classes.textField}
@@ -365,6 +372,7 @@ class Signup extends Component {
                 </Typography>
 
                 <TextField
+                  onKeyPress={this.onKeyPress}
                   fullWidth
                   error={emailError}
                   className={classes.textField}
@@ -379,6 +387,7 @@ class Signup extends Component {
                 />
 
                 <TextField
+                  onKeyPress={this.onKeyPress}
                   fullWidth
                   error={passwordError}
                   className={classes.textField}

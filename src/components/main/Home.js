@@ -12,6 +12,7 @@ import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo-full.png'
 import menuIcon from '../../images/menu.svg'
 import closeIcon from '../../images/close.svg'
+import CustomSnackbar from '../shared/CustomSnackbar'
 import Footer from './Footer'
 import Wallet from './Wallet'
 
@@ -151,9 +152,10 @@ class Home extends Component {
 
   state = {
     isExpanded: false,
-    selectedOption: options[0],
+    selectedOption: options[1],
     currency: currencies[0],
-    currencyOption: 0
+    currencyOption: 0,
+    snackbarIsOpen: false
   }
 
   handleCurrencyChange = name => event => {
@@ -163,13 +165,24 @@ class Home extends Component {
     })
   }
 
+  onSnackBarClose = () => {
+    this.setState({
+      snackbarIsOpen: false
+    })
+  }
+
   handleOptionChange = (option) => {
     if (option === "Sign out") {
       store.clearAll()
       window.location = '/signin'
-    }
+    } else if (option !== "Wallet") {
+      this.setState({
+        snackbarIsOpen: true
+      })
+    } 
+
     this.setState({
-      selectedOption: option
+      isExpanded: false
     })
   }
 
@@ -182,7 +195,7 @@ class Home extends Component {
   }
 
   render() {
-    const { currency, currencyOption, isExpanded, selectedOption } = this.state
+    const { currency, currencyOption, isExpanded, selectedOption, snackbarIsOpen } = this.state
     const { classes } = this.props
 
     return (
@@ -293,6 +306,7 @@ class Home extends Component {
 
           <div />
         }
+        <CustomSnackbar variant={'info'} message={'Coming soon!'} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose} />
       </div>
 
     )

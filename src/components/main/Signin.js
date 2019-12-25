@@ -114,6 +114,12 @@ class Signin extends Component {
     this.validateForms()
   }
 
+  onKeyPress = (e) => {
+    if (e.key === 'Enter') {
+      this.validateForms()
+    }
+  }
+
   validateForms() { 
     const { email, password } = this.state
 
@@ -194,6 +200,7 @@ class Signin extends Component {
             </Typography>
 
             <TextField
+              onKeyPress={this.onKeyPress}
               fullWidth
               error={emailError}
               className={classes.textField}
@@ -208,6 +215,7 @@ class Signin extends Component {
             />
 
             <TextField
+              onKeyPress={this.onKeyPress}
               fullWidth
               error={passwordError}
               className={classes.textField}

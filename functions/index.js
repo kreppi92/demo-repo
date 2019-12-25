@@ -12,7 +12,7 @@ const satstreetToken = functions.config().satstreet.token
 admin.initializeApp()
 
 exports.generateCode = functions.https.onCall((data, context) => {
-  const email = data.email
+  const email = data.email.toLowerCase()
   const generatedCode = Math.floor(Math.random() * 899999 + 100000).toString()
 
   let authorization = "Bearer " + sendgridKey
@@ -110,7 +110,7 @@ exports.generateCode = functions.https.onCall((data, context) => {
 })
 
 exports.verifyCode = functions.https.onCall((data, context) => {
-  const email = data.email
+  const email = data.email.toLowerCase()
   const code = data.code
 
   return admin.firestore().collection("verification").where("email", "==", email)
@@ -136,7 +136,7 @@ exports.verifyCode = functions.https.onCall((data, context) => {
 })
 
 exports.signUp = functions.https.onCall((data, context) => {
-  const email = data.email
+  const email = data.email.toLowerCase()
   const password = data.password
 
   return admin.firestore().collection("users").where("email", "==", email)
@@ -169,7 +169,7 @@ exports.signUp = functions.https.onCall((data, context) => {
 })
 
 exports.signIn = functions.https.onCall((data, context) => {
-  const email = data.email
+  const email = data.email.toLowerCase()
   const password = data.password
 
   return admin.firestore().collection("users").where("email", "==", email).get()
@@ -206,7 +206,7 @@ exports.checkAddress = functions.https.onCall((data, context) => {
     if (err) {
       return { "success": false, "error": "Not authorized" }
     } else {
-      const email = decoded.email
+      const email = decoded.email.toLowerCase()
       return admin.firestore().collection("users").where("email", "==", email).get()
         .then(function (querySnapshot) {
           var address = ""
@@ -336,7 +336,7 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
     if (err) {
       return { "success": false, "error": "Not authorized" }
     } else {
-      const email = decoded.email
+      const email = decoded.email.toLowerCase()
 
       return admin.firestore().collection("transactions").where("to", "==", email).get()
         .then(function (querySnapshot) {
@@ -357,7 +357,7 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
 
 exports.postTransaction = functions.https.onCall((data, context) => {
   const token = data.token
-  const toEmail = data.toEmail
+  const toEmail = data.toEmail.toLowerCase()
   const amount = data.amount
   const type = data.type
   const date = new Date()
@@ -366,7 +366,7 @@ exports.postTransaction = functions.https.onCall((data, context) => {
     if (err) {
       return { "success": false, "error": "Not authorized" }
     } else {
-      const fromEmail = decoded.email
+      const fromEmail = decoded.email.toLowerCase()
 
       let transactionData = { from: fromEmail, to: toEmail, amount: amount, type: type, date: date }
 
@@ -383,7 +383,7 @@ exports.postTransaction = functions.https.onCall((data, context) => {
 
 exports.sendEmailReceipt = functions.https.onCall((data, context) => {
   const token = data.token
-  const toEmail = data.toEmail
+  const toEmail = data.toEmail.toLowerCase()
   const amount = data.amount
 
   const btcAmount = bitcoinConverter(parseInt(amount), 'satoshi').to('BTC').toString()
@@ -392,7 +392,7 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
     if (err) {
       return { "success": false, "error": "Not authorized" }
     } else {
-      const fromEmail = decoded.email
+      const fromEmail = decoded.email.toLowerCase()
 
       let authorization = "Bearer " + sendgridKey
       let url = 'https://api.sendgrid.com/v3/mail/send'
