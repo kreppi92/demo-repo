@@ -4,6 +4,8 @@ import Divider from '@material-ui/core/Divider'
 import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../../constants/styles'
 
+const moment = require('moment')
+
 const styles = {
   container: {
     display: 'flex',
@@ -82,7 +84,7 @@ class Transaction extends Component {
         <div className={classes.contentContainer}>
           <div className={classes.leftContent}>
             <div className={classes.topLeftContent}>{transaction.email}</div>
-            <div className={classes.bottomLeftContent}>{transaction.date}</div>
+            <div className={classes.bottomLeftContent}>{moment.utc(transaction.date._seconds * 1000).format("MMM D, YYYY")}</div>
           </div>
           <div className={classes.rightContent}>
             {transaction.amount} Sats

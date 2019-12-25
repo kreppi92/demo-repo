@@ -7,6 +7,7 @@ import { mainTheme } from './constants/styles'
 import Signin from './components/main/Signin'
 import Signup from './components/main/Signup'
 import ForgotPassword from './components/main/ForgotPassword'
+import Privacy from './components/main/Privacy'
 import Terms from './components/main/Terms'
 import Home from './components/main/Home'
 import Landing from './components/main/Landing'
@@ -20,6 +21,7 @@ ReactDOM.render((
         <Route exact path='/create_account' component={() => <Signup />} />
         <Route exact path='/forgot_password' component={() => <ForgotPassword />} />
         <Route exact path='/terms' component={() => <Terms />} />
+        <Route exact path='/privacy' component={() => <Privacy />} />
         <Route exact path='/home' component={() => <Home />} />
       </Switch>
     </BrowserRouter>

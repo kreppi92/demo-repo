@@ -140,14 +140,14 @@ class Footer extends Component {
           <div className={classes.rightFooter}>
             <div className={classes.linkIconContainer}>
               <img src={mailIcon} className={classes.linkIconEmail} alt="" />
-              <Link className={classes.linkWithIcon} href={"/"} color="inherit" target="_blank">Support</Link>
+              <Link className={classes.linkWithIcon} href={"mailto:support@satstreet.com"} color="inherit" target="_blank">Support</Link>
             </div>
             <div className={classes.linkIconContainer}>
               <img src={twitterIcon} className={classes.linkIcon} alt="" />
               <Link className={classes.linkWithIcon} href={"https://twitter.com/satstreet"} color="inherit" target="_blank">Twitter</Link>
             </div>
-            <Link className={classes.link} href={"/"} color="inherit" target="_blank">Terms of use</Link>
-            <Link className={classes.link} href={"/"} color="inherit" target="_blank">Privacy policy</Link>
+            <Link className={classes.link} href={"/terms"} color="inherit" target="_blank">Terms of use</Link>
+            <Link className={classes.link} href={"/privacy"} color="inherit" target="_blank">Privacy policy</Link>
           </div>
         </div>
       </div>

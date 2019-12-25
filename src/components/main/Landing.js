@@ -1,5 +1,5 @@
 // React
-import React, { Component } from "react";
+import React from "react";
 import { Link } from "react-router-dom";
 
 // Prop Types
@@ -18,6 +18,7 @@ import Screen from "../../assets/iphone-mask.png";
 import Video from "../../assets/video.mp4";
 import Laptop from "../../assets/dashboard.png";
 import Referral from "../../assets/referral.jpg";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 
 import Footer from "./Footer";
 
@@ -90,6 +91,7 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "center",
     flexDirection: "column",
     flexGrow: 1,
+    padding: 50,
     backgroundImage: `linear-gradient(to bottom right, #0F2027 0%, #2C5364 100%)`
   },
   textField: {
@@ -126,6 +128,10 @@ const useStyles = makeStyles(theme => ({
   bodySubTitleWhite: {
     color: "#fff",
     opacity: 0.75
+  },
+  bodySubTitleBold: {
+    fontWeight: 700,
+    color: "#fff"
   },
   center: {
     display: "flex",
@@ -263,12 +269,6 @@ const useStyles = makeStyles(theme => ({
     justifyContent: "center",
     overflow: "hidden"
   },
-  particleContainer: {
-    position: "absolute",
-    minWidth: "100vw",
-    minHeight: "100vh",
-    zIndex: 1
-  },
   footer: { width: "100%" },
   flexgrow: {
     flexGrow: 1,
@@ -287,7 +287,6 @@ const useStyles = makeStyles(theme => ({
   },
   overlayContainer: {
     maxWidth: "75vw",
-    // margin: "0 auto",
     display: "block",
     position: "relative",
     margin: "auto",
@@ -357,6 +356,9 @@ const useStyles = makeStyles(theme => ({
   referral: {
     width: 550,
     maxWidth: "90vw"
+  },
+  spacer: {
+    margin: 50
   }
 }));
 
@@ -445,15 +447,28 @@ const Landing = () => {
             </Typography>
           </Grid>
           <Grid item xs={12} className={classes.center}>
-            <Button
-              variant="outlined"
-              color="primary"
-              className={classes.link}
-              component={Link}
-              to={"/home"}
-            >
-              Get Started
-            </Button>
+            <div className={classes.spacer}>
+              <Button
+                variant="outlined"
+                color="primary"
+                className={classes.link}
+                component={Link}
+                to={"/create_user"}
+              >
+                SIGN UP
+              </Button>
+              <Button
+                // variant="outlined"
+                color="primary"
+                className={classes.link}
+                component={Link}
+                to={"/signin"}
+              >
+                LOG IN
+              </Button>
+            </div>
+              <br /> <br /> <br />
+              <ExpandMoreIcon />
           </Grid>
         </Grid>
       </div>
@@ -488,14 +503,14 @@ const Landing = () => {
               email and an amount and that is all you need!
             </Typography>
             <Button
-                // variant="outlined"
-                color="primary"
-                className={classes.link}
-                component={Link}
-                to={"/home"}
-              >
-                Find Out More
-              </Button>
+              // variant="outlined"
+              color="primary"
+              className={classes.link}
+              component={Link}
+              to={"/home"}
+            >
+              Find Out More
+            </Button>
           </Grid>
         </Grid>
       </div>
@@ -553,7 +568,7 @@ const Landing = () => {
       <div className={classes.container2}>
         <Grid container>
           <Grid item xs={12} md={8}>
-          <div className={classes.center}>
+            <div className={classes.center}>
               <img src={Referral} alt="Referral" className={classes.referral} />
             </div>
           </Grid>
@@ -569,27 +584,27 @@ const Landing = () => {
               Our referral program gives you the ability to earn Bitcoin for
               yourself by referring new users to our platform.
             </Typography>
-            
           </Grid>
 
           <Grid item xs={12} className={classes.center}>
             <div className={classes.textContainer}>
-              <Typography variant="h5" className={classes.bodyTitle}>
-                Let's get started.
-              </Typography>
-              <Button
-                color="primary"
-                component={Link}
-                to={"/home"}
-                className={classes.link}
-              >
-                Start Now
-              </Button>
+              <div className={classes.spacer}>
+                <Typography variant="h5" className={classes.bodyTitle}>
+                  Let's get started.
+                </Typography>
+                <Button
+                  color="primary"
+                  component={Link}
+                  to={"/home"}
+                  className={classes.link}
+                >
+                  Start Now
+                </Button>
+              </div>
             </div>
           </Grid>
         </Grid>
       </div>
-
 
       <div className={classes.container5}>
         <Grid container>
@@ -601,30 +616,58 @@ const Landing = () => {
               <Typography
                 variant="subtitle1"
                 gutterBottom
-                className={classes.bodySubTitleWhite}
+                className={classes.bodySubTitleBold}
               >
-                Learn Bitcoin - explore our educational resources
+                Learn Bitcoin
               </Typography>
               <Typography
                 variant="subtitle1"
                 gutterBottom
                 className={classes.bodySubTitleWhite}
               >
-                Buy Bitcoin - from our exchange partners{" "}
+                explore our educational resources
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className={classes.bodySubTitleBold}
+              >
+                Buy Bitcoin
               </Typography>
               <Typography
                 variant="subtitle1"
                 gutterBottom
                 className={classes.bodySubTitleWhite}
               >
-                Earn Bitcoin - from our affiliate programs{" "}
+                from our exchange partners{" "}
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className={classes.bodySubTitleBold}
+              >
+                Earn Bitcoin
               </Typography>
               <Typography
                 variant="subtitle1"
                 gutterBottom
                 className={classes.bodySubTitleWhite}
               >
-                Explore Bitcoin - discover the Bitcoin ecosystem{" "}
+                from our affiliate programs{" "}
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className={classes.bodySubTitleBold}
+              >
+                Explore Bitcoin
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className={classes.bodySubTitleWhite}
+              >
+                discover the Bitcoin ecosystem{" "}
               </Typography>
             </div>
           </Grid>

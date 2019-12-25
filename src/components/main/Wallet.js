@@ -18,15 +18,20 @@ import Deposit from './Transactions/Deposit'
 import Transaction from './Transactions/Transaction'
 import Firebase from '../../constants/firebase'
 import CustomSnackbar from '../shared/CustomSnackbar'
-import { pdf } from "@react-pdf/renderer";
-import { saveAs } from "file-saver";
-import Certificate from "./Certificate";
+import { pdf } from "@react-pdf/renderer"
+import { saveAs } from "file-saver"
+import { CopyToClipboard } from 'react-copy-to-clipboard'
+import Certificate from "./Certificate"
 
+var bitcoinConverter = require('bitcoin-units')
+var currencyFormatter = require('currency-formatter')
 var QRCode = require('qrcode.react')
 var store = require('store')
 
 const EMAIL = "email"
 const GIFT = "gift"
+var timerID = null
+var currency = ''
 
 const styles = {
   address: {
@@ -234,12 +239,25 @@ const styles = {
 
   textField: {
     margin: "0 0 25px 0"
+  },
+
+  currencySummary: {
+    alignItems: 'center',
+    color: palette.gray[2],
+    display: 'flex',
+    justifyContent: 'flex-end',
+    width: '100%',
+    fontWeight: '700',
+    fontSize: '13px',
+    margin: '-15px 0 20px 0'
   }
 };
 
 class Wallet extends Component {
   state = {
     address: '',
+    rate: 0,
+    balance: '',
     email: '',
     emailHelperText: '',
     emailError: false,
@@ -260,9 +278,24 @@ class Wallet extends Component {
     snackbarMessage: ""
   };
 
+  componentWillReceiveProps(newProps) {
+    const { address } = this.state
+    if (store.get('token') && address.length > 0) {
+      currency = newProps.currency
+      this.getAllTransactions(store.get('token'), address)
+    }
+  }
+
   componentDidMount() {
     if (store.get('token')) {
+      currency = this.props.currency
       this.getWalletAddress(store.get('token'))
+    }
+  }
+
+  componentDidUnmount() {
+    if(timerID) {
+      clearInterval(timerID)
     }
   }
 
@@ -270,11 +303,100 @@ class Wallet extends Component {
     var checkAddress = Firebase.functions().httpsCallable('checkAddress')
     checkAddress({ token: token }).then(function (result) {
       if (result.data.success) {
-        this.setState({ address: result.data.address })
+        this.getAllTransactions(token, result.data.address)
+        this.setTransactionService(token, result.data.address) 
       } else {
         this.displaySnackbar('error', result.data.error)
       }
-      this.setState({ isLoading: false })
+    }.bind(this))
+  }
+
+  setTransactionService = (token, address) => {
+    timerID = setInterval(function() {
+      this.getAllTransactions(token, address)
+    }.bind(this), 30000)
+  }
+
+  getAllTransactions = (token, address) => {
+    var onChainTransactions = this.getOnchainTransactions(token, address)
+    var sentTransactions = this.getSentTransactions(token)
+    var receivedTransactions = this.getReceivedTransactions(token)
+    var currentRate = this.getRate()
+
+    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, currentRate]).then(responses => {
+      const deposits = responses[0].transfers
+      const sentTransactions = responses[1]
+      const receivedTransactions = responses[2]
+      const currentRate = responses[3]
+
+      var balance = 0
+      
+      deposits.map((deposit, index) => {
+        if (deposit.state === "confirmed" && deposit.type ==="receive") {
+          balance += deposit.value
+        }
+      })
+
+      sentTransactions.map((sentTransaction, index) => {
+        balance -= parseInt(sentTransaction.amount)
+      })
+
+      receivedTransactions.map((receivedTransaction, index) => {
+        balance += parseInt(receivedTransaction.amount)
+      })
+
+      this.setState({
+        address: address,
+        depositList: deposits,
+        sentList: sentTransactions,
+        receivedList: receivedTransactions,
+        balance: balance,
+        rate: parseFloat(currentRate)
+      })
+    })
+  }
+
+  getOnchainTransactions = (token, address) => {
+    var getOnchainTransactions = Firebase.functions().httpsCallable('getOnchainTransactions')
+    return getOnchainTransactions({ token: token, address: address }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.response)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getSentTransactions = (token) => {
+    var getSentTransactions = Firebase.functions().httpsCallable('getSentTransactions')
+    return getSentTransactions({ token: token }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.transactions)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getReceivedTransactions = (token) => {
+    var getReceivedTransactions = Firebase.functions().httpsCallable('getReceivedTransactions')
+    return getReceivedTransactions({ token: token }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.transactions)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getRate = () => {
+    var getRate = Firebase.functions().httpsCallable('getRate')
+    return getRate({ currency: currency }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.rate)
+      } else {
+        return ([])
+      }
     }.bind(this))
   }
 
@@ -313,79 +435,101 @@ class Wallet extends Component {
   };
 
   handleTransactionSwitch = (event, newTransactionListType) => {
-    this.setState({ transactionListType: newTransactionListType });
+    this.setState({ transactionListType: newTransactionListType })
   };
 
   handleSendDialogClose = () => {
-    this.setState({ sendDialogOpen: false });
+    this.setState({ 
+      sendDialogOpen: false
+     })
   };
 
   handleSendFunds = () => {
-    this.setState({ sendDialogOpen: true });
+    this.setState({
+      email: '',
+      amount: '',
+      sendDialogOpen: true
+     })
   };
 
   handleDownloadGiftReceipt = () => {
-    this.validateForms(GIFT);
+    this.validateForms(GIFT)
   };
 
   handleSendEmail = () => {
-    this.validateForms(EMAIL);
+    this.validateForms(EMAIL)
   };
 
   handleCancelTransaction = () => {
-    this.setState({ pendingConfirmation: false });
+    this.setState({ pendingConfirmation: false })
   };
 
   handleViewTransactions = () => {
-    this.setState({ transactionDialogOpen: true });
+    this.setState({ transactionDialogOpen: true })
   };
 
   handleTransactionDialogClose = () => {
-    this.setState({ transactionDialogOpen: false });
+    this.setState({ transactionDialogOpen: false })
   };
 
   handleConfirmTransaction = () => {
-    const { transactionType } = this.state;
+    const { transactionType, email, amount, address } = this.state
+    this.setState({ isLoading: true })
 
-    this.setState({ isLoading: true });
-
-    setTimeout(
-      function () {
-        // for gift
+    var postTransaction = Firebase.functions().httpsCallable('postTransaction')
+    return postTransaction({ token: store.get('token'), toEmail: email, amount: amount, type: transactionType }).then(function (result) {
+      if (result.data.success) {
+        this.displaySnackbar('success', "Transaction successfully created.")
+        
         if (transactionType === GIFT) {
           this.downloadGift()
+        } else {
+          this.sendEmail()
         }
 
         this.setState({
           sendDialogOpen: false,
           pendingConfirmation: false,
-          isLoading: false
-        });
+          isLoading: false,
+        })
 
-      }.bind(this),
-      1000
-    );
-  };
+        this.getAllTransactions(store.get('token'), address)
+        
+      } else {
+        this.displaySnackbar('error', result.data.error)
+      }
+    }.bind(this))
+  }
+  
+  sendEmail = () => {
+    const { email, amount } = this.state
+
+    var sendEmailReceipt = Firebase.functions().httpsCallable('sendEmailReceipt')
+    return sendEmailReceipt({ token: store.get('token'), toEmail: email, amount: amount }).then(function (result) {
+      if (result.data.success) {
+        this.displaySnackbar('success', "Your email receipt has been sent.")
+      } 
+    }.bind(this))
+  }
 
   // Download the gift certificate
   downloadGift = async () => {
-    const { email, amount } = this.state;
-    console.log("Does email work?", email, amount)
+    const { email, amount } = this.state
     const blob = await pdf(
       <Certificate email={email} amount={amount} />
     ).toBlob();
     saveAs(blob, "Certificate.pdf");
-  };
+  }
 
   validateForms(type) {
-    const { email, amount } = this.state;
+    const { email, amount, balance } = this.state;
 
     var emailHasError = false;
     var emailErrorText = "";
 
     if (email === "") {
       emailHasError = true;
-      emailErrorText = "Please enter a valid email.";
+      emailErrorText = "Please enter a valid email."
     }
 
     var amountHasError = false;
@@ -393,10 +537,13 @@ class Wallet extends Component {
 
     if (amount === "") {
       amountHasError = true;
-      amountErrorText = "Please enter an amount.";
+      amountErrorText = "Please enter an amount."
     } else if (!/^\d+$/.test(amount)) {
       amountHasError = true;
-      amountErrorText = "This field should only contain numbers.";
+      amountErrorText = "This field should only contain numbers."
+    } else if (parseInt(amount) > balance) {
+      amountHasError = true;
+      amountErrorText = "You cannot send more than your balance."
     }
 
     if (emailHasError || amountHasError) {
@@ -429,13 +576,8 @@ class Wallet extends Component {
   }
 
   getTransactions() {
-    const {
-      transactionListType,
-      sentList,
-      receivedList,
-      depositList
-    } = this.state;
-    const { classes } = this.props;
+    const { transactionListType, sentList, receivedList, depositList } = this.state
+    const { classes } = this.props
 
     if (transactionListType === "sent") {
       if (sentList.length === 0) {
@@ -498,8 +640,11 @@ class Wallet extends Component {
   }
 
   render() {
-    const { address, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
+    const { address, balance, rate, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
     const { classes } = this.props
+
+    var btcBalance = bitcoinConverter(parseInt(balance), 'satoshi').to('BTC')
+    var formattedCurrency = currencyFormatter.format(rate * btcBalance, { code: currency })
 
     return (
       <div className={classes.container}>
@@ -507,13 +652,14 @@ class Wallet extends Component {
           <Paper className={classes.paperOptions}>
             <div className={classes.contentContainer}>
               <Typography variant="h4" gutterBottom>
-                0 Sats
+               {balance.toString()} Sats
               </Typography>
-              0 BTC - $0.00
+                {btcBalance.toString()} BTC - {formattedCurrency}
 
               <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value={address} />
               <div className={classes.address}>{address}</div>
-              <a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a>
+              <CopyToClipboard text={address}><a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a></CopyToClipboard>
+              
               <div className={classes.qrButtonContainer}>
                 <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
                   Send
@@ -538,7 +684,7 @@ class Wallet extends Component {
 
 
         <Paper className={classes.paperChart}>
-          <Chart />
+          <Chart currency={currency}/>
         </Paper>
 
         <Dialog
@@ -592,6 +738,10 @@ class Wallet extends Component {
               onChange={this.handleChange("amount")}
               variant="outlined"
             />
+
+            <div className = {classes.currencySummary}>
+            { bitcoinConverter(parseInt(amount), 'satoshi').to('BTC').toString()} BTC - {currencyFormatter.format(rate * bitcoinConverter(parseInt(amount), 'satoshi').to('BTC'), { code: currency })}
+            </div>
 
             {pendingConfirmation ? (
               <div>
@@ -679,8 +829,6 @@ class Wallet extends Component {
               <ToggleButton value="received">Received</ToggleButton>
               <ToggleButton value="deposits">Deposits</ToggleButton>
             </ToggleButtonGroup>
-
-            {this.getTransactions()}
 
             {this.getTransactions()}
           </div>
