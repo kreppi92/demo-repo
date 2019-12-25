@@ -17,12 +17,12 @@ ReactDOM.render((
     <BrowserRouter>
       <Switch>
         <Route exact path='/' component={() => <Landing />} />
-        <Route exact path='/signin' component={() => <Signin />} />
-        <Route exact path='/create_account' component={() => <Signup />} />
-        <Route exact path='/forgot_password' component={() => <ForgotPassword />} />
-        <Route exact path='/terms' component={() => <Terms />} />
-        <Route exact path='/privacy' component={() => <Privacy />} />
-        <Route exact path='/home' component={() => <Home />} />
+        <Route path='/signin' component={() => <Signin />} />
+        <Route path='/create_account' component={() => <Signup />} />
+        <Route path='/forgot_password' component={() => <ForgotPassword />} />
+        <Route path='/terms' component={() => <Terms />} />
+        <Route path='/privacy' component={() => <Privacy />} />
+        <Route path='/home' component={() => <Home />} />
       </Switch>
     </BrowserRouter>
   </MuiThemeProvider>
