@@ -108,7 +108,7 @@ const MyDocument = ({ email, amount }) => (
           </CenterDiv>
           <CenterDiv>
             <HeaderEl>
-              <Header>BitCoin Gift Certificate</Header>
+              <Header>Bitcoin Gift Certificate</Header>
             </HeaderEl>
           </CenterDiv>
           <CenterDiv>

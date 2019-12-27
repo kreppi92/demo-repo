@@ -16,6 +16,7 @@ import { motion } from "framer-motion";
 import Text from "../../assets/satstreet-text.svg";
 import Screen from "../../assets/iphone-mask.png";
 import Video from "../../assets/video.mp4";
+import Screenshot from "../../assets/screenshot.png";
 import Laptop from "../../assets/dashboard.png";
 import Referral from "../../assets/referral.jpg";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
@@ -249,7 +250,11 @@ const useStyles = makeStyles(theme => ({
     marginTop: "auto"
   },
   image: {
-    maxWidth: "100%"
+    maxWidth: "100%",
+    minWidth: 250,
+    [theme.breakpoints.up("md")]: {
+      marginRight: 50
+    }
   },
   icon: {
     margin: 5,
@@ -281,7 +286,7 @@ const useStyles = makeStyles(theme => ({
     width: 300,
     maxWidth: "75vw"
   },
-  video: {
+  screenshot: {
     width: 240,
     maxWidth: "60vw",
     borderRadius: 25
@@ -355,8 +360,8 @@ const useStyles = makeStyles(theme => ({
     maxWidth: 400
   },
   referral: {
-    width: 550,
-    maxWidth: "90vw"
+    height: 350,
+    maxWidth: "90vw",
   },
   spacer: {
     margin: 50
@@ -438,13 +443,13 @@ const Landing = () => {
             </motion.div>
           </Grid>
           <Grid item xs={12} className={classes.center}>
-            <Typography variant="h3" className={classes.mainSubtitle}>
+            <Typography variant="h3" className={classes.mainSubtitle} gutterBottom>
               Bitcoin made simple.
             </Typography>
           </Grid>
           <Grid item xs={12} className={classes.center}>
             <Typography variant="subtitle1" gutterBottom>
-              Satstreet is a web-based app designed for gifting Bitcoin.
+              Send and gift Bitcoin to any email address.
             </Typography>
           </Grid>
           <Grid item xs={12} className={classes.center}>
@@ -479,9 +484,7 @@ const Landing = () => {
           <Grid item xs={12} md={6} className={classes.videoSectionRight}>
             <div className={classes.overlayContainer}>
               <div className={classes.videoUnderlay}>
-                <video loop autoPlay className={classes.video}>
-                  <source src={Video} type="video/mp4" />
-                </video>
+              <img src={Screenshot} alt="iphone" className={classes.screenshot} />
               </div>
               <div className={classes.iphoneOverlay}>
                 <img src={Screen} alt="iphone" className={classes.iphone} />
@@ -568,12 +571,12 @@ const Landing = () => {
 
       <div className={classes.container2}>
         <Grid container>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={4}>
             <div className={classes.center}>
               <img src={Referral} alt="Referral" className={classes.referral} />
             </div>
           </Grid>
-          <Grid item xs={12} md={4} className={classes.copyLeft}>
+          <Grid item xs={12} md={8} className={classes.copyLeft}>
             <Typography variant="h5" className={classes.bodyTitle}>
               Earn Bitcoin by Referring Users
             </Typography>
