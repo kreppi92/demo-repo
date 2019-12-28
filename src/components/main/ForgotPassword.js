@@ -9,6 +9,8 @@ import { withStyles } from '@material-ui/core/styles'
 import { palette } from '../../constants/styles'
 import logoIcon from '../../images/logo.png'
 import Footer from './Footer'
+import Firebase from '../../constants/firebase'
+import CustomSnackbar from '../shared/CustomSnackbar'
 
 const styles = {
   button: {
@@ -87,7 +89,10 @@ class ForgotPassword extends Component {
   state = {
     email: '',
     emailHelperText: '',
-    emailError: false
+    emailError: false,
+    snackbarIsOpen: false,
+    snackbarVariant: 'success',
+    snackbarMessage: ''
   }
 
   handleChange = name => event => {
@@ -95,6 +100,20 @@ class ForgotPassword extends Component {
       [name]: event.target.value,
       emailHelperText: '',
       emailError: false
+    })
+  }
+
+  onSnackBarClose = () => {
+    this.setState({
+      snackbarIsOpen: false
+    })
+  }
+
+  displaySnackbar = (variant, message) => {
+    this.setState({
+      snackbarIsOpen: true,
+      snackbarVariant: variant,
+      snackbarMessage: message
     })
   }
 
@@ -126,21 +145,28 @@ class ForgotPassword extends Component {
       emailHelperText: emailErrorText
     })
   }
-
+  
   recoverPassword() { 
+    const { email } = this.state
+
     this.setState({ isLoading: true })
 
-    setTimeout(
-      function() {
-        //this.props.completedSignIn()
-      }.bind(this),
-      1000,
-    )
+    var generateResetPassword = Firebase.functions().httpsCallable('generateResetPassword')
+    generateResetPassword({ email: email }).then(function (result) {
+      if (result.data.success) {
+        var message = "An email to reset your password has been successfully sent to " + email + "."
+        this.displaySnackbar('success', message)
+        this.setState({email: ""})
+      } else {
+        this.displaySnackbar('error', result.data.error)
+      }
+      this.setState({ isLoading: false })
+    }.bind(this))
   }
 
   render() {
     const { classes } = this.props
-    const { email, emailHelperText, emailError, isLoading } = this.state
+    const { email, emailHelperText, emailError, isLoading, snackbarIsOpen, snackbarMessage, snackbarVariant } = this.state
 
     return (
       <div className={classes.container}>
@@ -196,6 +222,9 @@ class ForgotPassword extends Component {
         <div className={classes.footer}>
           <Footer />
         </div>
+        
+        <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose}/>
+      
       </div>
     )
   }

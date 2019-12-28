@@ -4,6 +4,7 @@ const admin = require('firebase-admin')
 const bcrypt = require('bcrypt')
 var rp = require('request-promise')
 var bitcoinConverter = require('bitcoin-units')
+var crypto = require('crypto')
 
 const jwtToken = functions.config().jwt.token
 const sendgridKey = functions.config().sendgrid.key
@@ -458,4 +459,176 @@ exports.getRate = functions.https.onCall((data, context) => {
     console.log("Error is", error)
     return { "success": false, error: "There was an error sending the email. Please try again later." }
   })
+})
+
+exports.generateResetPassword = functions.https.onCall((data, context) => {
+  const email = data.email.toLowerCase()
+  var token = crypto.randomBytes(20).toString('hex')
+  var link = "http://www.satstreet.com/reset_password?reset=" + token
+
+  let authorization = "Bearer " + sendgridKey
+  let url = 'https://api.sendgrid.com/v3/mail/send'
+  let options = {
+    method: 'POST',
+    url: url,
+    headers: {
+      Authorization: authorization
+    },
+    json: true
+  }
+
+  options.body = {
+    from: {
+      email: 'info@satstreet.com'
+    },
+    template_id: 'd-fc00a55b975748bebfa5e023dfe7ca5b',
+    personalizations: [
+      {
+        to: [
+          {
+            email: email
+          }
+        ],
+        dynamic_template_data: {
+          link: link,
+        }
+      }
+    ]
+  }
+
+  return admin.firestore().collection("users").where("email", "==", email)
+    .get()
+    .then(function (querySnapshot) {
+      var documentId = ""
+      querySnapshot.forEach(function (doc) {
+        documentId = doc.id
+      })
+      if (documentId !== "") {
+        return admin.firestore().collection("resets").where("email", "==", email)
+          .get()
+          .then(function (querySnapshot) {
+            var docId = ""
+            querySnapshot.forEach(function (doc) {
+              docId = doc.id
+            })
+            if (docId === "") {
+              // Create the reset with the new code
+              let verificationData = { email: email, code: token, updatedAt: Date.now()}
+
+              return admin.firestore().collection('resets').add(verificationData)
+                .then(writeResult => {
+                  return rp(options).then(function (response) {
+                    return { "success": true }
+                  })
+                    .catch(function (error) {
+                      console.log("Error is", error)
+                      return { "success": false, error: "There was an error sending the reset password email. Please try again later." }
+                    })
+                })
+                .catch(err => {
+                  return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+                })
+            } else {
+              // Edit the verification with the new code
+              let verificationData = { email: email, code: token, updatedAt: Date.now() }
+
+              return admin.firestore().collection('resets').doc(docId).update(verificationData)
+                .then(writeResult => {
+                  return rp(options).then(function (response) {
+                    return { "success": true }
+                  })
+                  .catch(function (error) {
+                    console.log("Error is", error)
+                    return { "success": false, error: "There was an error sending the reset password email. Please try again later." }
+                  })
+                })
+                .catch(err => {
+                  return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+                })
+            }
+          })
+          .catch(err => {
+            return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+          })
+
+      } else {
+        return { "success": false, "error": "This user does not exits. Please try signing up instead." }
+      }
+    })
+    .catch(err => {
+      return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+    })
+})
+
+exports.isLinkValid = functions.https.onCall((data, context) => {
+  const token = data.token
+  const shouldReset = data.shouldReset
+
+  return admin.firestore().collection("resets").where("code", "==", token)
+    .get()
+    .then(function (querySnapshot) {
+      var docId = ""
+      var updatedAt = null
+      var email = ""
+      querySnapshot.forEach(function (doc) {
+        docId = doc.id
+        updatedAt = doc.data().updatedAt
+        email = doc.data().email
+      })
+      if (docId === "") {
+        return { "success": false }
+      } else {
+        const seconds = Math.floor((Date.now() - updatedAt)/1000)
+        const hours = seconds / 3600
+        if (hours < 12) {
+          if (shouldReset) {
+            return admin.firestore().collection('resets').doc(docId).update({code: ""})
+            .then(writeResult => {
+              return { "success": true, hours: hours, email: email}
+            })
+            .catch(err => {
+              return { "success": false, "error": "There was an error updating your password. Please try again later." }
+            })
+          } else {
+            return { "success": true, hours: hours, email: email}
+          }
+        } else {
+          return { "success": false, hours: hours}
+        }
+      }
+    })
+    .catch(err => {
+      return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+    })
+})
+
+exports.updatePassword = functions.https.onCall((data, context) => {
+  const email = data.email.toLowerCase()
+  const password = data.password
+
+  return admin.firestore().collection("users").where("email", "==", email)
+    .get()
+    .then(function (querySnapshot) {
+      var documentId = ""
+      querySnapshot.forEach(function (doc) {
+        documentId = doc.id
+      })
+      if (documentId !== "") {
+        var hash = bcrypt.hashSync(password, 10)
+        let userData = { password: hash }
+
+        return admin.firestore().collection('users').doc(documentId).update(userData)
+          .then(writeResult => {
+            return { "success": true }
+          })
+          .catch(err => {
+            return { "success": false, "error": "There was an error updating your password. Please try again later." }
+          })
+      } else {
+        return { "success": false, "error": "This user does not exists exits. Please try signing in." }
+      }
+    })
+    .catch(err => {
+      return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+    })
 })
