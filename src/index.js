@@ -7,6 +7,7 @@ import { mainTheme } from './constants/styles'
 import Signin from './components/main/Signin'
 import Signup from './components/main/Signup'
 import ForgotPassword from './components/main/ForgotPassword'
+import ResetPassword from './components/main/ResetPassword'
 import Privacy from './components/main/Privacy'
 import Terms from './components/main/Terms'
 import Home from './components/main/Home'
@@ -20,6 +21,7 @@ ReactDOM.render((
         <Route path='/signin' component={() => <Signin />} />
         <Route path='/create_account' component={() => <Signup />} />
         <Route path='/forgot_password' component={() => <ForgotPassword />} />
+        <Route path='/reset_password' component={() => <ResetPassword />} />
         <Route path='/terms' component={() => <Terms />} />
         <Route path='/privacy' component={() => <Privacy />} />
         <Route path='/home' component={() => <Home />} />
