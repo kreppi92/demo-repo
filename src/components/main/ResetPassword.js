@@ -213,7 +213,6 @@ class ResetPassword extends Component {
     this.setState({ isLoading: true })
 
     const parsed = queryString.parse(window.location.search)
-    console.log(parsed.reset)
 
     if (parsed.reset === "") {
       this.setState({
@@ -226,7 +225,6 @@ class ResetPassword extends Component {
     } else {
       var isLinkValid = Firebase.functions().httpsCallable('isLinkValid')
       isLinkValid({ token: parsed.reset, shouldReset: true }).then(function (result) {
-        console.log(result.data)
         if (result.data.success) {
           this.resetPassword(result.data.email, newPassword)
         } else {
