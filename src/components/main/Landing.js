@@ -15,7 +15,6 @@ import { motion } from "framer-motion";
 // Assets
 import Text from "../../assets/satstreet-text.svg";
 import Screen from "../../assets/iphone-mask.png";
-import Video from "../../assets/video.mp4";
 import Screenshot from "../../assets/screenshot.png";
 import Laptop from "../../assets/dashboard.png";
 import Referral from "../../assets/referral.jpg";
@@ -151,29 +150,31 @@ const useStyles = makeStyles(theme => ({
     textAlign: "left",
     flexDirection: "column",
     zIndex: 5,
-    padding: "50px 100px 50px 50px",
+    padding: "50px 150px 50px 50px",
     marginBottom: 50,
     [theme.breakpoints.down("sm")]: {
       justifyContent: "center",
       alignItems: "center",
       textAlign: "center",
-      padding: "50px 25px"
+      padding: "50px 25px",
+      marginBottom: 0,
     }
   },
   copyRight: {
     display: "flex",
     justifyContent: "center",
-    alignItems: "right",
-    textAlign: "right",
+    alignItems: "left",
+    textAlign: "left",
     flexDirection: "column",
     zIndex: 5,
-    padding: "50px 50px 50px 100px",
+    padding: "50px 50px 50px 150px",
     marginBottom: 50,
     [theme.breakpoints.down("sm")]: {
       justifyContent: "center",
       textAlign: "center",
       alignItems: "center",
-      padding: "50px 25px"
+      padding: "50px 25px",
+      marginBottom: 0,
     }
   },
   videoSectionLeft: {
@@ -317,7 +318,7 @@ const useStyles = makeStyles(theme => ({
   },
   laptopContainer: {
     margin: "auto",
-    padding: "auto"
+    padding: 10
   },
   laptopOverlay: {
     position: "absolute",
@@ -351,17 +352,20 @@ const useStyles = makeStyles(theme => ({
   },
   textContainer: {
     width: 600,
-    maxWidth: "80vw"
+    maxWidth: "80vw",
+    [theme.breakpoints.up("md")]: {
+      marginTop: 50
+    }
   },
   whiteText: {
     color: "#fff"
   },
   titleContainer: {
-    maxWidth: 400
+    width: "100%",
   },
   referral: {
-    height: 350,
-    maxWidth: "90vw",
+    maxHeight: 300,
+    maxWidth: "40vw",
   },
   spacer: {
     margin: 50
@@ -543,12 +547,10 @@ const Landing = () => {
 
       <div className={classes.container2}>
         <Grid container>
-          <Grid item xs={12} md={4} className={classes.copyRight}>
+          <Grid item xs={12} md={6} className={classes.copyRight}>
             <div className={classes.titleContainer}>
               <Typography variant="h5" className={classes.bodyTitle}>
-                Balance, <br />
-                Live Price chart, <br />
-                History.
+                Balance, Live Price Chart, History.
               </Typography>
             </div>
             <Typography
@@ -561,7 +563,7 @@ const Landing = () => {
               price chart, and transaction history!
             </Typography>
           </Grid>
-          <Grid item xs={12} md={8}>
+          <Grid item xs={12} md={6}>
             <div className={classes.laptopContainer}>
               <img src={Laptop} alt="laptop" className={classes.laptop} />
             </div>
@@ -571,12 +573,12 @@ const Landing = () => {
 
       <div className={classes.container2}>
         <Grid container>
-          <Grid item xs={12} md={4}>
+          <Grid item xs={12} md={6}>
             <div className={classes.center}>
               <img src={Referral} alt="Referral" className={classes.referral} />
             </div>
           </Grid>
-          <Grid item xs={12} md={8} className={classes.copyLeft}>
+          <Grid item xs={12} md={6} className={classes.copyLeft}>
             <Typography variant="h5" className={classes.bodyTitle}>
               Earn Bitcoin by Referring Users
             </Typography>
