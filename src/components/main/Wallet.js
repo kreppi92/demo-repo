@@ -264,10 +264,18 @@ class Wallet extends Component {
     amount: "",
     amountHelperText: "",
     amountError: false,
+    withdrawAddress: '',
+    withdrawAddressHelperText: '',
+    withdrawAddressError: false,
+    withdrawAmount: "",
+    withdrawAmountHelperText: "",
+    withdrawAmountError: false,
     sendDialogOpen: false,
+    withdrawDialogOpen: false,
     transactionListType: "sent",
     transactionDialogOpen: false,
     pendingConfirmation: false,
+    pendingWithdrawal: false,
     isLoading: false,
     transactionType: EMAIL,
     receivedList: [],
@@ -276,7 +284,7 @@ class Wallet extends Component {
     snackbarIsOpen: false,
     snackbarVariant: "success",
     snackbarMessage: ""
-  };
+  }
 
   componentWillReceiveProps(newProps) {
     const { address } = this.state
@@ -413,14 +421,14 @@ class Wallet extends Component {
       snackbarIsOpen: true,
       snackbarVariant: "success",
       snackbarMessage: "Your wallet address was successfully copied."
-    });
-  };
+    })
+  }
 
   onSnackBarClose = () => {
     this.setState({
       snackbarIsOpen: false
-    });
-  };
+    })
+  }
 
   handleChange = name => event => {
     event.preventDefault();
@@ -430,19 +438,29 @@ class Wallet extends Component {
       emailHelperText: "",
       emailError: false,
       amountHelperText: "",
-      amountError: false
-    });
-  };
+      amountError: false,
+      withdrawAddressError: false,
+      withdrawAddressHelperText: "",
+      withdrawAmountError: false,
+      withdrawAmountHelperText: ""
+    })
+  }
 
   handleTransactionSwitch = (event, newTransactionListType) => {
     this.setState({ transactionListType: newTransactionListType })
-  };
+  }
 
   handleSendDialogClose = () => {
     this.setState({ 
       sendDialogOpen: false
      })
-  };
+  }
+
+  handleWithdrawDialogClose = () => {
+    this.setState({ 
+      withdrawDialogOpen: false
+     })
+  }
 
   handleSendFunds = () => {
     this.setState({
@@ -452,25 +470,67 @@ class Wallet extends Component {
      })
   };
 
+  handleWithdrawFunds = () => {
+    this.setState({
+      withdrawAddress: '',
+      withdrawAmount: '',
+      withdrawDialogOpen: true
+     })
+  }
+
   handleDownloadGiftReceipt = () => {
     this.validateForms(GIFT)
-  };
+  }
 
   handleSendEmail = () => {
     this.validateForms(EMAIL)
-  };
+  }
 
   handleCancelTransaction = () => {
     this.setState({ pendingConfirmation: false })
-  };
+  }
+
+  handleCancelWithdrawal = () => {
+    this.setState({ pendingWithdrawal: false })
+  }
 
   handleViewTransactions = () => {
     this.setState({ transactionDialogOpen: true })
-  };
+  }
 
   handleTransactionDialogClose = () => {
     this.setState({ transactionDialogOpen: false })
-  };
+  }
+
+  handleConfirmWithdrawal = () => {
+    const { withdrawAddress, withdrawAmount, address } = this.state
+    console.log("Withdraw", withdrawAddress, withdrawAmount )
+
+    this.setState({ isLoading: true })
+
+    var withdrawFunds = Firebase.functions().httpsCallable('withdrawFunds')
+    return withdrawFunds({ token: store.get('token'), address: withdrawAddress, totalAmount: withdrawAmount }).then(function (result) {
+      if (result.data.success) {
+        this.displaySnackbar('success', "Withdrawal successfully processed.")
+        
+        this.setState({
+          withdrawDialogOpen: false,
+          pendingWithdrawal: false,
+          isLoading: false,
+        })
+
+        this.getAllTransactions(store.get('token'), address)
+        
+      } else {
+        this.displaySnackbar('error', result.data.error)
+
+        this.setState({
+          isLoading: false,
+        })
+      }
+    }.bind(this))
+
+  }
 
   handleConfirmTransaction = () => {
     const { transactionType, email, amount, address } = this.state
@@ -497,8 +557,51 @@ class Wallet extends Component {
         
       } else {
         this.displaySnackbar('error', result.data.error)
+
+        this.setState({
+          isLoading: false,
+        })
       }
     }.bind(this))
+  }
+
+  handleProcessWithdrawal = () => {
+    const { withdrawAddress, withdrawAmount, balance } = this.state
+
+    var withdrawAddressHasError = false
+    var withdrawAddressErrorText = ""
+
+    if (withdrawAddress === "") {
+      withdrawAddressHasError = true
+      withdrawAddressErrorText = "Please enter a valid bitcoin address."
+    }
+
+    var withdrawAmountHasError = false;
+    var withdrawAmountErrorText = ""
+
+    if (withdrawAmount === "") {
+      withdrawAmountHasError = true
+      withdrawAmountErrorText = "Please enter an amount."
+    } else if (!/^\d+$/.test(withdrawAmount)) {
+      withdrawAmountHasError = true
+      withdrawAmountErrorText = "This field should only contain numbers."
+    } else if (parseInt(withdrawAmount) > balance) {
+      withdrawAmountHasError = true
+      withdrawAmountErrorText = "You cannot send more than your balance."
+    }
+
+    if (withdrawAddressHasError || withdrawAmountHasError) {
+      this.setState({
+        withdrawAddressError: withdrawAddressHasError,
+        withdrawAddressHelperText: withdrawAddressErrorText,
+        withdrawAmountError: withdrawAmountHasError,
+        withdrawAmountHelperText: withdrawAmountErrorText
+      })
+    } else {
+      this.setState({
+        pendingWithdrawal: true
+      })
+    }
   }
   
   sendEmail = () => {
@@ -522,10 +625,10 @@ class Wallet extends Component {
   }
 
   validateForms(type) {
-    const { email, amount, balance } = this.state;
+    const { email, amount, balance } = this.state
 
-    var emailHasError = false;
-    var emailErrorText = "";
+    var emailHasError = false
+    var emailErrorText = ""
 
     if (email === "") {
       emailHasError = true;
@@ -533,7 +636,7 @@ class Wallet extends Component {
     }
 
     var amountHasError = false;
-    var amountErrorText = "";
+    var amountErrorText = ""
 
     if (amount === "") {
       amountHasError = true;
@@ -557,7 +660,7 @@ class Wallet extends Component {
       this.setState({
         transactionType: type,
         pendingConfirmation: true
-      });
+      })
     }
   }
 
@@ -640,7 +743,7 @@ class Wallet extends Component {
   }
 
   render() {
-    const { address, balance, rate, email, emailHelperText, emailError, amount, amountHelperText, amountError, sendDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, isLoading } = this.state
+    const { address, balance, rate, email, emailHelperText, emailError, withdrawAddress, withdrawAddressError, withdrawAddressHelperText, withdrawAmount, withdrawAmountError, withdrawAmountHelperText, amount, amountHelperText, amountError, sendDialogOpen, withdrawDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, pendingWithdrawal, isLoading } = this.state
     const { classes } = this.props
 
     var btcBalance = bitcoinConverter(parseInt(balance), 'satoshi').to('BTC')
@@ -663,10 +766,13 @@ class Wallet extends Component {
               <div className={classes.qrButtonContainer}>
                 <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
                   Send
-                  </Button>
+                </Button>
+                <Button className={classes.qrButton} size="small" variant={'contained'} color="primary" onClick={this.handleWithdrawFunds}>
+                  Withdraw
+                </Button>
                 <Button className={classes.qrButton} size="small" variant={'contained'} color="secondary" onClick={this.handleViewTransactions}>
                   View transactions
-                  </Button>
+                </Button>
               </div>
             </div>
           </Paper>
@@ -682,10 +788,121 @@ class Wallet extends Component {
           </Paper>
         }
 
-
         <Paper className={classes.paperChart}>
           <Chart currency={currency}/>
         </Paper>
+
+        <Dialog
+          onClose={this.handleWithdrawDialogClose}
+          open={withdrawDialogOpen}
+          disableBackdropClick
+        >
+          <div className={classes.dialogContent}>
+
+            { pendingWithdrawal ? (
+                <div className={classes.dialogTitleContainer}>
+                  Confirm withdrawal
+                  <div />
+                </div>
+              ) : (
+                <div className={classes.dialogTitleContainer}>
+                  Withdraw 
+                  <IconButton
+                    aria-label="close"
+                    className={classes.closeIcon}
+                    onClick={this.handleWithdrawDialogClose}
+                  >
+                    <img src={closeIcon} className={classes.iconButton} alt="" />
+                  </IconButton>
+                </div>
+            )}
+
+            <TextField
+              fullWidth
+              disabled={pendingWithdrawal}
+              error={withdrawAddressError}
+              className={classes.textField}
+              id="outlined-withdraw-address"
+              label="Bitcoin Address"
+              type="text"
+              helperText={withdrawAddressHelperText}
+              value={withdrawAddress}
+              onChange={this.handleChange("withdrawAddress")}
+              variant="outlined"
+            />
+
+            <TextField
+              fullWidth
+              disabled={pendingWithdrawal}
+              error={withdrawAmountError}
+              className={classes.textField}
+              id="outlined-withdraw-amount"
+              label="Amount in Sats"
+              type="text"
+              helperText={withdrawAmountHelperText}
+              value={withdrawAmount}
+              onChange={this.handleChange("withdrawAmount")}
+              variant="outlined"
+            />
+
+            { pendingWithdrawal ? (
+              <div className = {classes.currencySummary}>
+                All withdrawals are charged a 1% processing fee.
+              </div>
+            ) : (
+              <div className = {classes.currencySummary}>
+              { bitcoinConverter(parseInt(withdrawAmount), 'satoshi').to('BTC').toString()} BTC - {currencyFormatter.format(rate * bitcoinConverter(parseInt(withdrawAmount), 'satoshi').to('BTC'), { code: currency })}
+              </div>
+            ) }
+
+            {pendingWithdrawal ? (
+              <div>
+                <Button
+                  className={classes.confirmButton}
+                  size="large"
+                  variant={"contained"}
+                  fullWidth
+                  onClick={this.handleConfirmWithdrawal}
+                >
+                  {isLoading ? (
+                    <CircularProgress
+                      variant="indeterminate"
+                      disableShrink
+                      size={24}
+                      thickness={4}
+                    />
+                  ) : (
+                    "Confirm withdrawal"
+                  )}
+                </Button>
+
+                <Button
+                  disabled={isLoading}
+                  className={classes.cancelButton}
+                  size="large"
+                  variant={"contained"}
+                  fullWidth
+                  onClick={this.handleCancelWithdrawal}
+                >
+                  Cancel
+                </Button>
+              </div>
+            ) : (
+              <div>
+                <Button
+                  className={classes.button}
+                  size="large"
+                  variant={"contained"}
+                  color="primary"
+                  fullWidth
+                  onClick={this.handleProcessWithdrawal}
+                >
+                  Withdraw
+                </Button>
+              </div>
+            )}
+          </div>
+        </Dialog>
 
         <Dialog
           onClose={this.handleSendDialogClose}

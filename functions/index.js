@@ -304,6 +304,43 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
   })
 })
 
+exports.withdrawFunds = functions.https.onCall((data, context) => {
+  const token = data.token
+  const toAddress = data.address
+  const totalAmount = data.totalAmount
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      let authorization = satstreetToken
+      let url = 'https://bitgo.satstreetservices.com/withdrawal'
+      let options = {
+        method: 'POST',
+        url: url,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      options.body = {
+        walletId: "5df0646eb1138b4807c67ce3a37d9eea",
+        sendAmount: totalAmount,
+        sendAddress: toAddress
+      }
+
+      return rp(options).then(function (response) {
+        return { "success": true, response: response }
+      })
+        .catch(function (error) {
+          console.log("Error is", error)
+          return { "success": false, error: "There was an error posting the withdrawal. Please try again later." }
+        })
+    }
+  })
+})
+
 exports.getSentTransactions = functions.https.onCall((data, context) => {
   const token = data.token
 
