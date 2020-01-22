@@ -34,11 +34,11 @@ const styles = {
     },
 
     '@media (max-width:480px)': {
-      fontSize: '12px',
+      fontSize: '10px',
     },
 
     '@media (max-width:360px)': {
-      fontSize: '10px',
+      fontSize: '8px',
     }
   },
 
@@ -71,22 +71,19 @@ const styles = {
   }
 }
 
-class Transaction extends Component {
-  state = {
-  }
-
+class Withdraw extends Component {
   render() {
-    const { classes, transaction } = this.props
+    const { classes, withdrawal } = this.props
 
     return (
       <div className={classes.container}>
         <div className={classes.contentContainer}>
           <div className={classes.leftContent}>
-            <div className={classes.topLeftContent}>{transaction.email}</div>
-            <div className={classes.bottomLeftContent}>{moment.utc(transaction.date._seconds * 1000).format("MMM D, YYYY")}</div>
+            <div className={classes.topLeftContent}>{withdrawal.address}</div>
+            <div className={classes.bottomLeftContent}>{moment.utc(withdrawal.date._seconds * 1000).format("MMM D, YYYY")}</div>
           </div>
           <div className={classes.rightContent}>
-            {transaction.amount} Sats
+            {withdrawal.amount} Sats
         </div>
         </div>
         <Divider />
@@ -95,8 +92,8 @@ class Transaction extends Component {
   }
 }
 
-Transaction.propTypes = {
+Withdraw.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Transaction)
+export default withStyles(styles)(Withdraw)

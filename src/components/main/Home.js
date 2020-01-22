@@ -225,7 +225,7 @@ class Home extends Component {
                 <div className={classes.menuOptionsContainer}>
                   {
                     options.map(function (option, i) {
-                      if (i == 0) {
+                      if (i === 0) {
                         return (
                           <FormControl className={classes.select}>
                             <Select
@@ -256,7 +256,7 @@ class Home extends Component {
               {
                 isExpanded ?
                   options.map(function (option, i) {
-                    if (i == 0) {
+                    if (i === 0) {
                       return (
                         <div className={classes.selectMobile}>
                             <Select

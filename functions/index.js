@@ -304,6 +304,55 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
   })
 })
 
+exports.withdrawFunds = functions.https.onCall((data, context) => {
+  const token = data.token
+  const toAddress = data.address
+  const totalAmount = data.totalAmount
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const email = decoded.email.toLowerCase()
+
+      let authorization = satstreetToken
+      let url = 'https://bitgo.satstreetservices.com/withdrawal'
+      let options = {
+        method: 'POST',
+        url: url,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      options.body = {
+        walletId: "5df0646eb1138b4807c67ce3a37d9eea",
+        sendAmount: totalAmount,
+        sendAddress: toAddress
+      }
+
+      return rp(options).then(function (response) {
+        console.log("Withdraw Response", response)
+
+        let withdrawalData = { email: email, address: toAddress, amount: totalAmount, transactionID: "", date: new Date() }
+
+        return admin.firestore().collection('withdrawals').add(withdrawalData)
+          .then(writeResult => {
+            return { "success": true }
+          })
+          .catch(err => {
+            return { "success": false, "error": "There was an error posting the transaction. Please try again later." }
+          })
+      })
+        .catch(function (error) {
+          console.log("Error is", error)
+          return { "success": false, error: "There was an error posting the withdrawal. Please try again later." }
+        })
+    }
+  })
+})
+
 exports.getSentTransactions = functions.https.onCall((data, context) => {
   const token = data.token
 
@@ -348,6 +397,32 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
           })
 
           return { "success": true, "transactions": transactions }
+        })
+        .catch(err => {
+          return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+        })
+    }
+  })
+})
+
+exports.getWithdrawalTransactions = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const email = decoded.email.toLowerCase()
+
+      return admin.firestore().collection("withdrawals").where("email", "==", email).get()
+        .then(function (querySnapshot) {
+          var withdrawals = []
+          querySnapshot.forEach(function (doc) {
+            var withdrawal = { address: doc.data().address, amount: doc.data().amount, date: doc.data().date, transactionID: doc.data().transactionID }
+            withdrawals.push(withdrawal)
+          })
+
+          return { "success": true, "withdrawals": withdrawals }
         })
         .catch(err => {
           return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
