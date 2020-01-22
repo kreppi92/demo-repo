@@ -15,6 +15,7 @@ import bitcoinIcon from '../../images/bitcoin.svg'
 import closeIcon from '../../images/close.svg'
 import Chart from './Chart'
 import Deposit from './Transactions/Deposit'
+import Withdraw from './Transactions/Withdraw'
 import Transaction from './Transactions/Transaction'
 import Firebase from '../../constants/firebase'
 import CustomSnackbar from '../shared/CustomSnackbar'
@@ -226,6 +227,23 @@ const styles = {
     margin: "60px 0 20px 0"
   },
 
+  toggleButton: {
+    fontSize: '7px',
+    fontWeight: 700,
+
+    "@media (min-width:364px)": {
+      fontSize: '9px',
+    },
+
+    "@media (min-width:400px)": {
+      fontSize: '10px',
+    },
+
+    "@media (min-width:500px)": {
+      fontSize: '12px',
+    }
+  },
+
   textSeperator: {
     alignItems: "center",
     color: palette.blue[0],
@@ -281,6 +299,7 @@ class Wallet extends Component {
     receivedList: [],
     sentList: [],
     depositList: [],
+    withdrawList: [],
     snackbarIsOpen: false,
     snackbarVariant: "success",
     snackbarMessage: ""
@@ -329,13 +348,15 @@ class Wallet extends Component {
     var onChainTransactions = this.getOnchainTransactions(token, address)
     var sentTransactions = this.getSentTransactions(token)
     var receivedTransactions = this.getReceivedTransactions(token)
+    var withdrawalTransactions = this.getWithdrawalTransactions(token)
     var currentRate = this.getRate()
 
-    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, currentRate]).then(responses => {
+    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, withdrawalTransactions, currentRate]).then(responses => {
       const deposits = responses[0].transfers
       const sentTransactions = responses[1]
       const receivedTransactions = responses[2]
-      const currentRate = responses[3]
+      const withdrawalTransactions = responses[3]
+      const currentRate = responses[4]
 
       var balance = 0
       
@@ -353,11 +374,16 @@ class Wallet extends Component {
         balance += parseInt(receivedTransaction.amount)
       })
 
+      withdrawalTransactions.map((withdrawalTransaction, index) => {
+        balance -= parseInt(withdrawalTransaction.amount)
+      })
+
       this.setState({
         address: address,
         depositList: deposits,
         sentList: sentTransactions,
         receivedList: receivedTransactions,
+        withdrawList: withdrawalTransactions,
         balance: balance,
         rate: parseFloat(currentRate)
       })
@@ -391,6 +417,17 @@ class Wallet extends Component {
     return getReceivedTransactions({ token: token }).then(function (result) {
       if (result.data.success) {
         return (result.data.transactions)
+      } else {
+        return ([])
+      }
+    }.bind(this))
+  }
+
+  getWithdrawalTransactions = (token) => {
+    var getWithdrawalTransactions = Firebase.functions().httpsCallable('getWithdrawalTransactions')
+    return getWithdrawalTransactions({ token: token }).then(function (result) {
+      if (result.data.success) {
+        return (result.data.withdrawals)
       } else {
         return ([])
       }
@@ -504,23 +541,26 @@ class Wallet extends Component {
 
   handleConfirmWithdrawal = () => {
     const { withdrawAddress, withdrawAmount, address } = this.state
-    console.log("Withdraw", withdrawAddress, withdrawAmount )
+    const funds = Number(withdrawAmount) * 0.99
+    const fees = Number(withdrawAmount) * 0.01
 
     this.setState({ isLoading: true })
 
     var withdrawFunds = Firebase.functions().httpsCallable('withdrawFunds')
-    return withdrawFunds({ token: store.get('token'), address: withdrawAddress, totalAmount: withdrawAmount }).then(function (result) {
+    return withdrawFunds({ token: store.get('token'), address: withdrawAddress, totalAmount: funds.toString() }).then(function (result) {
       if (result.data.success) {
-        this.displaySnackbar('success', "Withdrawal successfully processed.")
+        var postTransaction = Firebase.functions().httpsCallable('postTransaction')
+        return postTransaction({ token: store.get('token'), toEmail: "info@satstreet.com", amount: fees.toString(), type: "Fees" }).then(function (result) {
+          this.displaySnackbar('success', "Withdrawal successfully processed.")
         
-        this.setState({
-          withdrawDialogOpen: false,
-          pendingWithdrawal: false,
-          isLoading: false,
-        })
+          this.setState({
+            withdrawDialogOpen: false,
+            pendingWithdrawal: false,
+            isLoading: false,
+          })
 
-        this.getAllTransactions(store.get('token'), address)
-        
+          this.getAllTransactions(store.get('token'), address)
+        }.bind(this))
       } else {
         this.displaySnackbar('error', result.data.error)
 
@@ -529,8 +569,8 @@ class Wallet extends Component {
         })
       }
     }.bind(this))
-
   }
+
 
   handleConfirmTransaction = () => {
     const { transactionType, email, amount, address } = this.state
@@ -571,7 +611,7 @@ class Wallet extends Component {
     var withdrawAddressHasError = false
     var withdrawAddressErrorText = ""
 
-    if (withdrawAddress === "") {
+    if (withdrawAddress === "" || withdrawAddress.length < 23) {
       withdrawAddressHasError = true
       withdrawAddressErrorText = "Please enter a valid bitcoin address."
     }
@@ -588,6 +628,9 @@ class Wallet extends Component {
     } else if (parseInt(withdrawAmount) > balance) {
       withdrawAmountHasError = true
       withdrawAmountErrorText = "You cannot send more than your balance."
+    } else if (parseInt(withdrawAmount) < 3000) {
+      withdrawAmountHasError = true
+      withdrawAmountErrorText = "The minimum withdrawal amount is 3000."
     }
 
     if (withdrawAddressHasError || withdrawAmountHasError) {
@@ -679,7 +722,7 @@ class Wallet extends Component {
   }
 
   getTransactions() {
-    const { transactionListType, sentList, receivedList, depositList } = this.state
+    const { transactionListType, sentList, receivedList, depositList, withdrawList } = this.state
     const { classes } = this.props
 
     if (transactionListType === "sent") {
@@ -734,6 +777,25 @@ class Wallet extends Component {
             {
               depositList.map((deposit, index) =>
                 <Deposit key={index} deposit={deposit} />
+              )
+            }
+          </div>
+        );
+      }
+    } else if (transactionListType === "withdrawals") {
+      if (withdrawList.length === 0) {
+        return (
+          <div className={classes.listEmpty}>
+            <img src={bitcoinIcon} className={classes.bitcoinIcon} alt="" />
+            No withdrawals
+          </div>
+        );
+      } else {
+        return (
+          <div className={classes.list}>
+            {
+              withdrawList.map((withdrawal, index) =>
+                <Withdraw key={index} withdrawal={withdrawal} />
               )
             }
           </div>
@@ -1042,9 +1104,10 @@ class Wallet extends Component {
               exclusive
               onChange={this.handleTransactionSwitch}
             >
-              <ToggleButton value="sent">Sent</ToggleButton>
-              <ToggleButton value="received">Received</ToggleButton>
-              <ToggleButton value="deposits">Deposits</ToggleButton>
+              <ToggleButton className={classes.toggleButton} value="sent">Sent</ToggleButton>
+              <ToggleButton className={classes.toggleButton} value="received">Received</ToggleButton>
+              <ToggleButton className={classes.toggleButton} value="deposits">Deposits</ToggleButton>
+              <ToggleButton className={classes.toggleButton} value="withdrawals">Withdrawals</ToggleButton>
             </ToggleButtonGroup>
 
             {this.getTransactions()}
