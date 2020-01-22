@@ -82,7 +82,7 @@ class Transaction extends Component {
       <div className={classes.container}>
         <div className={classes.contentContainer}>
           <div className={classes.leftContent}>
-            <div className={classes.topLeftContent}>{transaction.email}</div>
+            <div className={classes.topLeftContent}>{transaction.email === "info@satstreet.com" ? "Transaction Fee" : transaction.email}</div>
             <div className={classes.bottomLeftContent}>{moment.utc(transaction.date._seconds * 1000).format("MMM D, YYYY")}</div>
           </div>
           <div className={classes.rightContent}>
