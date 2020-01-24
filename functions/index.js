@@ -363,8 +363,8 @@ exports.withdrawFunds = functions.https.onCall((data, context) => {
 
         if (documentId !== "") {
           console.log("Total Balance Withdrawal", email, totalBalance, Number(totalAmount))
-          if (Number(totalAmount) > totalBalance) {
-            return { "success": false, "error": "There was an error posting the transaction. Your amount is larger than your balance." }
+          if (Number(totalAmount) > totalBalance || Number(totalAmount) < 1) {
+            return { "success": false, "error": "There was an error posting the transaction. Wrong amount." }
           } else {
             let authorization = satstreetToken
             let url = 'https://bitgo.satstreetservices.com/withdrawal'
@@ -573,42 +573,45 @@ exports.postTransaction = functions.https.onCall((data, context) => {
       return { "success": false, "error": "Not authorized" }
     } else {
       const fromEmail = decoded.email.toLowerCase()
+      
+      if (fromEmail === toEmail) {
+        return { "success": false, "error": "Invalid Transaction" }
+      } else {
+        let transactionData = { from: fromEmail, to: toEmail, amount: amount, type: type, date: date }
 
-      let transactionData = { from: fromEmail, to: toEmail, amount: amount, type: type, date: date }
+        return admin.firestore().collection("users").where("email", "==", fromEmail).get()
+        .then(function (querySnapshot) {
+          var documentId = ""
+          var totalBalance = 0
+          querySnapshot.forEach(function (doc) {
+            documentId = doc.id
+            totalBalance += Number(doc.data().received)
+            totalBalance -= Number(doc.data().sent)
+            totalBalance += Number(doc.data().deposits)
+            totalBalance -= Number(doc.data().withdrawals)
+          })
 
-      return admin.firestore().collection("users").where("email", "==", fromEmail).get()
-      .then(function (querySnapshot) {
-        var documentId = ""
-        var totalBalance = 0
-        querySnapshot.forEach(function (doc) {
-          documentId = doc.id
-          totalBalance += Number(doc.data().received)
-          totalBalance -= Number(doc.data().sent)
-          totalBalance += Number(doc.data().deposits)
-          totalBalance -= Number(doc.data().withdrawals)
-        })
-
-        if (documentId !== "") {
-          console.log("Total Balance", fromEmail, totalBalance, Number(amount))
-          if (Number(amount) > totalBalance) {
-            return { "success": false, "error": "There was an error posting the transaction. Your amount is larger than your balance." }
+          if (documentId !== "") {
+            console.log("Total Balance", fromEmail, totalBalance, Number(amount))
+            if (Number(amount) > totalBalance || Number(amount) < 1) {
+              return { "success": false, "error": "There was an error posting the transaction. Wrong amount." }
+            } else {
+              return admin.firestore().collection('transactions').add(transactionData)
+              .then(writeResult => {
+                return { "success": true }
+              })
+              .catch(err => {
+                return { "success": false, "error": "There was an error posting the transaction. Please try again later." }
+              })
+            }
           } else {
-            return admin.firestore().collection('transactions').add(transactionData)
-            .then(writeResult => {
-              return { "success": true }
-            })
-            .catch(err => {
-              return { "success": false, "error": "There was an error posting the transaction. Please try again later." }
-            })
+            return { "success": false, "error": "Not authorized" }
           }
-          
-        } else {
+        })
+        .catch(err => {
           return { "success": false, "error": "Not authorized" }
-        }
-      })
-      .catch(err => {
-        return { "success": false, "error": "Not authorized" }
-      })
+        })
+      }
     }
   })
 })
