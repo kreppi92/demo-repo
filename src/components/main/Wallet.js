@@ -359,10 +359,12 @@ class Wallet extends Component {
       const currentRate = responses[4]
 
       var balance = 0
+      var updatedDeposits = []
       
       deposits.map((deposit, index) => {
         if (deposit.state === "confirmed" && deposit.type ==="receive") {
           balance += deposit.value
+          updatedDeposits.push(deposit)
         }
       })
 
@@ -380,7 +382,7 @@ class Wallet extends Component {
 
       this.setState({
         address: address,
-        depositList: deposits,
+        depositList: updatedDeposits,
         sentList: sentTransactions,
         receivedList: receivedTransactions,
         withdrawList: withdrawalTransactions,
