@@ -122,9 +122,6 @@ exports.verifyCode = functions.https.onCall((data, context) => {
         storedCode = doc.data().code
       })
 
-      console.log("User code", code, email)
-      console.log("Stored code", storedCode)
-
       if (code === storedCode) {
         return { "success": true }
       } else {
