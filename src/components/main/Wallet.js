@@ -302,7 +302,10 @@ class Wallet extends Component {
     withdrawList: [],
     snackbarIsOpen: false,
     snackbarVariant: "success",
-    snackbarMessage: ""
+    snackbarMessage: "",
+    growsurfId: "",
+    referralUrl: "",
+    completedDeposit: false
   }
 
   componentWillReceiveProps(newProps) {
@@ -350,8 +353,9 @@ class Wallet extends Component {
     var receivedTransactions = this.getReceivedTransactions(token)
     var withdrawalTransactions = this.getWithdrawalTransactions(token)
     var currentRate = this.getRate()
+    var getCurrentGrowsurfParticipant = this.getCurrentGrowsurfParticipant(token)
 
-    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, withdrawalTransactions, currentRate]).then(responses => {
+    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, withdrawalTransactions, currentRate, getCurrentGrowsurfParticipant]).then(responses => {
       const deposits = responses[0].transfers
       const sentTransactions = responses[1]
       const receivedTransactions = responses[2]
@@ -445,6 +449,42 @@ class Wallet extends Component {
         return ([])
       }
     }.bind(this))
+  }
+
+  getCurrentGrowsurfParticipant = (token) => {
+    console.log("Checking growsurf")
+    return
+    /*
+    const { depositList } = this.state
+
+    var getGrowsurfParticipant = Firebase.functions().httpsCallable('getGrowsurfParticipant')
+    return getGrowsurfParticipant({ token: token }).then(function (result) {
+      console.log("Growsurf Get, ", result.data.success)
+      if (result.data.success) {
+        this.setState({
+          growsurfId: result.data.growsurfId,
+          referralUrl: result.data.referralUrl,
+          completedDeposit: result.data.completedDeposit
+        })
+        return 
+      } else {
+        var hasCompletedDeposit = (depositList.length > 0) ? true : false
+        var createGrowsurfParticipant = Firebase.functions().httpsCallable('createGrowsurfParticipant')
+        return createGrowsurfParticipant({ token: token, completedDeposit: hasCompletedDeposit }).then(function (result) {
+          console.log("Growsurf Create, ", result.data)
+          if (result.data.success) {
+            this.setState({
+              growsurfId: result.data.growsurfId,
+              referralUrl: result.data.referralUrl,
+              completedDeposit: true
+            })
+            return
+          } else {
+            return ("False")
+          }
+        }.bind(this))
+      }
+    }.bind(this))*/
   }
 
   displaySnackbar = (variant, message) => {

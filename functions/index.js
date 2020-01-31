@@ -9,6 +9,8 @@ var crypto = require('crypto')
 const jwtToken = functions.config().jwt.token
 const sendgridKey = functions.config().sendgrid.key
 const satstreetToken = functions.config().satstreet.token
+const growsurfKey = functions.config().growsurf.key
+const campaignKey = functions.config().campaign.key
 
 admin.initializeApp()
 
@@ -862,4 +864,119 @@ exports.updatePassword = functions.https.onCall((data, context) => {
     .catch(err => {
       return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
     })
+})
+
+exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
+  const token = data.token
+  const referId = data.referId
+  const completedDeposit = data.completedDeposit
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const userEmail = decoded.email.toLowerCase()
+
+      let authorization = "Bearer " + growsurfKey
+      let options = {
+        method: 'POST',
+        url: 'https://api.growsurf.com/v2/campaign/'+ campaignKey + '/participant',
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      if (data.referId) {
+        options.body = {
+          email: userEmail,
+          referredBy: referId,
+          completedDeposit: completedDeposit
+        }
+      } else {
+        options.body = {
+          email: userEmail,
+          completedDeposit: completedDeposit
+        }
+      }
+
+      return rp(options).then(function (response) {
+        const growsurfId = response.id
+        const referralUrl = response.shareUrl
+
+        return { "success": true, "growsurfId": growsurfId, "referralUrl": referralUrl }
+      })
+        .catch(function (err) {
+          console.log("Growsurf Create:", err)
+          return { "success": false }
+      })
+    }
+  })
+})
+
+exports.getGrowsurfParticipant = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const userEmail = decoded.email.toLowerCase()
+
+      let authorization = "Bearer " + growsurfKey
+      let options = {
+        method: 'GET',
+        url: 'https://api.growsurf.com/v2/campaign/'+ campaignKey + '/participant/' + userEmail,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      return rp(options).then(function (response) {
+        const growsurfId = response.id
+        const referralUrl = response.shareUrl
+        const completedDeposit = response.metadata.completedDeposit
+
+        return { "success": true, "growsurfId": growsurfId, "referralUrl": referralUrl, "completedDeposit": completedDeposit }
+      })
+        .catch(function (err) {
+          return { "success": false }
+      })
+    }
+  })
+})
+
+exports.updateGrowsurfDepositCompleted = functions.https.onCall((data, context) => {
+  const token = data.token
+  const growsurfId = data.growsurfId
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      let authorization = "Bearer " + growsurfKey
+      let options = {
+        method: 'POST',
+        url: 'https://api.growsurf.com/v2/campaign/'+ campaignKey + '/participant/' + growsurfId,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      options.body = {
+        metadata: {
+          completedDeposit: true
+        }
+      }
+
+      return rp(options).then(function (response) {
+        return { "success": true }
+      })
+        .catch(function (err) {
+          return { "success": false }
+      })
+    }
+  })
 })
