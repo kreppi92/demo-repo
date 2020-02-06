@@ -980,3 +980,33 @@ exports.updateGrowsurfDepositCompleted = functions.https.onCall((data, context) 
     }
   })
 })
+
+exports.getEarn = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      return admin.firestore().collection("earn").get().then(function (querySnapshot) {
+        var earns = []
+        querySnapshot.forEach(function (doc) {
+          var earn = {imageUrl: doc.data().imageUrl, 
+                      order: doc.data().order, 
+                      link: doc.data().link,
+                      preMessaging: doc.data().preMessaging,
+                      postMessaging: doc.data().postMessaging,
+                      satValue: doc.data().satValue,
+                      reward: doc.data().reward,
+                      provider: doc.data().provider
+                     }
+          earns.push(earn)
+        })
+        return { "success": true, "earns": earns } 
+      })
+      .catch(err => {
+        return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
+  })
+})

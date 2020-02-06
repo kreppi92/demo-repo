@@ -18,7 +18,7 @@ import Wallet from './Wallet'
 
 var store = require('store')
 
-const options = ["Currency", "Wallet", "Education", "Resources", "Sign out"]
+const options = ["Currency", "Wallet", "Earn", "Resources", "Sign out"]
 
 const Mobile = ({ children }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 })
@@ -110,6 +110,7 @@ const styles = {
   mainContent: {
     alignItems: 'center',
     display: 'flex',
+    minHeight: '100vh',
     flexDirection: 'column',
     width: '100%'
   },
@@ -172,14 +173,17 @@ class Home extends Component {
   }
 
   handleOptionChange = (option) => {
+    console.log('option', option)
     if (option === "Sign out") {
       store.clearAll()
       window.location = '/signin'
-    } else if (option !== "Wallet") {
+    } else if (option === "Resources") {
       this.setState({
         snackbarIsOpen: true
       })
-    } 
+    } else {
+      this.setState({selectedOption: option})
+    }
 
     this.setState({
       isExpanded: false
@@ -293,9 +297,8 @@ class Home extends Component {
             </Default>
 
             <div className={classes.mainContent}>
-              <Wallet currency={currency}/>
+              <Wallet currency={currency} type={selectedOption}/>
             </div>
-
 
             <div className={classes.footer}>
               <Footer />
