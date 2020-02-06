@@ -294,6 +294,11 @@ class Signup extends Component {
     signUp({ email: email, password: password }).then(function (result) {
       if (result.data.success) {
         store.set('token', result.data.token)
+        const query = new URLSearchParams(window.location.search)
+        if (query.get('grsf')) {
+          console.log("growsurf", query.get('grsf'))
+          store.set('referralID', query.get('grsf'))
+        }
         this.displaySnackbar('success', "Account successfully created.")
         window.location = '/home'
       } else {

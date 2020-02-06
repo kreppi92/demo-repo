@@ -11,7 +11,7 @@ var store = require('store')
 // Styles
 const styles = ({
   bold: {
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 700
   },
 
@@ -49,7 +49,7 @@ const styles = ({
     alignItems: 'center',
     display: 'flex',
     justifyContent: 'center',
-    margin: '10px 0 0 0',
+    margin: '10px 0 10px 0',
     width: 'calc(100% / 4)',
 
     "@media (max-width:780px)": {
@@ -69,7 +69,6 @@ const styles = ({
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-start',
-    height: "90%",
     width: "90%"
   },
 
@@ -81,14 +80,14 @@ const styles = ({
   },
 
   title: {
-    fontSize: '18px',
+    fontSize: '16px',
     fontWeight: 600,
     margin: '5px 10px 10px 10px',
   },
 
   subtitle: {
     color: palette.gray[2],
-    fontSize: '16px',
+    fontSize: '15px',
     fontWeight: 500,
     textAlign: 'center',
     margin: '10px 10px 10px 10px',

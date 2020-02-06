@@ -31,7 +31,8 @@ exports.generateCode = functions.https.onCall((data, context) => {
 
   options.body = {
     from: {
-      email: 'info@satstreet.com'
+      email: 'info@satstreet.com',
+      name: 'Satstreet Inc.'
     },
     template_id: 'd-5b71dd36091c4720bca38449b16d4808',
     personalizations: [
@@ -619,6 +620,9 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
   const token = data.token
   const toEmail = data.toEmail.toLowerCase()
   const amount = data.amount
+  const referralId = data.referralId
+  
+  console.log("Referral Id is", referralId)
 
   const btcAmount = bitcoinConverter(parseInt(amount), 'satoshi').to('BTC').toString()
 
@@ -641,7 +645,8 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
 
       options.body = {
         from: {
-          email: 'info@satstreet.com'
+          email: 'info@satstreet.com',
+          name: 'Satstreet Inc.'
         },
         template_id: 'd-337cfdfd328248f68c24d1b28df89bcf',
         personalizations: [
@@ -654,7 +659,8 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
             dynamic_template_data: {
               senderEmail: fromEmail,
               satAmount: amount,
-              btcAmount: btcAmount
+              btcAmount: btcAmount,
+              referralId: referralId
             }
           }
         ]
@@ -674,14 +680,10 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
 exports.getRate = functions.https.onCall((data, context) => {
   const currency = data.currency
 
-  let authorization = "Bearer " + sendgridKey
   let url = 'https://api.coindesk.com/v1/bpi/currentprice/' + currency +'.json'
   let options = {
     method: 'GET',
     url: url,
-    headers: {
-      Authorization: authorization
-    },
     json: true
   }
 
@@ -712,7 +714,8 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
 
   options.body = {
     from: {
-      email: 'info@satstreet.com'
+      email: 'info@satstreet.com',
+      name: 'Satstreet Inc.'
     },
     template_id: 'd-fc00a55b975748bebfa5e023dfe7ca5b',
     personalizations: [
@@ -891,12 +894,16 @@ exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
         options.body = {
           email: userEmail,
           referredBy: referId,
-          completedDeposit: completedDeposit
+          metadata: {
+            completedDeposit: completedDeposit
+          }
         }
       } else {
         options.body = {
           email: userEmail,
-          completedDeposit: completedDeposit
+          metadata: {
+            completedDeposit: completedDeposit
+          }
         }
       }
 

@@ -139,8 +139,7 @@ const styles = {
   list: {
     display: "flex",
     flexDirection: "column",
-    overflow: "auto",
-    height: "340px",
+    overflowY: "auto",
     margin: "20px 0 0 0"
   },
 
@@ -498,17 +497,17 @@ class Wallet extends Component {
       } else {
         var hasCompletedDeposit = (depositList.length > 0) ? true : false
         var createGrowsurfParticipant = Firebase.functions().httpsCallable('createGrowsurfParticipant')
-        return createGrowsurfParticipant({ token: token, completedDeposit: hasCompletedDeposit }).then(function (result) {
+        return createGrowsurfParticipant({ token: token, completedDeposit: hasCompletedDeposit, referId: store.get('referralID') }).then(function (result) {
           console.log("Growsurf Create, ", result.data)
           if (result.data.success) {
             this.setState({
               growsurfId: result.data.growsurfId,
               referralUrl: result.data.referralUrl,
-              completedDeposit: true
+              completedDeposit: hasCompletedDeposit
             })
             return
           } else {
-            return ("False")
+            return 
           }
         }.bind(this))
       }
@@ -726,10 +725,12 @@ class Wallet extends Component {
   }
   
   sendEmail = () => {
-    const { email, amount } = this.state
+    const { email, amount, growsurfId } = this.state
 
+    var referralID = "?grsf=" + growsurfId
+    
     var sendEmailReceipt = Firebase.functions().httpsCallable('sendEmailReceipt')
-    return sendEmailReceipt({ token: store.get('token'), toEmail: email, amount: amount }).then(function (result) {
+    return sendEmailReceipt({ token: store.get('token'), toEmail: email, amount: amount, referralId: referralID }).then(function (result) {
       if (result.data.success) {
         this.displaySnackbar('success', "Your email receipt has been sent.")
       } 
