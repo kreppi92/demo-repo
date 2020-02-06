@@ -48,5 +48,5 @@ Chart.propTypes = {
   classes: PropTypes.object.isRequired
 }
 
-export default withStyles(styles)(Chart)
+export default withStyles(styles)(React.memo(Chart))
 

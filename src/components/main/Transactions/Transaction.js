@@ -17,6 +17,7 @@ const styles = {
     flexDirection: 'row',
     justifyContent: 'space-between',
     height: '80px',
+    minHeight: '80px',
     width: '100%'
   },
 

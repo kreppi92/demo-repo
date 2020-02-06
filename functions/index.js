@@ -9,6 +9,8 @@ var crypto = require('crypto')
 const jwtToken = functions.config().jwt.token
 const sendgridKey = functions.config().sendgrid.key
 const satstreetToken = functions.config().satstreet.token
+const growsurfKey = functions.config().growsurf.key
+const campaignKey = functions.config().campaign.key
 
 admin.initializeApp()
 
@@ -29,7 +31,8 @@ exports.generateCode = functions.https.onCall((data, context) => {
 
   options.body = {
     from: {
-      email: 'info@satstreet.com'
+      email: 'info@satstreet.com',
+      name: 'Satstreet Inc.'
     },
     template_id: 'd-5b71dd36091c4720bca38449b16d4808',
     personalizations: [
@@ -617,6 +620,9 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
   const token = data.token
   const toEmail = data.toEmail.toLowerCase()
   const amount = data.amount
+  const referralId = data.referralId
+  
+  console.log("Referral Id is", referralId)
 
   const btcAmount = bitcoinConverter(parseInt(amount), 'satoshi').to('BTC').toString()
 
@@ -639,7 +645,8 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
 
       options.body = {
         from: {
-          email: 'info@satstreet.com'
+          email: 'info@satstreet.com',
+          name: 'Satstreet Inc.'
         },
         template_id: 'd-337cfdfd328248f68c24d1b28df89bcf',
         personalizations: [
@@ -652,7 +659,8 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
             dynamic_template_data: {
               senderEmail: fromEmail,
               satAmount: amount,
-              btcAmount: btcAmount
+              btcAmount: btcAmount,
+              referralId: referralId
             }
           }
         ]
@@ -672,14 +680,10 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
 exports.getRate = functions.https.onCall((data, context) => {
   const currency = data.currency
 
-  let authorization = "Bearer " + sendgridKey
   let url = 'https://api.coindesk.com/v1/bpi/currentprice/' + currency +'.json'
   let options = {
     method: 'GET',
     url: url,
-    headers: {
-      Authorization: authorization
-    },
     json: true
   }
 
@@ -710,7 +714,8 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
 
   options.body = {
     from: {
-      email: 'info@satstreet.com'
+      email: 'info@satstreet.com',
+      name: 'Satstreet Inc.'
     },
     template_id: 'd-fc00a55b975748bebfa5e023dfe7ca5b',
     personalizations: [
@@ -862,4 +867,153 @@ exports.updatePassword = functions.https.onCall((data, context) => {
     .catch(err => {
       return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
     })
+})
+
+exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
+  const token = data.token
+  const referId = data.referId
+  const completedDeposit = data.completedDeposit
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const userEmail = decoded.email.toLowerCase()
+
+      let authorization = "Bearer " + growsurfKey
+      let options = {
+        method: 'POST',
+        url: 'https://api.growsurf.com/v2/campaign/'+ campaignKey + '/participant',
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      if (data.referId) {
+        options.body = {
+          email: userEmail,
+          referredBy: referId,
+          metadata: {
+            completedDeposit: completedDeposit
+          }
+        }
+      } else {
+        options.body = {
+          email: userEmail,
+          metadata: {
+            completedDeposit: completedDeposit
+          }
+        }
+      }
+
+      return rp(options).then(function (response) {
+        const growsurfId = response.id
+        const referralUrl = response.shareUrl
+
+        return { "success": true, "growsurfId": growsurfId, "referralUrl": referralUrl }
+      })
+        .catch(function (err) {
+          console.log("Growsurf Create:", err)
+          return { "success": false }
+      })
+    }
+  })
+})
+
+exports.getGrowsurfParticipant = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const userEmail = decoded.email.toLowerCase()
+
+      let authorization = "Bearer " + growsurfKey
+      let options = {
+        method: 'GET',
+        url: 'https://api.growsurf.com/v2/campaign/'+ campaignKey + '/participant/' + userEmail,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      return rp(options).then(function (response) {
+        const growsurfId = response.id
+        const referralUrl = response.shareUrl
+        const completedDeposit = response.metadata.completedDeposit
+
+        return { "success": true, "growsurfId": growsurfId, "referralUrl": referralUrl, "completedDeposit": completedDeposit }
+      })
+        .catch(function (err) {
+          return { "success": false }
+      })
+    }
+  })
+})
+
+exports.updateGrowsurfDepositCompleted = functions.https.onCall((data, context) => {
+  const token = data.token
+  const growsurfId = data.growsurfId
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      let authorization = "Bearer " + growsurfKey
+      let options = {
+        method: 'POST',
+        url: 'https://api.growsurf.com/v2/campaign/'+ campaignKey + '/participant/' + growsurfId,
+        headers: {
+          Authorization: authorization
+        },
+        json: true
+      }
+
+      options.body = {
+        metadata: {
+          completedDeposit: true
+        }
+      }
+
+      return rp(options).then(function (response) {
+        return { "success": true }
+      })
+        .catch(function (err) {
+          return { "success": false }
+      })
+    }
+  })
+})
+
+exports.getEarn = functions.https.onCall((data, context) => {
+  const token = data.token
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      return admin.firestore().collection("earn").get().then(function (querySnapshot) {
+        var earns = []
+        querySnapshot.forEach(function (doc) {
+          var earn = {imageUrl: doc.data().imageUrl, 
+                      order: doc.data().order, 
+                      link: doc.data().link,
+                      preMessaging: doc.data().preMessaging,
+                      postMessaging: doc.data().postMessaging,
+                      satValue: doc.data().satValue,
+                      reward: doc.data().reward,
+                      provider: doc.data().provider
+                     }
+          earns.push(earn)
+        })
+        return { "success": true, "earns": earns } 
+      })
+      .catch(err => {
+        return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
+  })
 })
