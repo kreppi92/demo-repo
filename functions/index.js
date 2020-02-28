@@ -820,13 +820,15 @@ exports.isLinkValid = functions.https.onCall((data, context) => {
           if (shouldReset) {
             return admin.firestore().collection('resets').doc(docId).update({code: ""})
             .then(writeResult => {
-              return { "success": true, hours: hours, email: email}
+              var refreshToken = jwt.sign({ email: email }, jwtToken)
+              return { "success": true, hours: hours, email: email, refreshToken: refreshToken}
             })
             .catch(err => {
               return { "success": false, "error": "There was an error updating your password. Please try again later." }
             })
           } else {
-            return { "success": true, hours: hours, email: email}
+            var refreshToken = jwt.sign({ email: email }, jwtToken)
+            return { "success": true, hours: hours, email: email, refreshToken: refreshToken}
           }
         } else {
           return { "success": false, hours: hours}
@@ -839,34 +841,42 @@ exports.isLinkValid = functions.https.onCall((data, context) => {
 })
 
 exports.updatePassword = functions.https.onCall((data, context) => {
-  const email = data.email.toLowerCase()
   const password = data.password
+  const token = data.token
 
-  return admin.firestore().collection("users").where("email", "==", email)
-    .get()
-    .then(function (querySnapshot) {
-      var documentId = ""
-      querySnapshot.forEach(function (doc) {
-        documentId = doc.id
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { "success": false, "error": "Not authorized" }
+    } else {
+      const email = decoded.email.toLowerCase()
+
+      return admin.firestore().collection("users").where("email", "==", email)
+      .get()
+      .then(function (querySnapshot) {
+        var documentId = ""
+        querySnapshot.forEach(function (doc) {
+          documentId = doc.id
+        })
+        if (documentId !== "") {
+          var hash = bcrypt.hashSync(password, 10)
+          let userData = { password: hash }
+
+          return admin.firestore().collection('users').doc(documentId).update(userData)
+            .then(writeResult => {
+              return { "success": true }
+            })
+            .catch(err => {
+              return { "success": false, "error": "There was an error updating your password. Please try again later." }
+            })
+        } else {
+          return { "success": false, "error": "This user does not exists exits. Please try signing in." }
+        }
       })
-      if (documentId !== "") {
-        var hash = bcrypt.hashSync(password, 10)
-        let userData = { password: hash }
-
-        return admin.firestore().collection('users').doc(documentId).update(userData)
-          .then(writeResult => {
-            return { "success": true }
-          })
-          .catch(err => {
-            return { "success": false, "error": "There was an error updating your password. Please try again later." }
-          })
-      } else {
-        return { "success": false, "error": "This user does not exists exits. Please try signing in." }
-      }
-    })
-    .catch(err => {
-      return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
-    })
+      .catch(err => {
+        return { "success": false, "error": "There was an error connecting to our server. Please try again later." }
+      })
+    }
+  })
 })
 
 exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
