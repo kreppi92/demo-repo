@@ -226,7 +226,7 @@ class ResetPassword extends Component {
       var isLinkValid = Firebase.functions().httpsCallable('isLinkValid')
       isLinkValid({ token: parsed.reset, shouldReset: true }).then(function (result) {
         if (result.data.success) {
-          this.resetPassword(result.data.email, newPassword)
+          this.resetPassword(newPassword, result.data.refreshToken)
         } else {
           this.setState({
             isViewLoading: false,
@@ -240,9 +240,9 @@ class ResetPassword extends Component {
     }
   }
 
-  resetPassword(email, newPassword) {
+  resetPassword(newPassword, token) {
     var updatePassword = Firebase.functions().httpsCallable('updatePassword')
-      updatePassword({ email: email, password: newPassword }).then(function (result) {
+      updatePassword({ password: newPassword, token: token }).then(function (result) {
         console.log(result.data)
         if (result.data.success) {
           this.setState({
