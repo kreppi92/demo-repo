@@ -1,39 +1,38 @@
-import React, { Component } from 'react'
-import PropTypes from 'prop-types'
-import Button from '@material-ui/core/Button'
-import CircularProgress from '@material-ui/core/CircularProgress'
-import Dialog from '@material-ui/core/Dialog'
-import IconButton from '@material-ui/core/IconButton'
-import Paper from '@material-ui/core/Paper'
-import TextField from '@material-ui/core/TextField'
-import Typography from '@material-ui/core/Typography'
-import ToggleButton from '@material-ui/lab/ToggleButton'
-import ToggleButtonGroup from '@material-ui/lab/ToggleButtonGroup'
-import { withStyles } from '@material-ui/core/styles'
-import { palette } from '../../constants/styles'
-import bitcoinIcon from '../../images/bitcoin.svg'
-import closeIcon from '../../images/close.svg'
-import Chart from './Chart'
-import Deposit from './Transactions/Deposit'
-import Withdraw from './Transactions/Withdraw'
-import Transaction from './Transactions/Transaction'
-import Firebase from '../../constants/firebase'
-import CustomSnackbar from '../shared/CustomSnackbar'
-import { pdf } from "@react-pdf/renderer"
-import { saveAs } from "file-saver"
-import { CopyToClipboard } from 'react-copy-to-clipboard'
-import Certificate from "./Certificate"
-import Earn from './Earn'
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import Button from "@material-ui/core/Button";
+import CircularProgress from "@material-ui/core/CircularProgress";
+import Dialog from "@material-ui/core/Dialog";
+import IconButton from "@material-ui/core/IconButton";
+import Paper from "@material-ui/core/Paper";
+import TextField from "@material-ui/core/TextField";
+import Typography from "@material-ui/core/Typography";
+import ToggleButton from "@material-ui/lab/ToggleButton";
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup";
+import { withStyles } from "@material-ui/core/styles";
+import { palette } from "../../constants/styles";
+import bitcoinIcon from "../../images/bitcoin.svg";
+import closeIcon from "../../images/close.svg";
+import Chart from "./Chart";
+import Deposit from "./Transactions/Deposit";
+import Withdraw from "./Transactions/Withdraw";
+import Transaction from "./Transactions/Transaction";
+import Firebase from "../../constants/firebase";
+import CustomSnackbar from "../shared/CustomSnackbar";
+import { pdf } from "@react-pdf/renderer";
+import { saveAs } from "file-saver";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import Certificate from "./Certificate";
+import Earn from "./Earn";
+var bitcoinConverter = require("bitcoin-units");
+var currencyFormatter = require("currency-formatter");
+var QRCode = require("qrcode.react");
+var store = require("store");
 
-var bitcoinConverter = require('bitcoin-units')
-var currencyFormatter = require('currency-formatter')
-var QRCode = require('qrcode.react')
-var store = require('store')
-
-const EMAIL = "email"
-const GIFT = "gift"
-var timerID = null
-var currency = ''
+const EMAIL = "email";
+const GIFT = "gift";
+var timerID = null;
+var currency = "";
 
 const styles = {
   address: {
@@ -69,9 +68,9 @@ const styles = {
   },
 
   holdingContainer: {
-    display: 'flex',
-    justifyContent: 'center',
-    width: '100%'
+    display: "flex",
+    justifyContent: "center",
+    width: "100%"
   },
 
   container: {
@@ -91,14 +90,22 @@ const styles = {
     justifyContent: "center",
     flexDirection: "column",
     alignItems: "center",
-    padding: "40px 20px 40px 20px",
+    // padding: "40px 20px 40px 20px",
 
     "@media (min-width:780px)": {
-      padding: "40px 40px 40px 40px"
+      // padding: "40px 40px 40px 40px"
     }
   },
 
   dialogContent: {
+    padding: "15px 20px 50px 20px"
+  },
+
+  dialogContentCentered: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "column",
     padding: "15px 20px 50px 20px"
   },
 
@@ -111,7 +118,8 @@ const styles = {
     height: "60px",
     justifyContent: "space-between",
     margin: "10px 0 30px 0",
-    padding: "0 0 0 5px"
+    padding: "0 0 0 5px",
+    width: "100%"
   },
 
   iconButton: {
@@ -129,7 +137,7 @@ const styles = {
     fontWeight: 700,
     fontSize: "13px",
     textDecoration: "none",
-    margin: "5px 0 0 0",
+    margin: "5px 0 30px 0",
 
     "&:hover": {
       textDecoration: "underline"
@@ -170,27 +178,30 @@ const styles = {
   },
 
   paperOptionsEmpty: {
-    alignItems: 'center',
-    display: 'flex',
-    flexDirection: 'column',
-    justifyContent: 'center',
-    minHeight: '652px',
-    minWidth: '300px',
-    width: '100%',
+    alignItems: "center",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    minHeight: "652px",
+    minWidth: "300px",
+    width: "100%",
 
-    '@media (min-width:780px)': {
-      border: '1px solid',
+    "@media (min-width:780px)": {
+      border: "1px solid",
       borderColor: palette.gray[0],
-      margin: '10vh 0 10vh 0',
-      width: '30%'
-    },
+      margin: "10vh 0 10vh 0",
+      width: "30%"
+    }
   },
 
-  paperChart: {
+  paperGrid: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
     boxShadow: "none",
     borderRadius: "5px",
     minHeight: "652px",
-    margin: "30px 0 80px 0",
+    margin: "50px 0 50px 0",
     width: "100%",
 
     "@media (min-width:780px)": {
@@ -218,7 +229,6 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "space-around",
-    padding: "40px 20px 0 20px",
     maxWidth: "400px",
     width: "100%"
   },
@@ -230,23 +240,23 @@ const styles = {
   },
 
   qrCode: {
-    margin: "60px 0 20px 0"
+    margin: "20px 0px"
   },
 
   toggleButton: {
-    fontSize: '7px',
+    fontSize: "7px",
     fontWeight: 700,
 
     "@media (min-width:364px)": {
-      fontSize: '9px',
+      fontSize: "9px"
     },
 
     "@media (min-width:400px)": {
-      fontSize: '10px',
+      fontSize: "10px"
     },
 
     "@media (min-width:500px)": {
-      fontSize: '12px',
+      fontSize: "12px"
     }
   },
 
@@ -266,27 +276,24 @@ const styles = {
   },
 
   currencySummary: {
-    alignItems: 'center',
+    alignItems: "center",
     color: palette.gray[2],
-    display: 'flex',
-    justifyContent: 'flex-end',
-    width: '100%',
-    fontWeight: '700',
-    fontSize: '13px',
-    margin: '-15px 0 20px 0'
+    display: "flex",
+    justifyContent: "flex-end",
+    width: "100%",
+    fontWeight: "700",
+    fontSize: "13px",
+    margin: "-15px 0 20px 0"
   },
 
-  horizontalButtonContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    margin: "0 0 15px 0",
+  paddingContainer: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: "25px",
+    boxSizing: "border-box",
     width: "100%"
-  },
-
-  horizontalButton: {
-    height: "50px",
-    width: '48%'
   },
 
   shareButton: {
@@ -298,22 +305,125 @@ const styles = {
     "&:hover": {
       background: palette.green[1]
     }
+  },
+  image: {
+    maxWidth: "150px",
+    margin: "10px 10px 5px 10px",
+    objectFit: "scale-down"
+  },
+  earnRow: {
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    cursor: "pointer",
+    padding: 10,
+    borderRadius: 3,
+    margin: 10,
+    "&:hover": {
+      background: "#eee"
+    }
+  },
+  earnCell: {
+    width: "50%",
+    height: "50px",
+    display: "flex",
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    textAlign: "center"
+  },
+  bold: {
+    fontSize: "16px",
+    fontWeight: 700
+  },
+
+  circularProgress: {
+    color: palette.blue[0]
+  },
+
+  button: {
+    height: "50px",
+    boxSizing: "border-box",
+    width: "90%"
+  },
+
+  earnContainer: {
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    margin: "50px 0 50px 0",
+    width: "100%",
+
+    "@media (min-width:780px)": {
+      width: "80%"
+    }
+  },
+
+  loadingHolder: {
+    alignItems: "center",
+    display: "flex",
+    height: "652px",
+    justifyContent: "center",
+    width: "100vw"
+  },
+
+  outerBox: {
+    alignItems: "center",
+    display: "flex",
+    justifyContent: "center",
+    margin: "10px 0 10px 0",
+    width: "calc(100% / 3)",
+
+    "@media (max-width:780px)": {
+      width: "calc(100% / 2)"
+    },
+
+    "@media (max-width:500px)": {
+      width: "100%"
+    }
+  },
+
+  innerBox: {
+    alignItems: "center",
+    border: "1px solid",
+    borderColor: palette.blue[0],
+    borderRadius: "5px",
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+    height: "250px",
+    width: "90%"
+  },
+
+  title: {
+    fontSize: "16px",
+    fontWeight: 600,
+    margin: "5px 10px 10px 10px"
+  },
+
+  subtitle: {
+    color: palette.gray[2],
+    fontSize: "15px",
+    fontWeight: 500,
+    textAlign: "center",
+    margin: "10px 10px 10px 10px"
   }
 };
 
 class Wallet extends Component {
   state = {
-    address: '',
+    address: "",
     rate: 0,
-    balance: '',
-    email: '',
-    emailHelperText: '',
+    balance: "",
+    email: "",
+    emailHelperText: "",
     emailError: false,
     amount: "",
     amountHelperText: "",
     amountError: false,
-    withdrawAddress: '',
-    withdrawAddressHelperText: '',
+    withdrawAddress: "",
+    withdrawAddressHelperText: "",
     withdrawAddressError: false,
     withdrawAmount: "",
     withdrawAmountHelperText: "",
@@ -335,84 +445,124 @@ class Wallet extends Component {
     snackbarMessage: "",
     growsurfId: "",
     referralUrl: "",
-    completedDeposit: false
-  }
+    completedDeposit: false,
+    addFundsDialog: false,
+    earns: []
+  };
 
   componentWillReceiveProps(newProps) {
-    const { address } = this.state
-    if (store.get('token') && address.length > 0) {
-      currency = newProps.currency
-      this.getAllTransactions(store.get('token'), address)
+    const { address } = this.state;
+    if (store.get("token") && address.length > 0) {
+      currency = newProps.currency;
+      this.getAllTransactions(store.get("token"), address);
     }
   }
 
   componentDidMount() {
-    if (store.get('token')) {
-      currency = this.props.currency
-      this.getWalletAddress(store.get('token'))
+    if (store.get("token")) {
+      currency = this.props.currency;
+      this.getWalletAddress(store.get("token"));
     }
+    this.getEarns();
   }
+
+  getEarns = () => {
+    this.setState({ isLoading: true });
+    var getEarn = Firebase.functions().httpsCallable("getEarn");
+    return getEarn({ token: store.get("token") }).then(
+      function(result) {
+        if (result.data.success) {
+          this.setState({
+            earns: result.data.earns.sort((a, b) =>
+              a.order > b.order ? 1 : -1
+            )
+          });
+        }
+        this.setState({ isLoading: false });
+      }.bind(this)
+    );
+  };
 
   componentDidUnmount() {
-    if(timerID) {
-      clearInterval(timerID)
+    if (timerID) {
+      clearInterval(timerID);
     }
   }
 
-  getWalletAddress = (token) => {
-    var checkAddress = Firebase.functions().httpsCallable('checkAddress')
-    checkAddress({ token: token }).then(function (result) {
-      if (result.data.success) {
-        this.getAllTransactions(token, result.data.address)
-        this.setTransactionService(token, result.data.address) 
-      } else {
-        this.displaySnackbar('error', result.data.error)
-      }
-    }.bind(this))
-  }
+  handleClickLink = index => e => {
+    const { earns } = this.state;
+
+    window.open(earns[index].link, "_blank");
+  };
+
+  getWalletAddress = token => {
+    var checkAddress = Firebase.functions().httpsCallable("checkAddress");
+    checkAddress({ token: token }).then(
+      function(result) {
+        if (result.data.success) {
+          this.getAllTransactions(token, result.data.address);
+          this.setTransactionService(token, result.data.address);
+        } else {
+          this.displaySnackbar("error", result.data.error);
+        }
+      }.bind(this)
+    );
+  };
 
   setTransactionService = (token, address) => {
-    timerID = setInterval(function() {
-      this.getAllTransactions(token, address)
-    }.bind(this), 30000)
-  }
+    timerID = setInterval(
+      function() {
+        this.getAllTransactions(token, address);
+      }.bind(this),
+      30000
+    );
+  };
 
   getAllTransactions = (token, address) => {
-    var onChainTransactions = this.getOnchainTransactions(token, address)
-    var sentTransactions = this.getSentTransactions(token)
-    var receivedTransactions = this.getReceivedTransactions(token)
-    var withdrawalTransactions = this.getWithdrawalTransactions(token)
-    var currentRate = this.getRate()
-    var getCurrentGrowsurfParticipant = this.getCurrentGrowsurfParticipant(token)
+    var onChainTransactions = this.getOnchainTransactions(token, address);
+    var sentTransactions = this.getSentTransactions(token);
+    var receivedTransactions = this.getReceivedTransactions(token);
+    var withdrawalTransactions = this.getWithdrawalTransactions(token);
+    var currentRate = this.getRate();
+    var getCurrentGrowsurfParticipant = this.getCurrentGrowsurfParticipant(
+      token
+    );
 
-    Promise.all([onChainTransactions, sentTransactions, receivedTransactions, withdrawalTransactions, currentRate, getCurrentGrowsurfParticipant]).then(responses => {
-      const deposits = responses[0].transfers
-      const sentTransactions = responses[1]
-      const receivedTransactions = responses[2]
-      const withdrawalTransactions = responses[3]
-      const currentRate = responses[4]
+    Promise.all([
+      onChainTransactions,
+      sentTransactions,
+      receivedTransactions,
+      withdrawalTransactions,
+      currentRate,
+      getCurrentGrowsurfParticipant
+    ]).then(responses => {
+      const deposits = responses[0].transfers;
+      const sentTransactions = responses[1];
+      const receivedTransactions = responses[2];
+      const withdrawalTransactions = responses[3];
+      const currentRate = responses[4];
 
-      var balance = 0
-      var updatedDeposits = []
-      
+      var balance = 0;
+      var updatedDeposits = [];
+
       deposits.map((deposit, index) => {
-        if (deposit.state === "confirmed" && deposit.type ==="receive") {
-          balance += deposit.value
-          updatedDeposits.push(deposit)
+        if (deposit.state === "confirmed" && deposit.type === "receive") {
+          balance += deposit.value;
+          updatedDeposits.push(deposit);
         }
-      })
+      });
 
       sentTransactions.map((sentTransaction, index) => {
-        balance -= parseInt(sentTransaction.amount)
-      })
+        balance -= parseInt(sentTransaction.amount);
+      });
 
       receivedTransactions.map((receivedTransaction, index) => {
-        balance += parseInt(receivedTransaction.amount)
-      })
+        balance += parseInt(receivedTransaction.amount);
+      });
 
       withdrawalTransactions.map((withdrawalTransaction, index) => {
-        balance -= parseInt(withdrawalTransaction.amount)
-      })
+        balance -= parseInt(withdrawalTransaction.amount);
+      });
 
       this.setState({
         address: address,
@@ -422,127 +572,157 @@ class Wallet extends Component {
         withdrawList: withdrawalTransactions,
         balance: balance,
         rate: parseFloat(currentRate)
-      })
-    })
-  }
+      });
+    });
+  };
 
   getOnchainTransactions = (token, address) => {
-    var getOnchainTransactions = Firebase.functions().httpsCallable('getOnchainTransactions')
-    return getOnchainTransactions({ token: token, address: address }).then(function (result) {
-      if (result.data.success) {
-        return (result.data.response)
-      } else {
-        return ([])
-      }
-    }.bind(this))
-  }
+    var getOnchainTransactions = Firebase.functions().httpsCallable(
+      "getOnchainTransactions"
+    );
+    return getOnchainTransactions({ token: token, address: address }).then(
+      function(result) {
+        if (result.data.success) {
+          return result.data.response;
+        } else {
+          return [];
+        }
+      }.bind(this)
+    );
+  };
 
-  getSentTransactions = (token) => {
-    var getSentTransactions = Firebase.functions().httpsCallable('getSentTransactions')
-    return getSentTransactions({ token: token }).then(function (result) {
-      if (result.data.success) {
-        return (result.data.transactions)
-      } else {
-        return ([])
-      }
-    }.bind(this))
-  }
+  getSentTransactions = token => {
+    var getSentTransactions = Firebase.functions().httpsCallable(
+      "getSentTransactions"
+    );
+    return getSentTransactions({ token: token }).then(
+      function(result) {
+        if (result.data.success) {
+          return result.data.transactions;
+        } else {
+          return [];
+        }
+      }.bind(this)
+    );
+  };
 
-  getReceivedTransactions = (token) => {
-    var getReceivedTransactions = Firebase.functions().httpsCallable('getReceivedTransactions')
-    return getReceivedTransactions({ token: token }).then(function (result) {
-      if (result.data.success) {
-        return (result.data.transactions)
-      } else {
-        return ([])
-      }
-    }.bind(this))
-  }
+  getReceivedTransactions = token => {
+    var getReceivedTransactions = Firebase.functions().httpsCallable(
+      "getReceivedTransactions"
+    );
+    return getReceivedTransactions({ token: token }).then(
+      function(result) {
+        if (result.data.success) {
+          return result.data.transactions;
+        } else {
+          return [];
+        }
+      }.bind(this)
+    );
+  };
 
-  getWithdrawalTransactions = (token) => {
-    var getWithdrawalTransactions = Firebase.functions().httpsCallable('getWithdrawalTransactions')
-    return getWithdrawalTransactions({ token: token }).then(function (result) {
-      if (result.data.success) {
-        return (result.data.withdrawals)
-      } else {
-        return ([])
-      }
-    }.bind(this))
-  }
+  getWithdrawalTransactions = token => {
+    var getWithdrawalTransactions = Firebase.functions().httpsCallable(
+      "getWithdrawalTransactions"
+    );
+    return getWithdrawalTransactions({ token: token }).then(
+      function(result) {
+        if (result.data.success) {
+          return result.data.withdrawals;
+        } else {
+          return [];
+        }
+      }.bind(this)
+    );
+  };
 
   getRate = () => {
-    var getRate = Firebase.functions().httpsCallable('getRate')
-    return getRate({ currency: currency }).then(function (result) {
-      if (result.data.success) {
-        return (result.data.rate)
-      } else {
-        return ([])
-      }
-    }.bind(this))
-  }
+    var getRate = Firebase.functions().httpsCallable("getRate");
+    return getRate({ currency: currency }).then(
+      function(result) {
+        if (result.data.success) {
+          return result.data.rate;
+        } else {
+          return [];
+        }
+      }.bind(this)
+    );
+  };
 
-  getCurrentGrowsurfParticipant = (token) => {
-    const { depositList } = this.state
+  getCurrentGrowsurfParticipant = token => {
+    const { depositList } = this.state;
 
-    var getGrowsurfParticipant = Firebase.functions().httpsCallable('getGrowsurfParticipant')
-    return getGrowsurfParticipant({ token: token }).then(function (result) {
-      console.log("Growsurf Get, ", result.data)
-      if (result.data.success) {
-        this.setState({
-          growsurfId: result.data.growsurfId,
-          referralUrl: result.data.referralUrl,
-          completedDeposit: result.data.completedDeposit
-        })
-        return 
-      } else {
-        var hasCompletedDeposit = (depositList.length > 0) ? true : false
-        var createGrowsurfParticipant = Firebase.functions().httpsCallable('createGrowsurfParticipant')
-        return createGrowsurfParticipant({ token: token, completedDeposit: hasCompletedDeposit, referId: store.get('referralID') }).then(function (result) {
-          console.log("Growsurf Create, ", result.data)
-          if (result.data.success) {
-            this.setState({
-              growsurfId: result.data.growsurfId,
-              referralUrl: result.data.referralUrl,
-              completedDeposit: hasCompletedDeposit
-            })
-            return
-          } else {
-            return 
-          }
-        }.bind(this))
-      }
-    }.bind(this))
-  }
+    var getGrowsurfParticipant = Firebase.functions().httpsCallable(
+      "getGrowsurfParticipant"
+    );
+    return getGrowsurfParticipant({ token: token }).then(
+      function(result) {
+        console.log("Growsurf Get, ", result.data);
+        if (result.data.success) {
+          this.setState({
+            growsurfId: result.data.growsurfId,
+            referralUrl: result.data.referralUrl,
+            completedDeposit: result.data.completedDeposit
+          });
+          return;
+        } else {
+          var hasCompletedDeposit = depositList.length > 0 ? true : false;
+          var createGrowsurfParticipant = Firebase.functions().httpsCallable(
+            "createGrowsurfParticipant"
+          );
+          return createGrowsurfParticipant({
+            token: token,
+            completedDeposit: hasCompletedDeposit,
+            referId: store.get("referralID")
+          }).then(
+            function(result) {
+              console.log("Growsurf Create, ", result.data);
+              if (result.data.success) {
+                this.setState({
+                  growsurfId: result.data.growsurfId,
+                  referralUrl: result.data.referralUrl,
+                  completedDeposit: hasCompletedDeposit
+                });
+                return;
+              } else {
+                return;
+              }
+            }.bind(this)
+          );
+        }
+      }.bind(this)
+    );
+  };
 
   displaySnackbar = (variant, message) => {
     this.setState({
       snackbarIsOpen: true,
       snackbarVariant: variant,
       snackbarMessage: message
-    })
-  }
+    });
+  };
 
   handleCopyCode = () => {
     this.setState({
       snackbarIsOpen: true,
       snackbarVariant: "success",
       snackbarMessage: "Your wallet address was successfully copied."
-    })
-  }
+    });
+  };
 
   handleCopyShareUrl = () => {
     this.setState({
       snackbarIsOpen: true,
       snackbarVariant: "success",
       snackbarMessage: "Your share link was successfully copied."
-    })
-  }
+    });
+  };
 
   onSnackBarClose = () => {
     this.setState({
       snackbarIsOpen: false
-    })
-  }
+    });
+  };
 
   handleChange = name => event => {
     event.preventDefault();
@@ -557,157 +737,184 @@ class Wallet extends Component {
       withdrawAddressHelperText: "",
       withdrawAmountError: false,
       withdrawAmountHelperText: ""
-    })
-  }
+    });
+  };
 
   handleTransactionSwitch = (event, newTransactionListType) => {
-    this.setState({ transactionListType: newTransactionListType })
-  }
+    this.setState({ transactionListType: newTransactionListType });
+  };
 
   handleSendDialogClose = () => {
-    this.setState({ 
+    this.setState({
       sendDialogOpen: false
-     })
-  }
+    });
+  };
 
   handleWithdrawDialogClose = () => {
-    this.setState({ 
+    this.setState({
       withdrawDialogOpen: false
-     })
-  }
+    });
+  };
 
   handleSendFunds = () => {
     this.setState({
-      email: '',
-      amount: '',
+      email: "",
+      amount: "",
       sendDialogOpen: true
-     })
+    });
   };
 
   handleWithdrawFunds = () => {
     this.setState({
-      withdrawAddress: '',
-      withdrawAmount: '',
+      withdrawAddress: "",
+      withdrawAmount: "",
       withdrawDialogOpen: true
-     })
-  }
+    });
+  };
 
   handleDownloadGiftReceipt = () => {
-    this.validateForms(GIFT)
-  }
+    this.validateForms(GIFT);
+  };
 
   handleSendEmail = () => {
-    this.validateForms(EMAIL)
-  }
+    this.validateForms(EMAIL);
+  };
 
   handleCancelTransaction = () => {
-    this.setState({ pendingConfirmation: false })
-  }
+    this.setState({ pendingConfirmation: false });
+  };
 
   handleCancelWithdrawal = () => {
-    this.setState({ pendingWithdrawal: false })
-  }
+    this.setState({ pendingWithdrawal: false });
+  };
+
+  handleAddFundsModal = () => {
+    this.setState({ addFundsOpen: !this.state.addFundsOpen });
+  };
 
   handleViewTransactions = () => {
-    this.setState({ transactionDialogOpen: true })
-  }
+    this.setState({ transactionDialogOpen: true });
+  };
 
   handleTransactionDialogClose = () => {
-    this.setState({ transactionDialogOpen: false })
-  }
+    this.setState({ transactionDialogOpen: false });
+  };
 
   handleConfirmWithdrawal = () => {
-    const { withdrawAddress, withdrawAmount, address } = this.state
-    const funds = Number(withdrawAmount) * 0.99
-    const fees = Number(withdrawAmount) * 0.01
+    const { withdrawAddress, withdrawAmount, address } = this.state;
+    const funds = Number(withdrawAmount) * 0.99;
+    const fees = Number(withdrawAmount) * 0.01;
 
-    this.setState({ isLoading: true })
+    this.setState({ isLoading: true });
 
-    var withdrawFunds = Firebase.functions().httpsCallable('withdrawFunds')
-    return withdrawFunds({ token: store.get('token'), address: withdrawAddress, totalAmount: funds.toString() }).then(function (result) {
-      if (result.data.success) {
-        var postTransaction = Firebase.functions().httpsCallable('postTransaction')
-        return postTransaction({ token: store.get('token'), toEmail: "info@satstreet.com", amount: fees.toString(), type: "Fees" }).then(function (result) {
-          this.displaySnackbar('success', "Withdrawal successfully processed.")
-        
+    var withdrawFunds = Firebase.functions().httpsCallable("withdrawFunds");
+    return withdrawFunds({
+      token: store.get("token"),
+      address: withdrawAddress,
+      totalAmount: funds.toString()
+    }).then(
+      function(result) {
+        if (result.data.success) {
+          var postTransaction = Firebase.functions().httpsCallable(
+            "postTransaction"
+          );
+          return postTransaction({
+            token: store.get("token"),
+            toEmail: "info@satstreet.com",
+            amount: fees.toString(),
+            type: "Fees"
+          }).then(
+            function(result) {
+              this.displaySnackbar(
+                "success",
+                "Withdrawal successfully processed."
+              );
+
+              this.setState({
+                withdrawDialogOpen: false,
+                pendingWithdrawal: false,
+                isLoading: false
+              });
+
+              this.getAllTransactions(store.get("token"), address);
+            }.bind(this)
+          );
+        } else {
+          this.displaySnackbar("error", result.data.error);
+
           this.setState({
-            withdrawDialogOpen: false,
-            pendingWithdrawal: false,
-            isLoading: false,
-          })
-
-          this.getAllTransactions(store.get('token'), address)
-        }.bind(this))
-      } else {
-        this.displaySnackbar('error', result.data.error)
-
-        this.setState({
-          isLoading: false,
-        })
-      }
-    }.bind(this))
-  }
-
+            isLoading: false
+          });
+        }
+      }.bind(this)
+    );
+  };
 
   handleConfirmTransaction = () => {
-    const { transactionType, email, amount, address } = this.state
-    this.setState({ isLoading: true })
+    const { transactionType, email, amount, address } = this.state;
+    this.setState({ isLoading: true });
 
-    var postTransaction = Firebase.functions().httpsCallable('postTransaction')
-    return postTransaction({ token: store.get('token'), toEmail: email, amount: amount, type: transactionType }).then(function (result) {
-      if (result.data.success) {
-        this.displaySnackbar('success', "Transaction successfully created.")
-        
-        if (transactionType === GIFT) {
-          this.downloadGift()
+    var postTransaction = Firebase.functions().httpsCallable("postTransaction");
+    return postTransaction({
+      token: store.get("token"),
+      toEmail: email,
+      amount: amount,
+      type: transactionType
+    }).then(
+      function(result) {
+        if (result.data.success) {
+          this.displaySnackbar("success", "Transaction successfully created.");
+
+          if (transactionType === GIFT) {
+            this.downloadGift();
+          } else {
+            this.sendEmail();
+          }
+
+          this.setState({
+            sendDialogOpen: false,
+            pendingConfirmation: false,
+            isLoading: false
+          });
+
+          this.getAllTransactions(store.get("token"), address);
         } else {
-          this.sendEmail()
+          this.displaySnackbar("error", result.data.error);
+
+          this.setState({
+            isLoading: false
+          });
         }
-
-        this.setState({
-          sendDialogOpen: false,
-          pendingConfirmation: false,
-          isLoading: false,
-        })
-
-        this.getAllTransactions(store.get('token'), address)
-        
-      } else {
-        this.displaySnackbar('error', result.data.error)
-
-        this.setState({
-          isLoading: false,
-        })
-      }
-    }.bind(this))
-  }
+      }.bind(this)
+    );
+  };
 
   handleProcessWithdrawal = () => {
-    const { withdrawAddress, withdrawAmount, balance } = this.state
+    const { withdrawAddress, withdrawAmount, balance } = this.state;
 
-    var withdrawAddressHasError = false
-    var withdrawAddressErrorText = ""
+    var withdrawAddressHasError = false;
+    var withdrawAddressErrorText = "";
 
     if (withdrawAddress === "" || withdrawAddress.length < 23) {
-      withdrawAddressHasError = true
-      withdrawAddressErrorText = "Please enter a valid bitcoin address."
+      withdrawAddressHasError = true;
+      withdrawAddressErrorText = "Please enter a valid bitcoin address.";
     }
 
     var withdrawAmountHasError = false;
-    var withdrawAmountErrorText = ""
+    var withdrawAmountErrorText = "";
 
     if (withdrawAmount === "") {
-      withdrawAmountHasError = true
-      withdrawAmountErrorText = "Please enter an amount."
+      withdrawAmountHasError = true;
+      withdrawAmountErrorText = "Please enter an amount.";
     } else if (!/^\d+$/.test(withdrawAmount)) {
-      withdrawAmountHasError = true
-      withdrawAmountErrorText = "This field should only contain numbers."
+      withdrawAmountHasError = true;
+      withdrawAmountErrorText = "This field should only contain numbers.";
     } else if (parseInt(withdrawAmount) > balance) {
-      withdrawAmountHasError = true
-      withdrawAmountErrorText = "You cannot send more than your balance."
+      withdrawAmountHasError = true;
+      withdrawAmountErrorText = "You cannot send more than your balance.";
     } else if (parseInt(withdrawAmount) < 3000) {
-      withdrawAmountHasError = true
-      withdrawAmountErrorText = "The minimum withdrawal amount is 3000."
+      withdrawAmountHasError = true;
+      withdrawAmountErrorText = "The minimum withdrawal amount is 3000.";
     }
 
     if (withdrawAddressHasError || withdrawAmountHasError) {
@@ -716,59 +923,68 @@ class Wallet extends Component {
         withdrawAddressHelperText: withdrawAddressErrorText,
         withdrawAmountError: withdrawAmountHasError,
         withdrawAmountHelperText: withdrawAmountErrorText
-      })
+      });
     } else {
       this.setState({
         pendingWithdrawal: true
-      })
+      });
     }
-  }
-  
-  sendEmail = () => {
-    const { email, amount, growsurfId } = this.state
+  };
 
-    var referralID = "?grsf=" + growsurfId
-    
-    var sendEmailReceipt = Firebase.functions().httpsCallable('sendEmailReceipt')
-    return sendEmailReceipt({ token: store.get('token'), toEmail: email, amount: amount, referralId: referralID }).then(function (result) {
-      if (result.data.success) {
-        this.displaySnackbar('success', "Your email receipt has been sent.")
-      } 
-    }.bind(this))
-  }
+  sendEmail = () => {
+    const { email, amount, growsurfId } = this.state;
+
+    var referralID = "?grsf=" + growsurfId;
+
+    var sendEmailReceipt = Firebase.functions().httpsCallable(
+      "sendEmailReceipt"
+    );
+    return sendEmailReceipt({
+      token: store.get("token"),
+      toEmail: email,
+      amount: amount,
+      referralId: referralID
+    }).then(
+      function(result) {
+        if (result.data.success) {
+          this.displaySnackbar("success", "Your email receipt has been sent.");
+        }
+      }.bind(this)
+    );
+  };
 
   // Download the gift certificate
   downloadGift = async () => {
-    const { email, amount } = this.state
+    const { email, amount } = this.state;
     const blob = await pdf(
       <Certificate email={email} amount={amount} />
     ).toBlob();
     saveAs(blob, "Certificate.pdf");
-  }
+  };
 
   validateForms(type) {
-    const { email, amount, balance } = this.state
+    const { email, amount, balance } = this.state;
 
-    var emailHasError = false
-    var emailErrorText = ""
+    var emailHasError = false;
+    var emailErrorText = "";
 
     if (email === "") {
       emailHasError = true;
-      emailErrorText = "Please enter a valid email."
+      emailErrorText = "Please enter a valid email.";
     }
 
     var amountHasError = false;
-    var amountErrorText = ""
+    var amountErrorText = "";
 
     if (amount === "") {
       amountHasError = true;
-      amountErrorText = "Please enter an amount."
+      amountErrorText = "Please enter an amount.";
     } else if (!/^\d+$/.test(amount)) {
       amountHasError = true;
-      amountErrorText = "This field should only contain numbers."
+      amountErrorText = "This field should only contain numbers.";
     } else if (parseInt(amount) > balance) {
       amountHasError = true;
-      amountErrorText = "You cannot send more than your balance."
+      amountErrorText = "You cannot send more than your balance.";
     }
 
     if (emailHasError || amountHasError) {
@@ -782,7 +998,7 @@ class Wallet extends Component {
       this.setState({
         transactionType: type,
         pendingConfirmation: true
-      })
+      });
     }
   }
 
@@ -801,8 +1017,14 @@ class Wallet extends Component {
   }
 
   getTransactions() {
-    const { transactionListType, sentList, receivedList, depositList, withdrawList } = this.state
-    const { classes } = this.props
+    const {
+      transactionListType,
+      sentList,
+      receivedList,
+      depositList,
+      withdrawList
+    } = this.state;
+    const { classes } = this.props;
 
     if (transactionListType === "sent") {
       if (sentList.length === 0) {
@@ -815,11 +1037,9 @@ class Wallet extends Component {
       } else {
         return (
           <div className={classes.list}>
-            {
-              sentList.map((transaction, index) =>
-                <Transaction key={index} transaction={transaction} />
-              )
-            }
+            {sentList.map((transaction, index) => (
+              <Transaction key={index} transaction={transaction} />
+            ))}
           </div>
         );
       }
@@ -834,11 +1054,9 @@ class Wallet extends Component {
       } else {
         return (
           <div className={classes.list}>
-            {
-              receivedList.map((transaction, index) =>
-                <Transaction key={index} transaction={transaction} />
-              )
-            }
+            {receivedList.map((transaction, index) => (
+              <Transaction key={index} transaction={transaction} />
+            ))}
           </div>
         );
       }
@@ -853,11 +1071,9 @@ class Wallet extends Component {
       } else {
         return (
           <div className={classes.list}>
-            {
-              depositList.map((deposit, index) =>
-                <Deposit key={index} deposit={deposit} />
-              )
-            }
+            {depositList.map((deposit, index) => (
+              <Deposit key={index} deposit={deposit} />
+            ))}
           </div>
         );
       }
@@ -872,11 +1088,9 @@ class Wallet extends Component {
       } else {
         return (
           <div className={classes.list}>
-            {
-              withdrawList.map((withdrawal, index) =>
-                <Withdraw key={index} withdrawal={withdrawal} />
-              )
-            }
+            {withdrawList.map((withdrawal, index) => (
+              <Withdraw key={index} withdrawal={withdrawal} />
+            ))}
           </div>
         );
       }
@@ -884,53 +1098,107 @@ class Wallet extends Component {
   }
 
   render() {
-    const { address, balance, rate, email, emailHelperText, emailError, referralUrl, withdrawAddress, withdrawAddressError, withdrawAddressHelperText, withdrawAmount, withdrawAmountError, withdrawAmountHelperText, amount, amountHelperText, amountError, sendDialogOpen, withdrawDialogOpen, snackbarIsOpen, snackbarVariant, snackbarMessage, transactionListType, transactionDialogOpen, pendingConfirmation, pendingWithdrawal, isLoading } = this.state
-    const { classes, type } = this.props
+    const {
+      address,
+      balance,
+      rate,
+      email,
+      emailHelperText,
+      emailError,
+      referralUrl,
+      withdrawAddress,
+      withdrawAddressError,
+      withdrawAddressHelperText,
+      withdrawAmount,
+      withdrawAmountError,
+      withdrawAmountHelperText,
+      amount,
+      amountHelperText,
+      amountError,
+      sendDialogOpen,
+      withdrawDialogOpen,
+      snackbarIsOpen,
+      snackbarVariant,
+      snackbarMessage,
+      transactionListType,
+      transactionDialogOpen,
+      pendingConfirmation,
+      pendingWithdrawal,
+      isLoading,
+      addFundsOpen,
+      earns
+    } = this.state;
+    const { classes, type } = this.props;
 
-    var btcBalance = bitcoinConverter(parseInt(balance), 'satoshi').to('BTC')
-    var formattedCurrency = currencyFormatter.format(rate * btcBalance, { code: currency })
+    var btcBalance = bitcoinConverter(parseInt(balance), "satoshi").to("BTC");
+    var formattedCurrency = currencyFormatter.format(rate * btcBalance, {
+      code: currency
+    });
 
     return (
       <div className={classes.holdingContainer}>
-        {
-          type === "Earn" ? <Earn />
-          :
+        {type === "Earn" ? (
+          <Earn />
+        ) : (
           <div className={classes.container}>
-            {address !== "" ?
+            {address !== "" ? (
               <Paper className={classes.paperOptions}>
                 <div className={classes.contentContainer}>
-                  <Typography variant="h4" gutterBottom>
-                  {balance.toString()} Sats
-                  </Typography>
+                  <div className={classes.paddingContainer}>
+                    <Typography variant="h4" gutterBottom>
+                      {balance.toString()} Sats
+                    </Typography>
                     {btcBalance.toString()} BTC - {formattedCurrency}
+                  </div>
+                  <Chart currency={currency} />
+                  <div className={classes.paddingContainer}>
+                    <div className={classes.qrButtonContainer}>
+                      <Button
+                        className={classes.qrButton}
+                        size="small"
+                        variant={"contained"}
+                        color="primary"
+                        onClick={this.handleAddFundsModal}
+                      >
+                        Add funds
+                      </Button>
 
-                  <QRCode className={classes.qrCode} color={palette.blue[0]} size={160} value={address} />
-                  <div className={classes.address}>{address}</div>
-                  <CopyToClipboard text={address}><a className={classes.link} href={"#"} onClick={this.handleCopyCode}>Copy</a></CopyToClipboard>
-                  
-                  <div className={classes.qrButtonContainer}>
-                    <div className={classes.horizontalButtonContainer}>
-                      <Button className={classes.horizontalButton} size="small" variant={'contained'} color="primary" onClick={this.handleSendFunds}>
+                      <Button
+                        className={classes.qrButton}
+                        size="small"
+                        variant={"contained"}
+                        color="primary"
+                        onClick={this.handleSendFunds}
+                      >
                         Send
                       </Button>
-                      <Button className={classes.horizontalButton} size="small" variant={'contained'} color="primary" onClick={this.handleWithdrawFunds}>
-                        Withdraw
-                      </Button>
-                    </div>
-                    
-                    <Button className={classes.qrButton} size="small" variant={'contained'} color="secondary" onClick={this.handleViewTransactions}>
-                      View transactions
-                    </Button>
 
-                    <CopyToClipboard text={referralUrl}>
-                      <Button className={classes.shareButton} size="small" variant={'contained'} color="secondary" onClick={this.handleCopyShareUrl}>
-                        Copy referral link
+                      <Button
+                        className={classes.qrButton}
+                        size="small"
+                        variant={"contained"}
+                        color="secondary"
+                        onClick={this.handleViewTransactions}
+                      >
+                        View activity
                       </Button>
-                    </CopyToClipboard>
+
+                      <CopyToClipboard text={referralUrl}>
+                        <Button
+                          className={classes.shareButton}
+                          size="small"
+                          variant={"contained"}
+                          color="secondary"
+                          onClick={this.handleCopyShareUrl}
+                        >
+                          Share your referral link
+                        </Button>
+                      </CopyToClipboard>
+                    </div>
                   </div>
                 </div>
               </Paper>
-              :
+            ) : (
               <Paper className={classes.paperOptionsEmpty}>
                 <CircularProgress
                   className={classes.circularProgress}
@@ -940,35 +1208,138 @@ class Wallet extends Component {
                   thickness={4}
                 />
               </Paper>
-            }
+            )}
 
-            <Paper className={classes.paperChart}>
-              <Chart currency={currency}/>
+            <Paper className={classes.paperGrid}>
+              {isLoading ? (
+                <div className={classes.loadingHolder}>
+                  <CircularProgress
+                    className={classes.circularProgress}
+                    variant="indeterminate"
+                    disableShrink
+                    size={24}
+                    thickness={4}
+                  />
+                </div>
+              ) : (
+                earns.map((earn, index) => {
+                  return (
+                    <div className={classes.outerBox} key={index}>
+                      <div className={classes.innerBox}>
+                        <img
+                          src={earn.imageUrl}
+                          className={classes.image}
+                          alt=""
+                        />
+                        <div className={classes.title}>{earn.reward}</div>
+                        <div className={classes.subtitle}>
+                          {earn.preMessaging}
+                          <span className={classes.bold}>
+                            {" "}
+                            {earn.satValue}{" "}
+                          </span>
+                          {earn.postMessaging}
+                        </div>
+                        <Button
+                          className={classes.button}
+                          size="small"
+                          fullWidth
+                          variant={"contained"}
+                          color="primary"
+                          onClick={this.handleClickLink(index)}
+                        >
+                          Earn
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
             </Paper>
 
+            <Dialog open={addFundsOpen}>
+              <div className={classes.dialogContentCentered}>
+                <div className={classes.dialogTitleContainer}>
+                  Add Funds
+                  <IconButton
+                    aria-label="menu"
+                    className={classes.closeIcon}
+                    onClick={this.handleAddFundsModal}
+                  >
+                    <img
+                      src={closeIcon}
+                      className={classes.iconButton}
+                      alt=""
+                    />
+                  </IconButton>
+                </div>
+                <Typography variant="h4" gutterBottom>
+                  Deposit Bitcoin
+                </Typography>
+                <QRCode
+                  className={classes.qrCode}
+                  color={palette.blue[0]}
+                  size={160}
+                  value={address}
+                />
+                <div className={classes.address}>{address}</div>
+                <CopyToClipboard text={address}>
+                  <a
+                    className={classes.link}
+                    href={"#"}
+                    onClick={this.handleCopyCode}
+                  >
+                    Copy
+                  </a>
+                </CopyToClipboard>
+                <Typography variant="h4" gutterBottom>
+                  Buy Bitcoin
+                </Typography>
+                <div className={classes.affiliateLinks}>
+                  {earns.slice(0, 4).map((earn, index) => (
+                    <div
+                      className={classes.earnRow}
+                      onClick={this.handleClickLink(index)}
+                    >
+                      <div className={classes.earnCell}>
+                        <img
+                          src={earn.imageUrl}
+                          className={classes.image}
+                          alt=""
+                        />
+                      </div>
+                      <div className={classes.earnCell}>Earn {earn.reward}</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </Dialog>
             <Dialog
               onClose={this.handleWithdrawDialogClose}
               open={withdrawDialogOpen}
               disableBackdropClick
             >
               <div className={classes.dialogContent}>
-
-                { pendingWithdrawal ? (
-                    <div className={classes.dialogTitleContainer}>
-                      Confirm withdrawal
-                      <div />
-                    </div>
-                  ) : (
-                    <div className={classes.dialogTitleContainer}>
-                      Withdraw 
-                      <IconButton
-                        aria-label="close"
-                        className={classes.closeIcon}
-                        onClick={this.handleWithdrawDialogClose}
-                      >
-                        <img src={closeIcon} className={classes.iconButton} alt="" />
-                      </IconButton>
-                    </div>
+                {pendingWithdrawal ? (
+                  <div className={classes.dialogTitleContainer}>
+                    Confirm withdrawal
+                    <div />
+                  </div>
+                ) : (
+                  <div className={classes.dialogTitleContainer}>
+                    Withdraw
+                    <IconButton
+                      aria-label="close"
+                      className={classes.closeIcon}
+                      onClick={this.handleWithdrawDialogClose}
+                    >
+                      <img
+                        src={closeIcon}
+                        className={classes.iconButton}
+                        alt=""
+                      />
+                    </IconButton>
+                  </div>
                 )}
 
                 <TextField
@@ -999,15 +1370,26 @@ class Wallet extends Component {
                   variant="outlined"
                 />
 
-                { pendingWithdrawal ? (
-                  <div className = {classes.currencySummary}>
+                {pendingWithdrawal ? (
+                  <div className={classes.currencySummary}>
                     All withdrawals are charged a 1% processing fee.
                   </div>
                 ) : (
-                  <div className = {classes.currencySummary}>
-                  { bitcoinConverter(parseInt(withdrawAmount), 'satoshi').to('BTC').toString()} BTC - {currencyFormatter.format(rate * bitcoinConverter(parseInt(withdrawAmount), 'satoshi').to('BTC'), { code: currency })}
+                  <div className={classes.currencySummary}>
+                    {bitcoinConverter(parseInt(withdrawAmount), "satoshi")
+                      .to("BTC")
+                      .toString()}{" "}
+                    BTC -{" "}
+                    {currencyFormatter.format(
+                      rate *
+                        bitcoinConverter(
+                          parseInt(withdrawAmount),
+                          "satoshi"
+                        ).to("BTC"),
+                      { code: currency }
+                    )}
                   </div>
-                ) }
+                )}
 
                 {pendingWithdrawal ? (
                   <div>
@@ -1077,7 +1459,11 @@ class Wallet extends Component {
                       className={classes.closeIcon}
                       onClick={this.handleSendDialogClose}
                     >
-                      <img src={closeIcon} className={classes.iconButton} alt="" />
+                      <img
+                        src={closeIcon}
+                        className={classes.iconButton}
+                        alt=""
+                      />
                     </IconButton>
                   </div>
                 )}
@@ -1110,8 +1496,16 @@ class Wallet extends Component {
                   variant="outlined"
                 />
 
-                <div className = {classes.currencySummary}>
-                { bitcoinConverter(parseInt(amount), 'satoshi').to('BTC').toString()} BTC - {currencyFormatter.format(rate * bitcoinConverter(parseInt(amount), 'satoshi').to('BTC'), { code: currency })}
+                <div className={classes.currencySummary}>
+                  {bitcoinConverter(parseInt(amount), "satoshi")
+                    .to("BTC")
+                    .toString()}{" "}
+                  BTC -{" "}
+                  {currencyFormatter.format(
+                    rate *
+                      bitcoinConverter(parseInt(amount), "satoshi").to("BTC"),
+                    { code: currency }
+                  )}
                 </div>
 
                 {pendingConfirmation ? (
@@ -1185,9 +1579,16 @@ class Wallet extends Component {
               <div className={classes.dialogContent}>
                 <div className={classes.dialogTitleContainer}>
                   Transactions
-
-                  <IconButton aria-label="menu" className={classes.closeIcon} onClick={this.handleTransactionDialogClose}>
-                    <img src={closeIcon} className={classes.iconButton} alt="" />
+                  <IconButton
+                    aria-label="menu"
+                    className={classes.closeIcon}
+                    onClick={this.handleTransactionDialogClose}
+                  >
+                    <img
+                      src={closeIcon}
+                      className={classes.iconButton}
+                      alt=""
+                    />
                   </IconButton>
                 </div>
 
@@ -1196,21 +1597,42 @@ class Wallet extends Component {
                   exclusive
                   onChange={this.handleTransactionSwitch}
                 >
-                  <ToggleButton className={classes.toggleButton} value="sent">Sent</ToggleButton>
-                  <ToggleButton className={classes.toggleButton} value="received">Received</ToggleButton>
-                  <ToggleButton className={classes.toggleButton} value="deposits">Deposits</ToggleButton>
-                  <ToggleButton className={classes.toggleButton} value="withdrawals">Withdrawals</ToggleButton>
+                  <ToggleButton className={classes.toggleButton} value="sent">
+                    Sent
+                  </ToggleButton>
+                  <ToggleButton
+                    className={classes.toggleButton}
+                    value="received"
+                  >
+                    Received
+                  </ToggleButton>
+                  <ToggleButton
+                    className={classes.toggleButton}
+                    value="deposits"
+                  >
+                    Deposits
+                  </ToggleButton>
+                  <ToggleButton
+                    className={classes.toggleButton}
+                    value="withdrawals"
+                  >
+                    Withdrawals
+                  </ToggleButton>
                 </ToggleButtonGroup>
 
                 {this.getTransactions()}
               </div>
             </Dialog>
 
-            <CustomSnackbar variant={snackbarVariant} message={snackbarMessage} open={snackbarIsOpen} onSnackBarClose={this.onSnackBarClose} />
-
+            <CustomSnackbar
+              variant={snackbarVariant}
+              message={snackbarMessage}
+              open={snackbarIsOpen}
+              onSnackBarClose={this.onSnackBarClose}
+            />
           </div>
-        }
-        </div>
+        )}
+      </div>
     );
   }
 }
@@ -1219,4 +1641,4 @@ Wallet.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default withStyles(styles)(Wallet)
+export default withStyles(styles)(Wallet);
