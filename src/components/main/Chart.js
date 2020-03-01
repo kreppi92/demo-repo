@@ -44,7 +44,7 @@ class Chart extends Component {
       <div className={classes.container}>
         <iframe
           src={src}
-          width="100%"
+          width="99%"
           height="220px"
           scrolling="auto"
           marginwidth="0"

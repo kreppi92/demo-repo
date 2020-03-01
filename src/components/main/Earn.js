@@ -131,47 +131,7 @@ class Earn extends Component {
     const { earns, isLoading } = this.state;
     const { classes } = this.props;
 
-    return (
-      <div className={classes.container}>
-        {isLoading ? (
-          <div className={classes.loadingHolder}>
-            <CircularProgress
-              className={classes.circularProgress}
-              variant="indeterminate"
-              disableShrink
-              size={24}
-              thickness={4}
-            />
-          </div>
-        ) : (
-          earns.map((earn, index) => {
-            return (
-              <div className={classes.outerBox} key={index}>
-                <div className={classes.innerBox}>
-                  <img src={earn.imageUrl} className={classes.image} alt="" />
-                  <div className={classes.title}>{earn.reward}</div>
-                  <div className={classes.subtitle}>
-                    {earn.preMessaging}
-                    <span className={classes.bold}> {earn.satValue} </span>
-                    {earn.postMessaging}
-                  </div>
-                  <Button
-                    className={classes.button}
-                    size="small"
-                    fullWidth
-                    variant={"contained"}
-                    color="primary"
-                    onClick={this.handleClickLink(index)}
-                  >
-                    Earn
-                  </Button>
-                </div>
-              </div>
-            );
-          })
-        )}
-      </div>
-    );
+    return <div className={classes.container}></div>;
   }
 }
 

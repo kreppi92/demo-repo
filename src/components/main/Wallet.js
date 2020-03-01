@@ -13,6 +13,7 @@ import { withStyles } from "@material-ui/core/styles";
 import { palette } from "../../constants/styles";
 import bitcoinIcon from "../../images/bitcoin.svg";
 import closeIcon from "../../images/close.svg";
+import bitgoLogo from "../../assets/bitgo-logo-vector.png";
 import Chart from "./Chart";
 import Deposit from "./Transactions/Deposit";
 import Withdraw from "./Transactions/Withdraw";
@@ -117,7 +118,7 @@ const styles = {
     fontWeight: 700,
     height: "60px",
     justifyContent: "space-between",
-    margin: "10px 0 30px 0",
+    margin: "10px 0 10px 0",
     padding: "0 0 0 5px",
     width: "100%"
   },
@@ -199,10 +200,10 @@ const styles = {
     flexWrap: "wrap",
     justifyContent: "flex-start",
     boxShadow: "none",
-    borderRadius: "5px",
     minHeight: "652px",
-    margin: "50px 0 50px 0",
     width: "100%",
+    border: "0px none",
+    padding: 5,
 
     "@media (min-width:780px)": {
       border: "1px solid",
@@ -307,8 +308,14 @@ const styles = {
     }
   },
   image: {
-    maxWidth: "150px",
-    margin: "10px 10px 5px 10px",
+    maxWidth: "125px",
+    height: "75px",
+    margin: "10px",
+    objectFit: "scale-down"
+  },
+  bitgoImage: {
+    maxWidth: "100px",
+    margin: "10px",
     objectFit: "scale-down"
   },
   earnRow: {
@@ -345,7 +352,8 @@ const styles = {
   button: {
     height: "50px",
     boxSizing: "border-box",
-    width: "90%"
+    width: "90%",
+    marginBottom: 10
   },
 
   earnContainer: {
@@ -372,8 +380,10 @@ const styles = {
     alignItems: "center",
     display: "flex",
     justifyContent: "center",
-    margin: "10px 0 10px 0",
-    width: "calc(100% / 3)",
+    width: "calc(100% / 3 - 10px)",
+    flexGrow: 0,
+    margin: 5,
+    flexBasis: "auto",
 
     "@media (max-width:780px)": {
       width: "calc(100% / 2)"
@@ -392,22 +402,24 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     justifyContent: "center",
-    height: "250px",
-    width: "90%"
+    width: "100%",
+    height: "100%"
   },
 
-  title: {
+  titleBox: {
     fontSize: "16px",
     fontWeight: 600,
+    padding: 20,
     margin: "5px 10px 10px 10px"
   },
 
-  subtitle: {
+  subtitleBox: {
     color: palette.gray[2],
     fontSize: "15px",
     fontWeight: 500,
     textAlign: "center",
-    margin: "10px 10px 10px 10px"
+    margin: "10px 10px 10px 10px",
+    flexGrow: 1
   }
 };
 
@@ -1146,12 +1158,11 @@ class Wallet extends Component {
                 <div className={classes.contentContainer}>
                   <div className={classes.paddingContainer}>
                     <Typography variant="h4" gutterBottom>
-                      {balance.toString()} Sats
+                      {balance.toLocaleString()} Sats
                     </Typography>
-                    {btcBalance.toString()} BTC - {formattedCurrency}
-                  </div>
-                  <Chart currency={currency} />
-                  <div className={classes.paddingContainer}>
+                    <Typography variant="h6" gutterBottom>
+                      {btcBalance.toLocaleString()} BTC - {formattedCurrency}
+                    </Typography>
                     <div className={classes.qrButtonContainer}>
                       <Button
                         className={classes.qrButton}
@@ -1162,7 +1173,6 @@ class Wallet extends Component {
                       >
                         Add funds
                       </Button>
-
                       <Button
                         className={classes.qrButton}
                         size="small"
@@ -1171,6 +1181,16 @@ class Wallet extends Component {
                         onClick={this.handleSendFunds}
                       >
                         Send
+                      </Button>
+
+                      <Button
+                        className={classes.qrButton}
+                        size="small"
+                        variant={"contained"}
+                        color="primary"
+                        onClick={this.handleWithdrawFunds}
+                      >
+                        Withdraw
                       </Button>
 
                       <Button
@@ -1191,11 +1211,12 @@ class Wallet extends Component {
                           color="secondary"
                           onClick={this.handleCopyShareUrl}
                         >
-                          Share your referral link
+                          Refer a friend
                         </Button>
                       </CopyToClipboard>
                     </div>
                   </div>
+                  <Chart currency={currency} />
                 </div>
               </Paper>
             ) : (
@@ -1223,6 +1244,7 @@ class Wallet extends Component {
                 </div>
               ) : (
                 earns.map((earn, index) => {
+                  console.log(earn);
                   return (
                     <div className={classes.outerBox} key={index}>
                       <div className={classes.innerBox}>
@@ -1231,8 +1253,8 @@ class Wallet extends Component {
                           className={classes.image}
                           alt=""
                         />
-                        <div className={classes.title}>{earn.reward}</div>
-                        <div className={classes.subtitle}>
+                        <div className={classes.titleBox}>{earn.reward}</div>
+                        <div className={classes.subtitleBox}>
                           {earn.preMessaging}
                           <span className={classes.bold}>
                             {" "}
@@ -1273,9 +1295,12 @@ class Wallet extends Component {
                     />
                   </IconButton>
                 </div>
-                <Typography variant="h4" gutterBottom>
-                  Deposit Bitcoin
-                </Typography>
+                <Typography variant="h4">Deposit Bitcoin</Typography>
+                <img
+                  src={bitgoLogo}
+                  className={classes.bitgoImage}
+                  alt="Bitgo logo"
+                />
                 <QRCode
                   className={classes.qrCode}
                   color={palette.blue[0]}
