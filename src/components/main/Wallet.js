@@ -116,10 +116,8 @@ const styles = {
     flexDirection: "row",
     fontSize: "23px",
     fontWeight: 700,
-    height: "60px",
+    marginBottom: "10px",
     justifyContent: "space-between",
-    margin: "10px 0 10px 0",
-    padding: "0 0 0 5px",
     width: "100%"
   },
 
