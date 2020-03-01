@@ -106,8 +106,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "column",
-    padding: "15px 20px 50px 20px"
+    flexDirection: "column"
   },
 
   dialogTitleContainer: {
@@ -336,7 +335,8 @@ const styles = {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    textAlign: "center"
+    textAlign: "center",
+    padding: 10
   },
   bold: {
     fontSize: "16px",
@@ -1285,7 +1285,7 @@ class Wallet extends Component {
             </Paper>
 
             <Dialog open={addFundsOpen}>
-              <div className={classes.dialogContentCentered}>
+              <div className={classes.dialogContent}>
                 <div className={classes.dialogTitleContainer}>
                   Add Funds
                   <IconButton
@@ -1300,29 +1300,33 @@ class Wallet extends Component {
                     />
                   </IconButton>
                 </div>
-                <Typography variant="h4">Deposit Bitcoin</Typography>
-                <img
-                  src={bitgoLogo}
-                  className={classes.bitgoImage}
-                  alt="Bitgo logo"
-                />
-                <QRCode
-                  className={classes.qrCode}
-                  color={palette.blue[0]}
-                  size={160}
-                  value={address}
-                />
-                <div className={classes.address}>{address}</div>
-                <CopyToClipboard text={address}>
-                  <a
-                    className={classes.link}
-                    href={"#"}
-                    onClick={this.handleCopyCode}
-                  >
-                    Copy
-                  </a>
-                </CopyToClipboard>
-                <Typography variant="h4" gutterBottom>
+                <Typography variant="h4" align="center">
+                  Deposit Bitcoin
+                </Typography>
+                <div className={classes.dialogContentCentered}>
+                  <img
+                    src={bitgoLogo}
+                    className={classes.bitgoImage}
+                    alt="Bitgo logo"
+                  />
+                  <QRCode
+                    className={classes.qrCode}
+                    color={palette.blue[0]}
+                    size={160}
+                    value={address}
+                  />
+                  <div className={classes.address}>{address}</div>
+                  <CopyToClipboard text={address}>
+                    <a
+                      className={classes.link}
+                      href={"#"}
+                      onClick={this.handleCopyCode}
+                    >
+                      Copy
+                    </a>
+                  </CopyToClipboard>
+                </div>
+                <Typography variant="h4" gutterBottom align="center">
                   Buy Bitcoin
                 </Typography>
                 <div className={classes.affiliateLinks}>
