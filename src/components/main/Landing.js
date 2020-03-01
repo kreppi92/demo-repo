@@ -44,7 +44,7 @@ const useStyles = makeStyles(theme => ({
     minHeight: "100vh",
     minWidth: "100vw",
     alignItems: "center",
-    overflowX: 'hidden',
+    overflowX: "hidden",
     background: "#eef2f3"
   },
   container: {
@@ -157,7 +157,7 @@ const useStyles = makeStyles(theme => ({
       alignItems: "center",
       textAlign: "center",
       padding: "50px 25px",
-      marginBottom: 0,
+      marginBottom: 0
     }
   },
   copyRight: {
@@ -174,7 +174,7 @@ const useStyles = makeStyles(theme => ({
       textAlign: "center",
       alignItems: "center",
       padding: "50px 25px",
-      marginBottom: 0,
+      marginBottom: 0
     }
   },
   videoSectionLeft: {
@@ -361,11 +361,11 @@ const useStyles = makeStyles(theme => ({
     color: "#fff"
   },
   titleContainer: {
-    width: "100%",
+    width: "100%"
   },
   referral: {
     maxHeight: 300,
-    maxWidth: "40vw",
+    maxWidth: "40vw"
   },
   spacer: {
     margin: 50
@@ -447,7 +447,11 @@ const Landing = () => {
             </motion.div>
           </Grid>
           <Grid item xs={12} className={classes.center}>
-            <Typography variant="h3" className={classes.mainSubtitle} gutterBottom>
+            <Typography
+              variant="h3"
+              className={classes.mainSubtitle}
+              gutterBottom
+            >
               Bitcoin made simple.
             </Typography>
           </Grid>
@@ -477,8 +481,8 @@ const Landing = () => {
                 LOG IN
               </Button>
             </div>
-              <br /> <br /> <br />
-              <ExpandMoreIcon />
+            <br /> <br /> <br />
+            <ExpandMoreIcon />
           </Grid>
         </Grid>
       </div>
@@ -488,7 +492,11 @@ const Landing = () => {
           <Grid item xs={12} md={6} className={classes.videoSectionRight}>
             <div className={classes.overlayContainer}>
               <div className={classes.videoUnderlay}>
-              <img src={Screenshot} alt="iphone" className={classes.screenshot} />
+                <img
+                  src={Screenshot}
+                  alt="iphone"
+                  className={classes.screenshot}
+                />
               </div>
               <div className={classes.iphoneOverlay}>
                 <img src={Screen} alt="iphone" className={classes.iphone} />
@@ -550,7 +558,7 @@ const Landing = () => {
           <Grid item xs={12} md={6} className={classes.copyRight}>
             <div className={classes.titleContainer}>
               <Typography variant="h5" className={classes.bodyTitle}>
-                Balance, Live Price Chart, History.
+                Earn Bitcoin. Stack Sats.
               </Typography>
             </div>
             <Typography
@@ -558,9 +566,9 @@ const Landing = () => {
               gutterBottom
               className={classes.bodySubTitle}
             >
-              Our comprehensive dashboard gives you all the insights you need
-              into your assets including the ability to view your balance, live
-              price chart, and transaction history!
+              We've made it easy for you to earn Bitcoin by signing up with
+              exchanges, buying a hardware wallet, earning interest, and making
+              online purchases!
             </Typography>
           </Grid>
           <Grid item xs={12} md={6}>
@@ -580,15 +588,15 @@ const Landing = () => {
           </Grid>
           <Grid item xs={12} md={6} className={classes.copyLeft}>
             <Typography variant="h5" className={classes.bodyTitle}>
-              Earn Bitcoin by Referring Users
+              Earn by Giving.
             </Typography>
             <Typography
               variant="subtitle1"
               gutterBottom
               className={classes.bodySubTitle}
             >
-              Our referral program gives you the ability to earn Bitcoin for
-              yourself by referring new users to our platform.
+              We will reward you with 25% commissions for every friend you refer
+              that earns Bitcoin through Satstreet!
             </Typography>
           </Grid>
 
@@ -624,6 +632,20 @@ const Landing = () => {
                 gutterBottom
                 className={classes.bodySubTitleBold}
               >
+                Satstreet App (Android & iOS)
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className={classes.bodySubTitleWhite}
+              >
+                Making it easy to send to any contact on your phone!
+              </Typography>
+              <Typography
+                variant="subtitle1"
+                gutterBottom
+                className={classes.bodySubTitleBold}
+              >
                 Learn Bitcoin
               </Typography>
               <Typography
@@ -631,49 +653,8 @@ const Landing = () => {
                 gutterBottom
                 className={classes.bodySubTitleWhite}
               >
-                explore our educational resources
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                className={classes.bodySubTitleBold}
-              >
-                Buy Bitcoin
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                className={classes.bodySubTitleWhite}
-              >
-                from our exchange partners{" "}
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                className={classes.bodySubTitleBold}
-              >
-                Earn Bitcoin
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                className={classes.bodySubTitleWhite}
-              >
-                from our affiliate programs{" "}
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                className={classes.bodySubTitleBold}
-              >
-                Explore Bitcoin
-              </Typography>
-              <Typography
-                variant="subtitle1"
-                gutterBottom
-                className={classes.bodySubTitleWhite}
-              >
-                discover the Bitcoin ecosystem{" "}
+                Explore our educational resources. A simple guide to explain
+                Bitcoin and interactive webinars.
               </Typography>
             </div>
           </Grid>
