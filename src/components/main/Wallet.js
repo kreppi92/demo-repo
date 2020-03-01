@@ -356,6 +356,13 @@ const styles = {
     marginBottom: 10
   },
 
+  sendButton: {
+    height: "50px",
+    boxSizing: "border-box",
+    width: "100%",
+    marginBottom: 10
+  },
+
   earnContainer: {
     display: "flex",
     flexWrap: "wrap",
@@ -1451,7 +1458,7 @@ class Wallet extends Component {
                 ) : (
                   <div>
                     <Button
-                      className={classes.button}
+                      className={classes.sendButton}
                       size="large"
                       variant={"contained"}
                       color="primary"
@@ -1568,7 +1575,7 @@ class Wallet extends Component {
                 ) : (
                   <div>
                     <Button
-                      className={classes.button}
+                      className={classes.sendButton}
                       size="large"
                       variant={"contained"}
                       color="primary"
@@ -1581,7 +1588,7 @@ class Wallet extends Component {
                     <div className={classes.textSeperator}>Or</div>
 
                     <Button
-                      className={classes.button}
+                      className={classes.sendButton}
                       size="large"
                       variant={"contained"}
                       color="primary"
