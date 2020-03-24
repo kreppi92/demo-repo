@@ -679,7 +679,10 @@ class Wallet extends Component {
           this.setState({
             growsurfId: result.data.growsurfId,
             referralUrl: result.data.referralUrl,
-            completedDeposit: result.data.completedDeposit
+            completedDeposit: result.data.completedDeposit,
+            referralCount: result.data.referralCount,
+            referralRank: result.data.rank,
+            referralMonthlyCount: result.data.monthlyReferralCount
           });
           return;
         } else {
