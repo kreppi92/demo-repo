@@ -681,8 +681,8 @@ class Wallet extends Component {
             referralUrl: result.data.referralUrl,
             completedDeposit: result.data.completedDeposit,
             referralCount: result.data.referralCount,
-            referralRank: result.data.rank,
-            referralMonthlyCount: result.data.monthlyReferralCount
+            referralRank: result.data.referralRank,
+            referralMonthlyCount: result.data.referralMonthlyCount
           });
           return;
         } else {
@@ -1146,7 +1146,10 @@ class Wallet extends Component {
       pendingWithdrawal,
       isLoading,
       addFundsOpen,
-      earns
+      earns,
+      referralCount,
+      referralRank,
+      referralMonthlyCount
     } = this.state;
     const { classes, type } = this.props;
 
@@ -1171,6 +1174,21 @@ class Wallet extends Component {
                     <Typography variant="h6" gutterBottom>
                       {btcBalance.toLocaleString()} BTC - {formattedCurrency}
                     </Typography>
+                    {referralCount && (
+                      <Typography variant="h6" gutterBottom>
+                        {referralCount} total referrals
+                      </Typography>
+                    )}
+                    {referralRank && (
+                      <Typography variant="h6" gutterBottom>
+                        {referralRank} referral rank
+                      </Typography>
+                    )}
+                    {referralMonthlyCount && (
+                      <Typography variant="h6" gutterBottom>
+                        {referralMonthlyCount} monthly referrals
+                      </Typography>
+                    )}
                     <div className={classes.qrButtonContainer}>
                       <Button
                         className={classes.qrButton}
