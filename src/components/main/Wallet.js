@@ -192,6 +192,16 @@ const styles = {
     }
   },
 
+  referrals: {
+    boxShadow: "none",
+    borderRadius: "5px",
+    width: "100%",
+    border: "1px solid",
+    borderColor: palette.gray[0],
+    padding: "10px",
+    margin: "20px"
+  },
+
   paperGrid: {
     display: "flex",
     flexWrap: "wrap",
@@ -1174,21 +1184,26 @@ class Wallet extends Component {
                     <Typography variant="h6" gutterBottom>
                       {btcBalance.toLocaleString()} BTC - {formattedCurrency}
                     </Typography>
-                    {referralCount && (
-                      <Typography variant="h6" gutterBottom>
-                        {referralCount} total referrals
+                    <Paper className={classes.referrals}>
+                      <Typography variant="h6" component="h3">
+                        Referrals
                       </Typography>
-                    )}
-                    {referralRank && (
-                      <Typography variant="h6" gutterBottom>
-                        {referralRank} referral rank
-                      </Typography>
-                    )}
-                    {referralMonthlyCount && (
-                      <Typography variant="h6" gutterBottom>
-                        {referralMonthlyCount} monthly referrals
-                      </Typography>
-                    )}
+                      {referralCount && (
+                        <Typography variant="body2" component="p">
+                          {referralCount} total referrals
+                        </Typography>
+                      )}
+                      {referralMonthlyCount && (
+                        <Typography variant="body2" component="p">
+                          {referralMonthlyCount} monthly referrals
+                        </Typography>
+                      )}
+                      {referralRank && (
+                        <Typography variant="body2" component="p">
+                          #{referralRank} rank on Satstreet
+                        </Typography>
+                      )}
+                    </Paper>
                     <div className={classes.qrButtonContainer}>
                       <Button
                         className={classes.qrButton}
