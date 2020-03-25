@@ -192,6 +192,16 @@ const styles = {
     }
   },
 
+  referrals: {
+    boxShadow: "none",
+    borderRadius: "5px",
+    width: "100%",
+    border: "1px solid",
+    borderColor: palette.gray[0],
+    padding: "10px",
+    margin: "20px"
+  },
+
   paperGrid: {
     display: "flex",
     flexWrap: "wrap",
@@ -679,7 +689,10 @@ class Wallet extends Component {
           this.setState({
             growsurfId: result.data.growsurfId,
             referralUrl: result.data.referralUrl,
-            completedDeposit: result.data.completedDeposit
+            completedDeposit: result.data.completedDeposit,
+            referralCount: result.data.referralCount,
+            referralRank: result.data.referralRank,
+            referralMonthlyCount: result.data.referralMonthlyCount
           });
           return;
         } else {
@@ -1143,7 +1156,10 @@ class Wallet extends Component {
       pendingWithdrawal,
       isLoading,
       addFundsOpen,
-      earns
+      earns,
+      referralCount,
+      referralRank,
+      referralMonthlyCount
     } = this.state;
     const { classes, type } = this.props;
 
@@ -1168,6 +1184,26 @@ class Wallet extends Component {
                     <Typography variant="h6" gutterBottom>
                       {btcBalance.toLocaleString()} BTC - {formattedCurrency}
                     </Typography>
+                    <Paper className={classes.referrals}>
+                      <Typography variant="h6" component="h3">
+                        Referrals
+                      </Typography>
+                      {referralCount && (
+                        <Typography variant="body2" component="p">
+                          {referralCount} total referrals
+                        </Typography>
+                      )}
+                      {referralMonthlyCount && (
+                        <Typography variant="body2" component="p">
+                          {referralMonthlyCount} monthly referrals
+                        </Typography>
+                      )}
+                      {referralRank && (
+                        <Typography variant="body2" component="p">
+                          #{referralRank} rank on Satstreet
+                        </Typography>
+                      )}
+                    </Paper>
                     <div className={classes.qrButtonContainer}>
                       <Button
                         className={classes.qrButton}

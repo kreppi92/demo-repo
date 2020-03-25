@@ -1379,12 +1379,18 @@ exports.getGrowsurfParticipant = functions.https.onCall((data, context) => {
           const growsurfId = response.id;
           const referralUrl = response.shareUrl;
           const completedDeposit = response.metadata.completedDeposit;
+          const referralCount = response.referralCount;
+          const referralRank = response.rank;
+          const referralMonthlyCount = response.monthlyReferralCount;
 
           return {
             success: true,
             growsurfId: growsurfId,
             referralUrl: referralUrl,
-            completedDeposit: completedDeposit
+            completedDeposit: completedDeposit,
+            referralCount,
+            referralRank,
+            referralMonthlyCount
           };
         })
         .catch(function(err) {
