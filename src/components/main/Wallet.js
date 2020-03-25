@@ -1188,19 +1188,21 @@ class Wallet extends Component {
                       <Typography variant="h6" component="h3">
                         Referrals
                       </Typography>
-                      {referralCount && (
+                      {!!referralCount ? (
+                        <React.Fragment>
+                          <Typography variant="body2" component="p">
+                            {referralCount} total referrals
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            {referralMonthlyCount} monthly referrals
+                          </Typography>
+                          <Typography variant="body2" component="p">
+                            #{referralRank} rank on Satstreet
+                          </Typography>
+                        </React.Fragment>
+                      ) : (
                         <Typography variant="body2" component="p">
-                          {referralCount} total referrals
-                        </Typography>
-                      )}
-                      {referralMonthlyCount && (
-                        <Typography variant="body2" component="p">
-                          {referralMonthlyCount} monthly referrals
-                        </Typography>
-                      )}
-                      {referralRank && (
-                        <Typography variant="body2" component="p">
-                          #{referralRank} rank on Satstreet
+                          No referrals yet. Try inviting some friends!
                         </Typography>
                       )}
                     </Paper>
