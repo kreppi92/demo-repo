@@ -1202,7 +1202,8 @@ class Wallet extends Component {
                         </React.Fragment>
                       ) : (
                         <Typography variant="body2" component="p">
-                          No referrals yet. Try inviting some friends!
+                          No referrals yet. Add the first referral by sending
+                          some sats to a new user!
                         </Typography>
                       )}
                     </Paper>
