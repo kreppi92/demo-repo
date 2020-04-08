@@ -1227,7 +1227,7 @@ class Wallet extends Component {
                         Send
                       </Button>
 
-                      <Button
+                      {/* <Button
                         className={classes.qrButton}
                         size="small"
                         variant={"contained"}
@@ -1235,7 +1235,7 @@ class Wallet extends Component {
                         onClick={this.handleWithdrawFunds}
                       >
                         Withdraw
-                      </Button>
+                      </Button> */}
 
                       <Button
                         className={classes.qrButton}
