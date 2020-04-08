@@ -248,9 +248,9 @@ class Home extends Component {
                               value={currencyOption}
                               onChange={this.handleCurrencyChange("currency")}
                             >
-                              <MenuItem value={0}>CAD</MenuItem>
-                              <MenuItem value={1}>USD</MenuItem>
-                              <MenuItem value={2}>EUR</MenuItem>
+                              {currencies.map((currency, index) => (
+                                <MenuItem value={index}>{currency}</MenuItem>
+                              ))}
                             </Select>
                           </FormControl>
                         );
@@ -286,9 +286,9 @@ class Home extends Component {
                             value={currencyOption}
                             onChange={this.handleCurrencyChange("currency")}
                           >
-                            <MenuItem value={0}>CAD</MenuItem>
-                            <MenuItem value={1}>USD</MenuItem>
-                            <MenuItem value={2}>EUR</MenuItem>
+                            {currencies.map((currency, index) => (
+                              <MenuItem value={index}>{currency}</MenuItem>
+                            ))}
                           </Select>
                         </div>
                       );
