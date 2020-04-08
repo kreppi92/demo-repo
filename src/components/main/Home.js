@@ -141,7 +141,7 @@ const styles = {
   },
 };
 
-const currencies = ["CAD", "USD", "EUR"];
+const currencies = ["USD", "CAD", "EUR"];
 
 class Home extends Component {
   componentWillMount() {
@@ -153,8 +153,8 @@ class Home extends Component {
   state = {
     isExpanded: false,
     selectedOption: options[1],
-    currency: currencies[1],
-    currencyOption: 1,
+    currency: currencies[0],
+    currencyOption: 0,
     snackbarIsOpen: false,
   };
 
