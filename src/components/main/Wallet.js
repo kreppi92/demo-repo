@@ -37,18 +37,18 @@ var currency = "";
 
 const styles = {
   address: {
-    fontSize: "13px"
+    fontSize: "13px",
   },
 
   circularProgress: {
-    color: palette.blue[0]
+    color: palette.blue[0],
   },
 
   bitcoinIcon: {
     height: "100px",
     margin: "0 0 20px 0",
     opacity: 0.2,
-    width: "100px"
+    width: "100px",
   },
 
   cancelButton: {
@@ -56,22 +56,22 @@ const styles = {
     margin: "25px 0 0 0",
 
     "&:hover": {
-      background: palette.red[-1]
-    }
+      background: palette.red[-1],
+    },
   },
 
   confirmButton: {
     background: palette.green[0],
 
     "&:hover": {
-      background: palette.green[-1]
-    }
+      background: palette.green[-1],
+    },
   },
 
   holdingContainer: {
     display: "flex",
     justifyContent: "center",
-    width: "100%"
+    width: "100%",
   },
 
   container: {
@@ -82,8 +82,8 @@ const styles = {
     width: "100%",
 
     "@media (min-width:780px)": {
-      width: "80%"
-    }
+      width: "80%",
+    },
   },
 
   contentContainer: {
@@ -95,18 +95,18 @@ const styles = {
 
     "@media (min-width:780px)": {
       // padding: "40px 40px 40px 40px"
-    }
+    },
   },
 
   dialogContent: {
-    padding: "15px 20px 50px 20px"
+    padding: "15px 20px 50px 20px",
   },
 
   dialogContentCentered: {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    flexDirection: "column"
+    flexDirection: "column",
   },
 
   dialogTitleContainer: {
@@ -117,17 +117,17 @@ const styles = {
     fontWeight: 700,
     marginBottom: "10px",
     justifyContent: "space-between",
-    width: "100%"
+    width: "100%",
   },
 
   iconButton: {
     height: "30px",
-    width: "30px"
+    width: "30px",
   },
 
   closeIcon: {
     color: palette.blue[0],
-    margin: "-5px -10px 0 0"
+    margin: "-5px -10px 0 0",
   },
 
   link: {
@@ -138,15 +138,15 @@ const styles = {
     margin: "5px 0 30px 0",
 
     "&:hover": {
-      textDecoration: "underline"
-    }
+      textDecoration: "underline",
+    },
   },
 
   list: {
     display: "flex",
     flexDirection: "column",
     overflowY: "auto",
-    margin: "20px 0 0 0"
+    margin: "20px 0 0 0",
   },
 
   listEmpty: {
@@ -156,7 +156,7 @@ const styles = {
     justifyContent: "center",
     margin: "20px 0 0 0",
     overflow: "auto",
-    height: "340px"
+    height: "340px",
   },
 
   paperOptions: {
@@ -171,8 +171,8 @@ const styles = {
       border: "1px solid",
       borderColor: palette.gray[0],
       margin: "10vh 0 10vh 0",
-      width: "30%"
-    }
+      width: "30%",
+    },
   },
 
   paperOptionsEmpty: {
@@ -188,8 +188,8 @@ const styles = {
       border: "1px solid",
       borderColor: palette.gray[0],
       margin: "10vh 0 10vh 0",
-      width: "30%"
-    }
+      width: "30%",
+    },
   },
 
   referrals: {
@@ -199,7 +199,7 @@ const styles = {
     border: "1px solid",
     borderColor: palette.gray[0],
     padding: "10px",
-    margin: "20px"
+    margin: "20px",
   },
 
   paperGrid: {
@@ -216,20 +216,20 @@ const styles = {
       border: "1px solid",
       borderColor: palette.gray[0],
       margin: "10vh 0 10vh 0",
-      width: "50%"
+      width: "50%",
     },
 
     "@media (min-width:900px)": {
-      width: "55%"
+      width: "55%",
     },
 
     "@media (min-width:1000px)": {
-      width: "60%"
+      width: "60%",
     },
 
     "@media (min-width:1200px)": {
-      width: "65%"
-    }
+      width: "65%",
+    },
   },
 
   qrButtonContainer: {
@@ -238,17 +238,17 @@ const styles = {
     flexDirection: "column",
     justifyContent: "space-around",
     maxWidth: "400px",
-    width: "100%"
+    width: "100%",
   },
 
   qrButton: {
     height: "50px",
     margin: "0 0 15px 0",
-    width: "100%"
+    width: "100%",
   },
 
   qrCode: {
-    margin: "20px 0px"
+    margin: "20px 0px",
   },
 
   toggleButton: {
@@ -256,16 +256,16 @@ const styles = {
     fontWeight: 700,
 
     "@media (min-width:364px)": {
-      fontSize: "9px"
+      fontSize: "9px",
     },
 
     "@media (min-width:400px)": {
-      fontSize: "10px"
+      fontSize: "10px",
     },
 
     "@media (min-width:500px)": {
-      fontSize: "12px"
-    }
+      fontSize: "12px",
+    },
   },
 
   textSeperator: {
@@ -276,11 +276,11 @@ const styles = {
     fontSize: "18px",
     fontWeight: 700,
     height: "60px",
-    justifyContent: "center"
+    justifyContent: "center",
   },
 
   textField: {
-    margin: "0 0 25px 0"
+    margin: "0 0 25px 0",
   },
 
   currencySummary: {
@@ -291,7 +291,7 @@ const styles = {
     width: "100%",
     fontWeight: "700",
     fontSize: "13px",
-    margin: "-15px 0 20px 0"
+    margin: "-15px 0 20px 0",
   },
 
   paddingContainer: {
@@ -301,7 +301,7 @@ const styles = {
     alignItems: "center",
     padding: "25px",
     boxSizing: "border-box",
-    width: "100%"
+    width: "100%",
   },
 
   shareButton: {
@@ -311,19 +311,19 @@ const styles = {
     width: "100%",
 
     "&:hover": {
-      background: palette.green[1]
-    }
+      background: palette.green[1],
+    },
   },
   image: {
     maxWidth: "125px",
     height: "75px",
     margin: "10px",
-    objectFit: "scale-down"
+    objectFit: "scale-down",
   },
   bitgoImage: {
     maxWidth: "100px",
     margin: "10px",
-    objectFit: "scale-down"
+    objectFit: "scale-down",
   },
   earnRow: {
     display: "flex",
@@ -335,8 +335,8 @@ const styles = {
     borderRadius: 3,
     margin: 10,
     "&:hover": {
-      background: "#eee"
-    }
+      background: "#eee",
+    },
   },
   earnCell: {
     width: "50%",
@@ -346,29 +346,29 @@ const styles = {
     alignItems: "center",
     justifyContent: "center",
     textAlign: "center",
-    padding: 10
+    padding: 10,
   },
   bold: {
     fontSize: "16px",
-    fontWeight: 700
+    fontWeight: 700,
   },
 
   circularProgress: {
-    color: palette.blue[0]
+    color: palette.blue[0],
   },
 
   button: {
     height: "50px",
     boxSizing: "border-box",
     width: "90%",
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   sendButton: {
     height: "50px",
     boxSizing: "border-box",
     width: "100%",
-    marginBottom: 10
+    marginBottom: 10,
   },
 
   earnContainer: {
@@ -379,8 +379,8 @@ const styles = {
     width: "100%",
 
     "@media (min-width:780px)": {
-      width: "80%"
-    }
+      width: "80%",
+    },
   },
 
   loadingHolder: {
@@ -388,7 +388,7 @@ const styles = {
     display: "flex",
     height: "652px",
     justifyContent: "center",
-    width: "100vw"
+    width: "100vw",
   },
 
   outerBox: {
@@ -401,12 +401,12 @@ const styles = {
     flexBasis: "auto",
 
     "@media (max-width:780px)": {
-      width: "calc(100% / 2)"
+      width: "calc(100% / 2)",
     },
 
     "@media (max-width:500px)": {
-      width: "100%"
-    }
+      width: "100%",
+    },
   },
 
   innerBox: {
@@ -418,14 +418,14 @@ const styles = {
     flexDirection: "column",
     justifyContent: "center",
     width: "100%",
-    height: "100%"
+    height: "100%",
   },
 
   titleBox: {
     fontSize: "16px",
     fontWeight: 600,
     padding: 20,
-    margin: "5px 10px 10px 10px"
+    margin: "5px 10px 10px 10px",
   },
 
   subtitleBox: {
@@ -434,8 +434,8 @@ const styles = {
     fontWeight: 500,
     textAlign: "center",
     margin: "10px 10px 10px 10px",
-    flexGrow: 1
-  }
+    flexGrow: 1,
+  },
 };
 
 class Wallet extends Component {
@@ -474,7 +474,7 @@ class Wallet extends Component {
     referralUrl: "",
     completedDeposit: false,
     addFundsDialog: false,
-    earns: []
+    earns: [],
   };
 
   componentWillReceiveProps(newProps) {
@@ -497,12 +497,12 @@ class Wallet extends Component {
     this.setState({ isLoading: true });
     var getEarn = Firebase.functions().httpsCallable("getEarn");
     return getEarn({ token: store.get("token") }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           this.setState({
             earns: result.data.earns.sort((a, b) =>
               a.order > b.order ? 1 : -1
-            )
+            ),
           });
         }
         this.setState({ isLoading: false });
@@ -516,16 +516,16 @@ class Wallet extends Component {
     }
   }
 
-  handleClickLink = index => e => {
+  handleClickLink = (index) => (e) => {
     const { earns } = this.state;
 
     window.open(earns[index].link, "_blank");
   };
 
-  getWalletAddress = token => {
+  getWalletAddress = (token) => {
     var checkAddress = Firebase.functions().httpsCallable("checkAddress");
     checkAddress({ token: token }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           this.getAllTransactions(token, result.data.address);
           this.setTransactionService(token, result.data.address);
@@ -538,7 +538,7 @@ class Wallet extends Component {
 
   setTransactionService = (token, address) => {
     timerID = setInterval(
-      function() {
+      function () {
         this.getAllTransactions(token, address);
       }.bind(this),
       30000
@@ -561,8 +561,8 @@ class Wallet extends Component {
       receivedTransactions,
       withdrawalTransactions,
       currentRate,
-      getCurrentGrowsurfParticipant
-    ]).then(responses => {
+      getCurrentGrowsurfParticipant,
+    ]).then((responses) => {
       const deposits = responses[0].transfers;
       const sentTransactions = responses[1];
       const receivedTransactions = responses[2];
@@ -598,7 +598,7 @@ class Wallet extends Component {
         receivedList: receivedTransactions,
         withdrawList: withdrawalTransactions,
         balance: balance,
-        rate: parseFloat(currentRate)
+        rate: parseFloat(currentRate),
       });
     });
   };
@@ -608,7 +608,7 @@ class Wallet extends Component {
       "getOnchainTransactions"
     );
     return getOnchainTransactions({ token: token, address: address }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           return result.data.response;
         } else {
@@ -618,12 +618,12 @@ class Wallet extends Component {
     );
   };
 
-  getSentTransactions = token => {
+  getSentTransactions = (token) => {
     var getSentTransactions = Firebase.functions().httpsCallable(
       "getSentTransactions"
     );
     return getSentTransactions({ token: token }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           return result.data.transactions;
         } else {
@@ -633,12 +633,12 @@ class Wallet extends Component {
     );
   };
 
-  getReceivedTransactions = token => {
+  getReceivedTransactions = (token) => {
     var getReceivedTransactions = Firebase.functions().httpsCallable(
       "getReceivedTransactions"
     );
     return getReceivedTransactions({ token: token }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           return result.data.transactions;
         } else {
@@ -648,12 +648,12 @@ class Wallet extends Component {
     );
   };
 
-  getWithdrawalTransactions = token => {
+  getWithdrawalTransactions = (token) => {
     var getWithdrawalTransactions = Firebase.functions().httpsCallable(
       "getWithdrawalTransactions"
     );
     return getWithdrawalTransactions({ token: token }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           return result.data.withdrawals;
         } else {
@@ -666,7 +666,7 @@ class Wallet extends Component {
   getRate = () => {
     var getRate = Firebase.functions().httpsCallable("getRate");
     return getRate({ currency: currency }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           return result.data.rate;
         } else {
@@ -676,14 +676,14 @@ class Wallet extends Component {
     );
   };
 
-  getCurrentGrowsurfParticipant = token => {
+  getCurrentGrowsurfParticipant = (token) => {
     const { depositList } = this.state;
 
     var getGrowsurfParticipant = Firebase.functions().httpsCallable(
       "getGrowsurfParticipant"
     );
     return getGrowsurfParticipant({ token: token }).then(
-      function(result) {
+      function (result) {
         console.log("Growsurf Get, ", result.data);
         if (result.data.success) {
           this.setState({
@@ -692,7 +692,7 @@ class Wallet extends Component {
             completedDeposit: result.data.completedDeposit,
             referralCount: result.data.referralCount,
             referralRank: result.data.referralRank,
-            referralMonthlyCount: result.data.referralMonthlyCount
+            referralMonthlyCount: result.data.referralMonthlyCount,
           });
           return;
         } else {
@@ -703,15 +703,15 @@ class Wallet extends Component {
           return createGrowsurfParticipant({
             token: token,
             completedDeposit: hasCompletedDeposit,
-            referId: store.get("referralID")
+            referId: store.get("referralID"),
           }).then(
-            function(result) {
+            function (result) {
               console.log("Growsurf Create, ", result.data);
               if (result.data.success) {
                 this.setState({
                   growsurfId: result.data.growsurfId,
                   referralUrl: result.data.referralUrl,
-                  completedDeposit: hasCompletedDeposit
+                  completedDeposit: hasCompletedDeposit,
                 });
                 return;
               } else {
@@ -728,7 +728,7 @@ class Wallet extends Component {
     this.setState({
       snackbarIsOpen: true,
       snackbarVariant: variant,
-      snackbarMessage: message
+      snackbarMessage: message,
     });
   };
 
@@ -736,7 +736,7 @@ class Wallet extends Component {
     this.setState({
       snackbarIsOpen: true,
       snackbarVariant: "success",
-      snackbarMessage: "Your wallet address was successfully copied."
+      snackbarMessage: "Your wallet address was successfully copied.",
     });
   };
 
@@ -744,17 +744,17 @@ class Wallet extends Component {
     this.setState({
       snackbarIsOpen: true,
       snackbarVariant: "success",
-      snackbarMessage: "Your share link was successfully copied."
+      snackbarMessage: "Your share link was successfully copied.",
     });
   };
 
   onSnackBarClose = () => {
     this.setState({
-      snackbarIsOpen: false
+      snackbarIsOpen: false,
     });
   };
 
-  handleChange = name => event => {
+  handleChange = (name) => (event) => {
     event.preventDefault();
 
     this.setState({
@@ -766,7 +766,7 @@ class Wallet extends Component {
       withdrawAddressError: false,
       withdrawAddressHelperText: "",
       withdrawAmountError: false,
-      withdrawAmountHelperText: ""
+      withdrawAmountHelperText: "",
     });
   };
 
@@ -776,13 +776,13 @@ class Wallet extends Component {
 
   handleSendDialogClose = () => {
     this.setState({
-      sendDialogOpen: false
+      sendDialogOpen: false,
     });
   };
 
   handleWithdrawDialogClose = () => {
     this.setState({
-      withdrawDialogOpen: false
+      withdrawDialogOpen: false,
     });
   };
 
@@ -790,7 +790,7 @@ class Wallet extends Component {
     this.setState({
       email: "",
       amount: "",
-      sendDialogOpen: true
+      sendDialogOpen: true,
     });
   };
 
@@ -798,7 +798,7 @@ class Wallet extends Component {
     this.setState({
       withdrawAddress: "",
       withdrawAmount: "",
-      withdrawDialogOpen: true
+      withdrawDialogOpen: true,
     });
   };
 
@@ -841,9 +841,9 @@ class Wallet extends Component {
     return withdrawFunds({
       token: store.get("token"),
       address: withdrawAddress,
-      totalAmount: funds.toString()
+      totalAmount: funds.toString(),
     }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           var postTransaction = Firebase.functions().httpsCallable(
             "postTransaction"
@@ -852,9 +852,9 @@ class Wallet extends Component {
             token: store.get("token"),
             toEmail: "info@satstreet.com",
             amount: fees.toString(),
-            type: "Fees"
+            type: "Fees",
           }).then(
-            function(result) {
+            function (result) {
               this.displaySnackbar(
                 "success",
                 "Withdrawal successfully processed."
@@ -863,7 +863,7 @@ class Wallet extends Component {
               this.setState({
                 withdrawDialogOpen: false,
                 pendingWithdrawal: false,
-                isLoading: false
+                isLoading: false,
               });
 
               this.getAllTransactions(store.get("token"), address);
@@ -873,7 +873,7 @@ class Wallet extends Component {
           this.displaySnackbar("error", result.data.error);
 
           this.setState({
-            isLoading: false
+            isLoading: false,
           });
         }
       }.bind(this)
@@ -889,9 +889,9 @@ class Wallet extends Component {
       token: store.get("token"),
       toEmail: email,
       amount: amount,
-      type: transactionType
+      type: transactionType,
     }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           this.displaySnackbar("success", "Transaction successfully created.");
 
@@ -904,7 +904,7 @@ class Wallet extends Component {
           this.setState({
             sendDialogOpen: false,
             pendingConfirmation: false,
-            isLoading: false
+            isLoading: false,
           });
 
           this.getAllTransactions(store.get("token"), address);
@@ -912,7 +912,7 @@ class Wallet extends Component {
           this.displaySnackbar("error", result.data.error);
 
           this.setState({
-            isLoading: false
+            isLoading: false,
           });
         }
       }.bind(this)
@@ -952,11 +952,11 @@ class Wallet extends Component {
         withdrawAddressError: withdrawAddressHasError,
         withdrawAddressHelperText: withdrawAddressErrorText,
         withdrawAmountError: withdrawAmountHasError,
-        withdrawAmountHelperText: withdrawAmountErrorText
+        withdrawAmountHelperText: withdrawAmountErrorText,
       });
     } else {
       this.setState({
-        pendingWithdrawal: true
+        pendingWithdrawal: true,
       });
     }
   };
@@ -973,9 +973,9 @@ class Wallet extends Component {
       token: store.get("token"),
       toEmail: email,
       amount: amount,
-      referralId: referralID
+      referralId: referralID,
     }).then(
-      function(result) {
+      function (result) {
         if (result.data.success) {
           this.displaySnackbar("success", "Your email receipt has been sent.");
         }
@@ -1027,7 +1027,7 @@ class Wallet extends Component {
     } else {
       this.setState({
         transactionType: type,
-        pendingConfirmation: true
+        pendingConfirmation: true,
       });
     }
   }
@@ -1042,7 +1042,7 @@ class Wallet extends Component {
       emailError: emailHasError,
       emailHelperText: emailErrorText,
       amountError: amountHasError,
-      amountHelperText: amountErrorText
+      amountHelperText: amountErrorText,
     });
   }
 
@@ -1052,7 +1052,7 @@ class Wallet extends Component {
       sentList,
       receivedList,
       depositList,
-      withdrawList
+      withdrawList,
     } = this.state;
     const { classes } = this.props;
 
@@ -1159,13 +1159,13 @@ class Wallet extends Component {
       earns,
       referralCount,
       referralRank,
-      referralMonthlyCount
+      referralMonthlyCount,
     } = this.state;
     const { classes, type } = this.props;
 
     var btcBalance = bitcoinConverter(parseInt(balance), "satoshi").to("BTC");
     var formattedCurrency = currencyFormatter.format(rate * btcBalance, {
-      code: currency
+      code: currency,
     });
 
     return (
@@ -1260,7 +1260,7 @@ class Wallet extends Component {
                       </CopyToClipboard>
                     </div>
                   </div>
-                  <Chart currency={currency} />
+                  {/* <Chart currency={currency} /> */}
                 </div>
               </Paper>
             ) : (
@@ -1711,7 +1711,7 @@ class Wallet extends Component {
 }
 
 Wallet.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Wallet);

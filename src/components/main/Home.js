@@ -38,47 +38,47 @@ const styles = {
     justifyContent: "space-between",
     flexDirection: "row",
     height: "80px",
-    width: "100%"
+    width: "100%",
   },
 
   button: {
     color: palette.gray[1],
     padding: "0 15px 0 15px",
-    textDecoration: "none"
+    textDecoration: "none",
   },
 
   container: {
     alignItems: "center",
     display: "flex",
-    flexDirection: "column"
+    flexDirection: "column",
   },
 
   divider: {
-    width: "100%"
+    width: "100%",
   },
 
   footer: {
-    width: "100%"
+    width: "100%",
   },
 
   logoIcon: {
     margin: "0 0 0 30px",
     objectFit: "contain",
-    height: "30px"
+    height: "30px",
   },
 
   menuOptionsContainer: {
-    margin: "0 20px 0 0"
+    margin: "0 20px 0 0",
   },
 
   iconButton: {
     height: "30px",
-    width: "30px"
+    width: "30px",
   },
 
   menuIcon: {
     color: palette.blue[0],
-    margin: "0 20px 0 0"
+    margin: "0 20px 0 0",
   },
 
   expandedOption: {
@@ -88,7 +88,7 @@ const styles = {
     display: "flex",
     flexDirection: "row",
     height: "60px",
-    width: "100vw"
+    width: "100vw",
   },
 
   expandedOptionTextUnselected: {
@@ -96,7 +96,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "16px",
     fontWeight: "700",
-    padding: "0 20px 0 20px"
+    padding: "0 20px 0 20px",
   },
 
   expandedOptionTextSelected: {
@@ -104,7 +104,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "16px",
     fontWeight: "700",
-    padding: "0 20px 0 20px"
+    padding: "0 20px 0 20px",
   },
 
   mainContent: {
@@ -112,20 +112,20 @@ const styles = {
     display: "flex",
     minHeight: "100vh",
     flexDirection: "column",
-    width: "100%"
+    width: "100%",
   },
 
   selectedButton: {
     color: palette.blue[0],
     padding: "0 15px 0 15px",
-    textDecoration: "underline"
+    textDecoration: "underline",
   },
 
   select: {
     margin: "12px 5px 0 0",
     verticalAlign: "center",
     background: palette.black[-1],
-    fontSize: "15px"
+    fontSize: "15px",
   },
 
   selectMobile: {
@@ -137,11 +137,11 @@ const styles = {
     verticalAlign: "center",
     background: palette.black[-1],
     height: "20px",
-    width: "100vw"
-  }
+    width: "100vw",
+  },
 };
 
-const currencies = ["CAD", "USD", "EUR"];
+const currencies = ["USD", "CAD", "EUR"];
 
 class Home extends Component {
   componentWillMount() {
@@ -155,37 +155,37 @@ class Home extends Component {
     selectedOption: options[1],
     currency: currencies[0],
     currencyOption: 0,
-    snackbarIsOpen: false
+    snackbarIsOpen: false,
   };
 
-  handleCurrencyChange = name => event => {
+  handleCurrencyChange = (name) => (event) => {
     this.setState({
       currencyOption: event.target.value,
-      currency: currencies[event.target.value]
+      currency: currencies[event.target.value],
     });
   };
 
   onSnackBarClose = () => {
     this.setState({
-      snackbarIsOpen: false
+      snackbarIsOpen: false,
     });
   };
 
-  handleOptionChange = option => {
+  handleOptionChange = (option) => {
     console.log("option", option);
     if (option === "Sign out") {
       store.clearAll();
       window.location = "/signin";
     } else if (option === "Education") {
       this.setState({
-        snackbarIsOpen: true
+        snackbarIsOpen: true,
       });
     } else {
       this.setState({ selectedOption: option });
     }
 
     this.setState({
-      isExpanded: false
+      isExpanded: false,
     });
   };
 
@@ -193,7 +193,7 @@ class Home extends Component {
     const { isExpanded } = this.state;
 
     this.setState({
-      isExpanded: !isExpanded
+      isExpanded: !isExpanded,
     });
   };
 
@@ -203,7 +203,7 @@ class Home extends Component {
       currencyOption,
       isExpanded,
       selectedOption,
-      snackbarIsOpen
+      snackbarIsOpen,
     } = this.state;
     const { classes } = this.props;
 
@@ -239,7 +239,7 @@ class Home extends Component {
               <Default>
                 <div className={classes.menuOptionsContainer}>
                   {options.map(
-                    function(option, i) {
+                    function (option, i) {
                       if (i === 0) {
                         return (
                           <FormControl className={classes.select}>
@@ -248,9 +248,9 @@ class Home extends Component {
                               value={currencyOption}
                               onChange={this.handleCurrencyChange("currency")}
                             >
-                              <MenuItem value={0}>CAD</MenuItem>
-                              <MenuItem value={1}>USD</MenuItem>
-                              <MenuItem value={2}>EUR</MenuItem>
+                              {currencies.map((currency, index) => (
+                                <MenuItem value={index}>{currency}</MenuItem>
+                              ))}
                             </Select>
                           </FormControl>
                         );
@@ -277,7 +277,7 @@ class Home extends Component {
             <Mobile>
               {isExpanded ? (
                 options.map(
-                  function(option, i) {
+                  function (option, i) {
                     if (i === 0) {
                       return (
                         <div className={classes.selectMobile}>
@@ -286,9 +286,9 @@ class Home extends Component {
                             value={currencyOption}
                             onChange={this.handleCurrencyChange("currency")}
                           >
-                            <MenuItem value={0}>CAD</MenuItem>
-                            <MenuItem value={1}>USD</MenuItem>
-                            <MenuItem value={2}>EUR</MenuItem>
+                            {currencies.map((currency, index) => (
+                              <MenuItem value={index}>{currency}</MenuItem>
+                            ))}
                           </Select>
                         </div>
                       );
@@ -346,7 +346,7 @@ class Home extends Component {
 }
 
 Home.propTypes = {
-  classes: PropTypes.object.isRequired
+  classes: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles)(Home);
