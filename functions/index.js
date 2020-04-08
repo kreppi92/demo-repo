@@ -24,29 +24,29 @@ exports.generateCode = functions.https.onCall((data, context) => {
     method: "POST",
     url: url,
     headers: {
-      Authorization: authorization
+      Authorization: authorization,
     },
-    json: true
+    json: true,
   };
 
   options.body = {
     from: {
       email: "info@satstreet.com",
-      name: "Satstreet Inc."
+      name: "Satstreet Inc.",
     },
     template_id: "d-5b71dd36091c4720bca38449b16d4808",
     personalizations: [
       {
         to: [
           {
-            email: email
-          }
+            email: email,
+          },
         ],
         dynamic_template_data: {
-          code: generatedCode
-        }
-      }
-    ]
+          code: generatedCode,
+        },
+      },
+    ],
   };
 
   return admin
@@ -54,9 +54,9 @@ exports.generateCode = functions.https.onCall((data, context) => {
     .collection("users")
     .where("email", "==", email)
     .get()
-    .then(function(querySnapshot) {
+    .then(function (querySnapshot) {
       var documentId = "";
-      querySnapshot.forEach(function(doc) {
+      querySnapshot.forEach(function (doc) {
         documentId = doc.id;
       });
       if (documentId === "") {
@@ -65,9 +65,9 @@ exports.generateCode = functions.https.onCall((data, context) => {
           .collection("verification")
           .where("email", "==", email)
           .get()
-          .then(function(querySnapshot) {
+          .then(function (querySnapshot) {
             var docId = "";
-            querySnapshot.forEach(function(doc) {
+            querySnapshot.forEach(function (doc) {
               docId = doc.id;
             });
             if (docId === "") {
@@ -78,25 +78,25 @@ exports.generateCode = functions.https.onCall((data, context) => {
                 .firestore()
                 .collection("verification")
                 .add(verificationData)
-                .then(writeResult => {
+                .then((writeResult) => {
                   return rp(options)
-                    .then(function(response) {
+                    .then(function (response) {
                       return { success: true };
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                       console.log("Error is", error);
                       return {
                         success: false,
                         error:
-                          "There was an error sending the verification email. Please try again later."
+                          "There was an error sending the verification email. Please try again later.",
                       };
                     });
                 })
-                .catch(err => {
+                .catch((err) => {
                   return {
                     success: false,
                     error:
-                      "There was an error connecting to our server. Please try again later."
+                      "There was an error connecting to our server. Please try again later.",
                   };
                 });
             } else {
@@ -108,48 +108,48 @@ exports.generateCode = functions.https.onCall((data, context) => {
                 .collection("verification")
                 .doc(docId)
                 .update(verificationData)
-                .then(writeResult => {
+                .then((writeResult) => {
                   return rp(options)
-                    .then(function(response) {
+                    .then(function (response) {
                       return { success: true };
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                       console.log("Error is", error);
                       return {
                         success: false,
                         error:
-                          "There was an error sending the verification email. Please try again later."
+                          "There was an error sending the verification email. Please try again later.",
                       };
                     });
                 })
-                .catch(err => {
+                .catch((err) => {
                   return {
                     success: false,
                     error:
-                      "There was an error connecting to our server. Please try again later."
+                      "There was an error connecting to our server. Please try again later.",
                   };
                 });
             }
           })
-          .catch(err => {
+          .catch((err) => {
             return {
               success: false,
               error:
-                "There was an error connecting to our server. Please try again later."
+                "There was an error connecting to our server. Please try again later.",
             };
           });
       } else {
         return {
           success: false,
-          error: "This user already exits. Please try signing in."
+          error: "This user already exits. Please try signing in.",
         };
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return {
         success: false,
         error:
-          "There was an error connecting to our server. Please try again later."
+          "There was an error connecting to our server. Please try again later.",
       };
     });
 });
@@ -164,26 +164,26 @@ exports.verifyCode = functions.https.onCall((data, context) => {
     method: "POST",
     url: url,
     headers: {
-      Authorization: authorization
+      Authorization: authorization,
     },
-    json: true
+    json: true,
   };
 
   options.body = {
     from: {
       email: "info@satstreet.com",
-      name: "Satstreet Inc."
+      name: "Satstreet Inc.",
     },
     template_id: "d-28b2985574a341c6ab40c2dd8ac76486",
     personalizations: [
       {
         to: [
           {
-            email: email
-          }
-        ]
-      }
-    ]
+            email: email,
+          },
+        ],
+      },
+    ],
   };
 
   return admin
@@ -191,30 +191,30 @@ exports.verifyCode = functions.https.onCall((data, context) => {
     .collection("verification")
     .where("email", "==", email)
     .get()
-    .then(function(querySnapshot) {
+    .then(function (querySnapshot) {
       var storedCode = "";
-      querySnapshot.forEach(function(doc) {
+      querySnapshot.forEach(function (doc) {
         storedCode = doc.data().code;
       });
 
       if (code === storedCode) {
         // Send verification emain here
-        return rp(options).then(function(response) {
+        return rp(options).then(function (response) {
           return { success: true };
         });
       } else {
         return {
           success: false,
           error:
-            "The code you have entered does not match the code we sent to you."
+            "The code you have entered does not match the code we sent to you.",
         };
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return {
         success: false,
         error:
-          "There was an error connecting to our server. Please try again later."
+          "There was an error connecting to our server. Please try again later.",
       };
     });
 });
@@ -228,9 +228,9 @@ exports.signUp = functions.https.onCall((data, context) => {
     .collection("users")
     .where("email", "==", email)
     .get()
-    .then(function(querySnapshot) {
+    .then(function (querySnapshot) {
       var documentId = "";
-      querySnapshot.forEach(function(doc) {
+      querySnapshot.forEach(function (doc) {
         documentId = doc.id;
       });
       if (documentId === "") {
@@ -239,36 +239,36 @@ exports.signUp = functions.https.onCall((data, context) => {
           email: email,
           password: hash,
           verified: true,
-          address: ""
+          address: "",
         };
 
         return admin
           .firestore()
           .collection("users")
           .add(userData)
-          .then(writeResult => {
+          .then((writeResult) => {
             console.log("The write result is", writeResult);
             var token = jwt.sign({ email: email }, jwtToken);
             return { success: true, token: token };
           })
-          .catch(err => {
+          .catch((err) => {
             return {
               success: false,
-              error: "There was an error signing up. Please try again later."
+              error: "There was an error signing up. Please try again later.",
             };
           });
       } else {
         return {
           success: false,
-          error: "This user already exits. Please try signing in."
+          error: "This user already exits. Please try signing in.",
         };
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return {
         success: false,
         error:
-          "There was an error connecting to our server. Please try again later."
+          "There was an error connecting to our server. Please try again later.",
       };
     });
 });
@@ -282,10 +282,10 @@ exports.signIn = functions.https.onCall((data, context) => {
     .collection("users")
     .where("email", "==", email)
     .get()
-    .then(function(querySnapshot) {
+    .then(function (querySnapshot) {
       var documentId = "";
       var hash = "";
-      querySnapshot.forEach(function(doc) {
+      querySnapshot.forEach(function (doc) {
         documentId = doc.id;
         hash = doc.data().password;
       });
@@ -294,7 +294,7 @@ exports.signIn = functions.https.onCall((data, context) => {
         return {
           success: false,
           error:
-            "The email and password you entered did not match our records. Please double-check and try again."
+            "The email and password you entered did not match our records. Please double-check and try again.",
         };
       } else {
         const isValidPassword = bcrypt.compareSync(password, hash);
@@ -303,7 +303,7 @@ exports.signIn = functions.https.onCall((data, context) => {
           return {
             success: false,
             error:
-              "The email and password you entered did not match our records. Please double-check and try again."
+              "The email and password you entered did not match our records. Please double-check and try again.",
           };
         } else {
           var token = jwt.sign({ email: email }, jwtToken);
@@ -311,11 +311,11 @@ exports.signIn = functions.https.onCall((data, context) => {
         }
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return {
         success: false,
         error:
-          "There was an error connecting to our server. Please try again later."
+          "There was an error connecting to our server. Please try again later.",
       };
     });
 });
@@ -323,7 +323,7 @@ exports.signIn = functions.https.onCall((data, context) => {
 exports.checkAddress = functions.https.onCall((data, context) => {
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -333,10 +333,10 @@ exports.checkAddress = functions.https.onCall((data, context) => {
         .collection("users")
         .where("email", "==", email)
         .get()
-        .then(function(querySnapshot) {
+        .then(function (querySnapshot) {
           var address = "";
           var documentId = "";
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(function (doc) {
             documentId = doc.id;
             address = doc.data().address;
           });
@@ -346,7 +346,7 @@ exports.checkAddress = functions.https.onCall((data, context) => {
             return {
               success: false,
               error:
-                "There was an error connecting to our server. Please try again later."
+                "There was an error connecting to our server. Please try again later.",
             };
           } else {
             if (address === "") {
@@ -356,17 +356,17 @@ exports.checkAddress = functions.https.onCall((data, context) => {
                 method: "GET",
                 url: url,
                 headers: {
-                  Authorization: authorization
+                  Authorization: authorization,
                 },
-                json: true
+                json: true,
               };
 
               options.body = {
-                walletId: "5df0646eb1138b4807c67ce3a37d9eea"
+                walletId: "5df0646eb1138b4807c67ce3a37d9eea",
               };
 
               return rp(options)
-                .then(function(response) {
+                .then(function (response) {
                   const generatedAddress = response.address;
                   console.log("Generated address", generatedAddress);
                   let userData = { address: generatedAddress };
@@ -375,27 +375,27 @@ exports.checkAddress = functions.https.onCall((data, context) => {
                     .collection("users")
                     .doc(documentId)
                     .update(userData)
-                    .then(writeResult => {
+                    .then((writeResult) => {
                       return rp(options)
-                        .then(function(response) {
+                        .then(function (response) {
                           return { success: true, address: generatedAddress };
                         })
-                        .catch(function(error) {
+                        .catch(function (error) {
                           console.log("Error is", error);
                           return {
                             success: false,
                             error:
-                              "There was an error generating the wallet address. Please try again later."
+                              "There was an error generating the wallet address. Please try again later.",
                           };
                         });
                     });
                 })
-                .catch(function(error) {
+                .catch(function (error) {
                   console.log("Error is", error);
                   return {
                     success: false,
                     error:
-                      "There was an error generating the wallet address. Please try again later."
+                      "There was an error generating the wallet address. Please try again later.",
                   };
                 });
             } else {
@@ -404,11 +404,11 @@ exports.checkAddress = functions.https.onCall((data, context) => {
             }
           }
         })
-        .catch(err => {
+        .catch((err) => {
           return {
             success: false,
             error:
-              "There was an error connecting to our server. Please try again later."
+              "There was an error connecting to our server. Please try again later.",
           };
         });
     }
@@ -419,7 +419,7 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
   const token = data.token;
   const address = data.address;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -431,18 +431,18 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
         method: "GET",
         url: url,
         headers: {
-          Authorization: authorization
+          Authorization: authorization,
         },
-        json: true
+        json: true,
       };
 
       options.body = {
         walletId: "5df0646eb1138b4807c67ce3a37d9eea",
-        address: address
+        address: address,
       };
 
       return rp(options)
-        .then(function(response) {
+        .then(function (response) {
           const deposits = response.transfers;
 
           var totalAmount = 0;
@@ -460,9 +460,9 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
             .collection("users")
             .where("email", "==", email)
             .get()
-            .then(function(querySnapshot) {
+            .then(function (querySnapshot) {
               var documentId = "";
-              querySnapshot.forEach(function(doc) {
+              querySnapshot.forEach(function (doc) {
                 documentId = doc.id;
               });
 
@@ -472,147 +472,147 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
                   .collection("users")
                   .doc(documentId)
                   .update(balanceData)
-                  .then(writeResult => {
+                  .then((writeResult) => {
                     return { success: true, response: response };
                   })
-                  .catch(err => {
+                  .catch((err) => {
                     return {
                       success: false,
                       error:
-                        "There was an error connecting to our server. Please try again later."
+                        "There was an error connecting to our server. Please try again later.",
                     };
                   });
               }
             })
-            .catch(err => {
+            .catch((err) => {
               return {
                 success: false,
                 error:
-                  "There was an error connecting to our server. Please try again later."
+                  "There was an error connecting to our server. Please try again later.",
               };
             });
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log("Error is", error);
           return {
             success: false,
             error:
-              "There was an error getting onchain transactions. Please try again later."
+              "There was an error getting onchain transactions. Please try again later.",
           };
         });
     }
   });
 });
 
-exports.withdrawFunds = functions.https.onCall((data, context) => {
-  const token = data.token;
-  const toAddress = data.address;
-  const totalAmount = data.totalAmount;
+// exports.withdrawFunds = functions.https.onCall((data, context) => {
+//   const token = data.token;
+//   const toAddress = data.address;
+//   const totalAmount = data.totalAmount;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
-    if (err) {
-      return { success: false, error: "Not authorized" };
-    } else {
-      const email = decoded.email.toLowerCase();
+//   return jwt.verify(token, jwtToken, function(err, decoded) {
+//     if (err) {
+//       return { success: false, error: "Not authorized" };
+//     } else {
+//       const email = decoded.email.toLowerCase();
 
-      return admin
-        .firestore()
-        .collection("users")
-        .where("email", "==", email)
-        .get()
-        .then(function(querySnapshot) {
-          var documentId = "";
-          var totalBalance = 0;
-          querySnapshot.forEach(function(doc) {
-            documentId = doc.id;
-            totalBalance += Number(doc.data().received);
-            totalBalance -= Number(doc.data().sent);
-            totalBalance += Number(doc.data().deposits);
-            totalBalance -= Number(doc.data().withdrawals);
-          });
+//       return admin
+//         .firestore()
+//         .collection("users")
+//         .where("email", "==", email)
+//         .get()
+//         .then(function(querySnapshot) {
+//           var documentId = "";
+//           var totalBalance = 0;
+//           querySnapshot.forEach(function(doc) {
+//             documentId = doc.id;
+//             totalBalance += Number(doc.data().received);
+//             totalBalance -= Number(doc.data().sent);
+//             totalBalance += Number(doc.data().deposits);
+//             totalBalance -= Number(doc.data().withdrawals);
+//           });
 
-          if (documentId !== "") {
-            console.log(
-              "Total Balance Withdrawal",
-              email,
-              totalBalance,
-              Number(totalAmount)
-            );
-            if (Number(totalAmount) > totalBalance || Number(totalAmount) < 1) {
-              return {
-                success: false,
-                error:
-                  "There was an error posting the transaction. Wrong amount."
-              };
-            } else {
-              let authorization = satstreetToken;
-              let url = "https://bitgo.satstreetservices.com/withdrawal";
-              let options = {
-                method: "POST",
-                url: url,
-                headers: {
-                  Authorization: authorization
-                },
-                json: true
-              };
+//           if (documentId !== "") {
+//             console.log(
+//               "Total Balance Withdrawal",
+//               email,
+//               totalBalance,
+//               Number(totalAmount)
+//             );
+//             if (Number(totalAmount) > totalBalance || Number(totalAmount) < 1) {
+//               return {
+//                 success: false,
+//                 error:
+//                   "There was an error posting the transaction. Wrong amount."
+//               };
+//             } else {
+//               let authorization = satstreetToken;
+//               let url = "https://bitgo.satstreetservices.com/withdrawal";
+//               let options = {
+//                 method: "POST",
+//                 url: url,
+//                 headers: {
+//                   Authorization: authorization
+//                 },
+//                 json: true
+//               };
 
-              options.body = {
-                walletId: "5df0646eb1138b4807c67ce3a37d9eea",
-                sendAmount: totalAmount,
-                sendAddress: toAddress
-              };
+//               options.body = {
+//                 walletId: "5df0646eb1138b4807c67ce3a37d9eea",
+//                 sendAmount: totalAmount,
+//                 sendAddress: toAddress
+//               };
 
-              return rp(options)
-                .then(function(response) {
-                  console.log("Withdraw Response", response);
+//               return rp(options)
+//                 .then(function(response) {
+//                   console.log("Withdraw Response", response);
 
-                  let withdrawalData = {
-                    email: email,
-                    address: toAddress,
-                    amount: totalAmount,
-                    transactionID: "",
-                    date: new Date()
-                  };
+//                   let withdrawalData = {
+//                     email: email,
+//                     address: toAddress,
+//                     amount: totalAmount,
+//                     transactionID: "",
+//                     date: new Date()
+//                   };
 
-                  return admin
-                    .firestore()
-                    .collection("withdrawals")
-                    .add(withdrawalData)
-                    .then(writeResult => {
-                      return { success: true };
-                    })
-                    .catch(err => {
-                      return {
-                        success: false,
-                        error:
-                          "There was an error posting the transaction. Please try again later."
-                      };
-                    });
-                })
-                .catch(function(error) {
-                  console.log("Error is", error);
-                  return {
-                    success: false,
-                    error:
-                      "There was an error posting the withdrawal. Please try again later."
-                  };
-                });
-            }
-          } else {
-            return { success: false, error: "Not authorized" };
-          }
-        })
-        .catch(err => {
-          return { success: false, error: "Not authorized" };
-        });
-    }
-  });
-});
+//                   return admin
+//                     .firestore()
+//                     .collection("withdrawals")
+//                     .add(withdrawalData)
+//                     .then(writeResult => {
+//                       return { success: true };
+//                     })
+//                     .catch(err => {
+//                       return {
+//                         success: false,
+//                         error:
+//                           "There was an error posting the transaction. Please try again later."
+//                       };
+//                     });
+//                 })
+//                 .catch(function(error) {
+//                   console.log("Error is", error);
+//                   return {
+//                     success: false,
+//                     error:
+//                       "There was an error posting the withdrawal. Please try again later."
+//                   };
+//                 });
+//             }
+//           } else {
+//             return { success: false, error: "Not authorized" };
+//           }
+//         })
+//         .catch(err => {
+//           return { success: false, error: "Not authorized" };
+//         });
+//     }
+//   });
+// });
 
 exports.getSentTransactions = functions.https.onCall((data, context) => {
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -623,14 +623,14 @@ exports.getSentTransactions = functions.https.onCall((data, context) => {
         .collection("transactions")
         .where("from", "==", email)
         .get()
-        .then(function(querySnapshot) {
+        .then(function (querySnapshot) {
           var transactions = [];
           var totalAmount = 0;
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(function (doc) {
             var transaction = {
               email: doc.data().to,
               amount: doc.data().amount,
-              date: doc.data().date
+              date: doc.data().date,
             };
             transactions.push(transaction);
             totalAmount += Number(doc.data().amount);
@@ -643,9 +643,9 @@ exports.getSentTransactions = functions.https.onCall((data, context) => {
             .collection("users")
             .where("email", "==", email)
             .get()
-            .then(function(querySnapshot) {
+            .then(function (querySnapshot) {
               var documentId = "";
-              querySnapshot.forEach(function(doc) {
+              querySnapshot.forEach(function (doc) {
                 documentId = doc.id;
               });
 
@@ -655,31 +655,31 @@ exports.getSentTransactions = functions.https.onCall((data, context) => {
                   .collection("users")
                   .doc(documentId)
                   .update(balanceData)
-                  .then(writeResult => {
+                  .then((writeResult) => {
                     return { success: true, transactions: transactions };
                   })
-                  .catch(err => {
+                  .catch((err) => {
                     return {
                       success: false,
                       error:
-                        "There was an error connecting to our server. Please try again later."
+                        "There was an error connecting to our server. Please try again later.",
                     };
                   });
               }
             })
-            .catch(err => {
+            .catch((err) => {
               return {
                 success: false,
                 error:
-                  "There was an error connecting to our server. Please try again later."
+                  "There was an error connecting to our server. Please try again later.",
               };
             });
         })
-        .catch(err => {
+        .catch((err) => {
           return {
             success: false,
             error:
-              "There was an error connecting to our server. Please try again later."
+              "There was an error connecting to our server. Please try again later.",
           };
         });
     }
@@ -689,7 +689,7 @@ exports.getSentTransactions = functions.https.onCall((data, context) => {
 exports.getReceivedTransactions = functions.https.onCall((data, context) => {
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -700,14 +700,14 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
         .collection("transactions")
         .where("to", "==", email)
         .get()
-        .then(function(querySnapshot) {
+        .then(function (querySnapshot) {
           var transactions = [];
           var totalAmount = 0;
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(function (doc) {
             var transaction = {
               email: doc.data().from,
               amount: doc.data().amount,
-              date: doc.data().date
+              date: doc.data().date,
             };
             transactions.push(transaction);
             totalAmount += Number(doc.data().amount);
@@ -720,9 +720,9 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
             .collection("users")
             .where("email", "==", email)
             .get()
-            .then(function(querySnapshot) {
+            .then(function (querySnapshot) {
               var documentId = "";
-              querySnapshot.forEach(function(doc) {
+              querySnapshot.forEach(function (doc) {
                 documentId = doc.id;
               });
 
@@ -732,31 +732,31 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
                   .collection("users")
                   .doc(documentId)
                   .update(balanceData)
-                  .then(writeResult => {
+                  .then((writeResult) => {
                     return { success: true, transactions: transactions };
                   })
-                  .catch(err => {
+                  .catch((err) => {
                     return {
                       success: false,
                       error:
-                        "There was an error connecting to our server. Please try again later."
+                        "There was an error connecting to our server. Please try again later.",
                     };
                   });
               }
             })
-            .catch(err => {
+            .catch((err) => {
               return {
                 success: false,
                 error:
-                  "There was an error connecting to our server. Please try again later."
+                  "There was an error connecting to our server. Please try again later.",
               };
             });
         })
-        .catch(err => {
+        .catch((err) => {
           return {
             success: false,
             error:
-              "There was an error connecting to our server. Please try again later."
+              "There was an error connecting to our server. Please try again later.",
           };
         });
     }
@@ -766,7 +766,7 @@ exports.getReceivedTransactions = functions.https.onCall((data, context) => {
 exports.getWithdrawalTransactions = functions.https.onCall((data, context) => {
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -777,16 +777,16 @@ exports.getWithdrawalTransactions = functions.https.onCall((data, context) => {
         .collection("withdrawals")
         .where("email", "==", email)
         .get()
-        .then(function(querySnapshot) {
+        .then(function (querySnapshot) {
           var withdrawals = [];
           var totalAmount = 0;
 
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(function (doc) {
             var withdrawal = {
               address: doc.data().address,
               amount: doc.data().amount,
               date: doc.data().date,
-              transactionID: doc.data().transactionID
+              transactionID: doc.data().transactionID,
             };
             withdrawals.push(withdrawal);
             totalAmount += Number(doc.data().amount);
@@ -799,9 +799,9 @@ exports.getWithdrawalTransactions = functions.https.onCall((data, context) => {
             .collection("users")
             .where("email", "==", email)
             .get()
-            .then(function(querySnapshot) {
+            .then(function (querySnapshot) {
               var documentId = "";
-              querySnapshot.forEach(function(doc) {
+              querySnapshot.forEach(function (doc) {
                 documentId = doc.id;
               });
 
@@ -811,32 +811,32 @@ exports.getWithdrawalTransactions = functions.https.onCall((data, context) => {
                   .collection("users")
                   .doc(documentId)
                   .update(balanceData)
-                  .then(writeResult => {
+                  .then((writeResult) => {
                     console.log("Withdrawals", email, totalAmount);
                     return { success: true, withdrawals: withdrawals };
                   })
-                  .catch(err => {
+                  .catch((err) => {
                     return {
                       success: false,
                       error:
-                        "There was an error connecting to our server. Please try again later."
+                        "There was an error connecting to our server. Please try again later.",
                     };
                   });
               }
             })
-            .catch(err => {
+            .catch((err) => {
               return {
                 success: false,
                 error:
-                  "There was an error connecting to our server. Please try again later."
+                  "There was an error connecting to our server. Please try again later.",
               };
             });
         })
-        .catch(err => {
+        .catch((err) => {
           return {
             success: false,
             error:
-              "There was an error connecting to our server. Please try again later."
+              "There was an error connecting to our server. Please try again later.",
           };
         });
     }
@@ -850,7 +850,7 @@ exports.postTransaction = functions.https.onCall((data, context) => {
   const type = data.type;
   const date = new Date();
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -864,7 +864,7 @@ exports.postTransaction = functions.https.onCall((data, context) => {
           to: toEmail,
           amount: amount,
           type: type,
-          date: date
+          date: date,
         };
 
         return admin
@@ -872,10 +872,10 @@ exports.postTransaction = functions.https.onCall((data, context) => {
           .collection("users")
           .where("email", "==", fromEmail)
           .get()
-          .then(function(querySnapshot) {
+          .then(function (querySnapshot) {
             var documentId = "";
             var totalBalance = 0;
-            querySnapshot.forEach(function(doc) {
+            querySnapshot.forEach(function (doc) {
               documentId = doc.id;
               totalBalance += Number(doc.data().received);
               totalBalance -= Number(doc.data().sent);
@@ -894,21 +894,21 @@ exports.postTransaction = functions.https.onCall((data, context) => {
                 return {
                   success: false,
                   error:
-                    "There was an error posting the transaction. Wrong amount."
+                    "There was an error posting the transaction. Wrong amount.",
                 };
               } else {
                 return admin
                   .firestore()
                   .collection("transactions")
                   .add(transactionData)
-                  .then(writeResult => {
+                  .then((writeResult) => {
                     return { success: true };
                   })
-                  .catch(err => {
+                  .catch((err) => {
                     return {
                       success: false,
                       error:
-                        "There was an error posting the transaction. Please try again later."
+                        "There was an error posting the transaction. Please try again later.",
                     };
                   });
               }
@@ -916,7 +916,7 @@ exports.postTransaction = functions.https.onCall((data, context) => {
               return { success: false, error: "Not authorized" };
             }
           })
-          .catch(err => {
+          .catch((err) => {
             return { success: false, error: "Not authorized" };
           });
       }
@@ -936,7 +936,7 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
     .to("BTC")
     .toString();
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -948,44 +948,44 @@ exports.sendEmailReceipt = functions.https.onCall((data, context) => {
         method: "POST",
         url: url,
         headers: {
-          Authorization: authorization
+          Authorization: authorization,
         },
-        json: true
+        json: true,
       };
 
       options.body = {
         from: {
           email: "info@satstreet.com",
-          name: "Satstreet Inc."
+          name: "Satstreet Inc.",
         },
         template_id: "d-337cfdfd328248f68c24d1b28df89bcf",
         personalizations: [
           {
             to: [
               {
-                email: toEmail
-              }
+                email: toEmail,
+              },
             ],
             dynamic_template_data: {
               senderEmail: fromEmail,
               satAmount: amount,
               btcAmount: btcAmount,
-              referralId: referralId
-            }
-          }
-        ]
+              referralId: referralId,
+            },
+          },
+        ],
       };
 
       return rp(options)
-        .then(function(response) {
+        .then(function (response) {
           return { success: true };
         })
-        .catch(function(error) {
+        .catch(function (error) {
           console.log("Error is", error);
           return {
             success: false,
             error:
-              "There was an error sending the email. Please try again later."
+              "There was an error sending the email. Please try again later.",
           };
         });
     }
@@ -1000,18 +1000,18 @@ exports.getRate = functions.https.onCall((data, context) => {
   let options = {
     method: "GET",
     url: url,
-    json: true
+    json: true,
   };
 
   return rp(options)
-    .then(function(response) {
+    .then(function (response) {
       return { success: true, rate: response.bpi[currency].rate_float };
     })
-    .catch(function(error) {
+    .catch(function (error) {
       console.log("Error is", error);
       return {
         success: false,
-        error: "There was an error sending the email. Please try again later."
+        error: "There was an error sending the email. Please try again later.",
       };
     });
 });
@@ -1027,29 +1027,29 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
     method: "POST",
     url: url,
     headers: {
-      Authorization: authorization
+      Authorization: authorization,
     },
-    json: true
+    json: true,
   };
 
   options.body = {
     from: {
       email: "info@satstreet.com",
-      name: "Satstreet Inc."
+      name: "Satstreet Inc.",
     },
     template_id: "d-fc00a55b975748bebfa5e023dfe7ca5b",
     personalizations: [
       {
         to: [
           {
-            email: email
-          }
+            email: email,
+          },
         ],
         dynamic_template_data: {
-          link: link
-        }
-      }
-    ]
+          link: link,
+        },
+      },
+    ],
   };
 
   return admin
@@ -1057,9 +1057,9 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
     .collection("users")
     .where("email", "==", email)
     .get()
-    .then(function(querySnapshot) {
+    .then(function (querySnapshot) {
       var documentId = "";
-      querySnapshot.forEach(function(doc) {
+      querySnapshot.forEach(function (doc) {
         documentId = doc.id;
       });
       if (documentId !== "") {
@@ -1068,9 +1068,9 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
           .collection("resets")
           .where("email", "==", email)
           .get()
-          .then(function(querySnapshot) {
+          .then(function (querySnapshot) {
             var docId = "";
-            querySnapshot.forEach(function(doc) {
+            querySnapshot.forEach(function (doc) {
               docId = doc.id;
             });
             if (docId === "") {
@@ -1078,32 +1078,32 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
               let verificationData = {
                 email: email,
                 code: token,
-                updatedAt: Date.now()
+                updatedAt: Date.now(),
               };
 
               return admin
                 .firestore()
                 .collection("resets")
                 .add(verificationData)
-                .then(writeResult => {
+                .then((writeResult) => {
                   return rp(options)
-                    .then(function(response) {
+                    .then(function (response) {
                       return { success: true };
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                       console.log("Error is", error);
                       return {
                         success: false,
                         error:
-                          "There was an error sending the reset password email. Please try again later."
+                          "There was an error sending the reset password email. Please try again later.",
                       };
                     });
                 })
-                .catch(err => {
+                .catch((err) => {
                   return {
                     success: false,
                     error:
-                      "There was an error connecting to our server. Please try again later."
+                      "There was an error connecting to our server. Please try again later.",
                   };
                 });
             } else {
@@ -1111,7 +1111,7 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
               let verificationData = {
                 email: email,
                 code: token,
-                updatedAt: Date.now()
+                updatedAt: Date.now(),
               };
 
               return admin
@@ -1119,48 +1119,48 @@ exports.generateResetPassword = functions.https.onCall((data, context) => {
                 .collection("resets")
                 .doc(docId)
                 .update(verificationData)
-                .then(writeResult => {
+                .then((writeResult) => {
                   return rp(options)
-                    .then(function(response) {
+                    .then(function (response) {
                       return { success: true };
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                       console.log("Error is", error);
                       return {
                         success: false,
                         error:
-                          "There was an error sending the reset password email. Please try again later."
+                          "There was an error sending the reset password email. Please try again later.",
                       };
                     });
                 })
-                .catch(err => {
+                .catch((err) => {
                   return {
                     success: false,
                     error:
-                      "There was an error connecting to our server. Please try again later."
+                      "There was an error connecting to our server. Please try again later.",
                   };
                 });
             }
           })
-          .catch(err => {
+          .catch((err) => {
             return {
               success: false,
               error:
-                "There was an error connecting to our server. Please try again later."
+                "There was an error connecting to our server. Please try again later.",
             };
           });
       } else {
         return {
           success: false,
-          error: "This user does not exits. Please try signing up instead."
+          error: "This user does not exits. Please try signing up instead.",
         };
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return {
         success: false,
         error:
-          "There was an error connecting to our server. Please try again later."
+          "There was an error connecting to our server. Please try again later.",
       };
     });
 });
@@ -1174,11 +1174,11 @@ exports.isLinkValid = functions.https.onCall((data, context) => {
     .collection("resets")
     .where("code", "==", token)
     .get()
-    .then(function(querySnapshot) {
+    .then(function (querySnapshot) {
       var docId = "";
       var updatedAt = null;
       var email = "";
-      querySnapshot.forEach(function(doc) {
+      querySnapshot.forEach(function (doc) {
         docId = doc.id;
         updatedAt = doc.data().updatedAt;
         email = doc.data().email;
@@ -1195,20 +1195,20 @@ exports.isLinkValid = functions.https.onCall((data, context) => {
               .collection("resets")
               .doc(docId)
               .update({ code: "" })
-              .then(writeResult => {
+              .then((writeResult) => {
                 var refreshToken = jwt.sign({ email: email }, jwtToken);
                 return {
                   success: true,
                   hours: hours,
                   email: email,
-                  refreshToken: refreshToken
+                  refreshToken: refreshToken,
                 };
               })
-              .catch(err => {
+              .catch((err) => {
                 return {
                   success: false,
                   error:
-                    "There was an error updating your password. Please try again later."
+                    "There was an error updating your password. Please try again later.",
                 };
               });
           } else {
@@ -1217,7 +1217,7 @@ exports.isLinkValid = functions.https.onCall((data, context) => {
               success: true,
               hours: hours,
               email: email,
-              refreshToken: refreshToken
+              refreshToken: refreshToken,
             };
           }
         } else {
@@ -1225,11 +1225,11 @@ exports.isLinkValid = functions.https.onCall((data, context) => {
         }
       }
     })
-    .catch(err => {
+    .catch((err) => {
       return {
         success: false,
         error:
-          "There was an error connecting to our server. Please try again later."
+          "There was an error connecting to our server. Please try again later.",
       };
     });
 });
@@ -1238,7 +1238,7 @@ exports.updatePassword = functions.https.onCall((data, context) => {
   const password = data.password;
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -1249,9 +1249,9 @@ exports.updatePassword = functions.https.onCall((data, context) => {
         .collection("users")
         .where("email", "==", email)
         .get()
-        .then(function(querySnapshot) {
+        .then(function (querySnapshot) {
           var documentId = "";
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(function (doc) {
             documentId = doc.id;
           });
           if (documentId !== "") {
@@ -1263,28 +1263,28 @@ exports.updatePassword = functions.https.onCall((data, context) => {
               .collection("users")
               .doc(documentId)
               .update(userData)
-              .then(writeResult => {
+              .then((writeResult) => {
                 return { success: true };
               })
-              .catch(err => {
+              .catch((err) => {
                 return {
                   success: false,
                   error:
-                    "There was an error updating your password. Please try again later."
+                    "There was an error updating your password. Please try again later.",
                 };
               });
           } else {
             return {
               success: false,
-              error: "This user does not exists exits. Please try signing in."
+              error: "This user does not exists exits. Please try signing in.",
             };
           }
         })
-        .catch(err => {
+        .catch((err) => {
           return {
             success: false,
             error:
-              "There was an error connecting to our server. Please try again later."
+              "There was an error connecting to our server. Please try again later.",
           };
         });
     }
@@ -1296,7 +1296,7 @@ exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
   const referId = data.referId;
   const completedDeposit = data.completedDeposit;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -1310,9 +1310,9 @@ exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
           campaignKey +
           "/participant",
         headers: {
-          Authorization: authorization
+          Authorization: authorization,
         },
-        json: true
+        json: true,
       };
 
       if (data.referId) {
@@ -1320,30 +1320,30 @@ exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
           email: userEmail,
           referredBy: referId,
           metadata: {
-            completedDeposit: completedDeposit
-          }
+            completedDeposit: completedDeposit,
+          },
         };
       } else {
         options.body = {
           email: userEmail,
           metadata: {
-            completedDeposit: completedDeposit
-          }
+            completedDeposit: completedDeposit,
+          },
         };
       }
 
       return rp(options)
-        .then(function(response) {
+        .then(function (response) {
           const growsurfId = response.id;
           const referralUrl = response.shareUrl;
 
           return {
             success: true,
             growsurfId: growsurfId,
-            referralUrl: referralUrl
+            referralUrl: referralUrl,
           };
         })
-        .catch(function(err) {
+        .catch(function (err) {
           console.log("Growsurf Create:", err);
           return { success: false };
         });
@@ -1354,7 +1354,7 @@ exports.createGrowsurfParticipant = functions.https.onCall((data, context) => {
 exports.getGrowsurfParticipant = functions.https.onCall((data, context) => {
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -1369,13 +1369,13 @@ exports.getGrowsurfParticipant = functions.https.onCall((data, context) => {
           "/participant/" +
           userEmail,
         headers: {
-          Authorization: authorization
+          Authorization: authorization,
         },
-        json: true
+        json: true,
       };
 
       return rp(options)
-        .then(function(response) {
+        .then(function (response) {
           const growsurfId = response.id;
           const referralUrl = response.shareUrl;
           const completedDeposit = response.metadata.completedDeposit;
@@ -1390,10 +1390,10 @@ exports.getGrowsurfParticipant = functions.https.onCall((data, context) => {
             completedDeposit: completedDeposit,
             referralCount,
             referralRank,
-            referralMonthlyCount
+            referralMonthlyCount,
           };
         })
-        .catch(function(err) {
+        .catch(function (err) {
           return { success: false };
         });
     }
@@ -1405,7 +1405,7 @@ exports.updateGrowsurfDepositCompleted = functions.https.onCall(
     const token = data.token;
     const growsurfId = data.growsurfId;
 
-    return jwt.verify(token, jwtToken, function(err, decoded) {
+    return jwt.verify(token, jwtToken, function (err, decoded) {
       if (err) {
         return { success: false, error: "Not authorized" };
       } else {
@@ -1418,22 +1418,22 @@ exports.updateGrowsurfDepositCompleted = functions.https.onCall(
             "/participant/" +
             growsurfId,
           headers: {
-            Authorization: authorization
+            Authorization: authorization,
           },
-          json: true
+          json: true,
         };
 
         options.body = {
           metadata: {
-            completedDeposit: true
-          }
+            completedDeposit: true,
+          },
         };
 
         return rp(options)
-          .then(function(response) {
+          .then(function (response) {
             return { success: true };
           })
-          .catch(function(err) {
+          .catch(function (err) {
             return { success: false };
           });
       }
@@ -1444,7 +1444,7 @@ exports.updateGrowsurfDepositCompleted = functions.https.onCall(
 exports.getEarn = functions.https.onCall((data, context) => {
   const token = data.token;
 
-  return jwt.verify(token, jwtToken, function(err, decoded) {
+  return jwt.verify(token, jwtToken, function (err, decoded) {
     if (err) {
       return { success: false, error: "Not authorized" };
     } else {
@@ -1452,9 +1452,9 @@ exports.getEarn = functions.https.onCall((data, context) => {
         .firestore()
         .collection("earn")
         .get()
-        .then(function(querySnapshot) {
+        .then(function (querySnapshot) {
           var earns = [];
-          querySnapshot.forEach(function(doc) {
+          querySnapshot.forEach(function (doc) {
             var earn = {
               imageUrl: doc.data().imageUrl,
               order: doc.data().order,
@@ -1463,17 +1463,17 @@ exports.getEarn = functions.https.onCall((data, context) => {
               postMessaging: doc.data().postMessaging,
               satValue: doc.data().satValue,
               reward: doc.data().reward,
-              provider: doc.data().provider
+              provider: doc.data().provider,
             };
             earns.push(earn);
           });
           return { success: true, earns: earns };
         })
-        .catch(err => {
+        .catch((err) => {
           return {
             success: false,
             error:
-              "There was an error connecting to our server. Please try again later."
+              "There was an error connecting to our server. Please try again later.",
           };
         });
     }
