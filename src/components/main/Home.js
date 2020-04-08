@@ -154,7 +154,7 @@ class Home extends Component {
     isExpanded: false,
     selectedOption: options[1],
     currency: currencies[1],
-    currencyOption: 0,
+    currencyOption: 1,
     snackbarIsOpen: false,
   };
 
