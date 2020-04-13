@@ -172,7 +172,6 @@ class Home extends Component {
   };
 
   handleOptionChange = (option) => {
-    console.log("option", option);
     if (option === "Sign out") {
       store.clearAll();
       window.location = "/signin";

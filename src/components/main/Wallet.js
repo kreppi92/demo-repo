@@ -371,18 +371,6 @@ const styles = {
     marginBottom: 10,
   },
 
-  earnContainer: {
-    display: "flex",
-    flexWrap: "wrap",
-    justifyContent: "flex-start",
-    margin: "50px 0 50px 0",
-    width: "100%",
-
-    "@media (min-width:780px)": {
-      width: "80%",
-    },
-  },
-
   loadingHolder: {
     alignItems: "center",
     display: "flex",
@@ -401,7 +389,7 @@ const styles = {
     flexBasis: "auto",
 
     "@media (max-width:780px)": {
-      width: "calc(100% / 2)",
+      width: "calc(100% / 2 - 10px)",
     },
 
     "@media (max-width:500px)": {
@@ -684,7 +672,6 @@ class Wallet extends Component {
     );
     return getGrowsurfParticipant({ token: token }).then(
       function (result) {
-        console.log("Growsurf Get, ", result.data);
         if (result.data.success) {
           this.setState({
             growsurfId: result.data.growsurfId,
@@ -706,7 +693,6 @@ class Wallet extends Component {
             referId: store.get("referralID"),
           }).then(
             function (result) {
-              console.log("Growsurf Create, ", result.data);
               if (result.data.success) {
                 this.setState({
                   growsurfId: result.data.growsurfId,
@@ -1288,7 +1274,6 @@ class Wallet extends Component {
                 </div>
               ) : (
                 earns.map((earn, index) => {
-                  console.log(earn);
                   return (
                     <div className={classes.outerBox} key={index}>
                       <div className={classes.innerBox}>
