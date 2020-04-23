@@ -14,6 +14,7 @@ const campaignKey = functions.config().campaign.key;
 
 admin.initializeApp();
 
+
 exports.generateCode = functions.https.onCall((data, context) => {
   const email = data.email.toLowerCase();
   const generatedCode = Math.floor(Math.random() * 899999 + 100000).toString();
@@ -504,110 +505,110 @@ exports.getOnchainTransactions = functions.https.onCall((data, context) => {
   });
 });
 
-// exports.withdrawFunds = functions.https.onCall((data, context) => {
-//   const token = data.token;
-//   const toAddress = data.address;
-//   const totalAmount = data.totalAmount;
+exports.withdrawFunds = functions.https.onCall((data, context) => {
+  const token = data.token;
+  const toAddress = data.address;
+  const totalAmount = data.totalAmount;
 
-//   return jwt.verify(token, jwtToken, function(err, decoded) {
-//     if (err) {
-//       return { success: false, error: "Not authorized" };
-//     } else {
-//       const email = decoded.email.toLowerCase();
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { success: false, error: "Not authorized" };
+    } else {
+      const email = decoded.email.toLowerCase();
 
-//       return admin
-//         .firestore()
-//         .collection("users")
-//         .where("email", "==", email)
-//         .get()
-//         .then(function(querySnapshot) {
-//           var documentId = "";
-//           var totalBalance = 0;
-//           querySnapshot.forEach(function(doc) {
-//             documentId = doc.id;
-//             totalBalance += Number(doc.data().received);
-//             totalBalance -= Number(doc.data().sent);
-//             totalBalance += Number(doc.data().deposits);
-//             totalBalance -= Number(doc.data().withdrawals);
-//           });
+      return admin
+        .firestore()
+        .collection("users")
+        .where("email", "==", email)
+        .get()
+        .then(function (querySnapshot) {
+          var documentId = "";
+          var totalBalance = 0;
+          querySnapshot.forEach(function (doc) {
+            documentId = doc.id;
+            totalBalance += Number(doc.data().received);
+            totalBalance -= Number(doc.data().sent);
+            totalBalance += Number(doc.data().deposits);
+            totalBalance -= Number(doc.data().withdrawals);
+          });
 
-//           if (documentId !== "") {
-//             console.log(
-//               "Total Balance Withdrawal",
-//               email,
-//               totalBalance,
-//               Number(totalAmount)
-//             );
-//             if (Number(totalAmount) > totalBalance || Number(totalAmount) < 1) {
-//               return {
-//                 success: false,
-//                 error:
-//                   "There was an error posting the transaction. Wrong amount."
-//               };
-//             } else {
-//               let authorization = satstreetToken;
-//               let url = "https://bitgo.satstreetservices.com/withdrawal";
-//               let options = {
-//                 method: "POST",
-//                 url: url,
-//                 headers: {
-//                   Authorization: authorization
-//                 },
-//                 json: true
-//               };
+          if (documentId !== "") {
+            console.log(
+              "Total Balance Withdrawal",
+              email,
+              totalBalance,
+              Number(totalAmount)
+            );
+            if (Number(totalAmount) > totalBalance || Number(totalAmount) < 1) {
+              return {
+                success: false,
+                error:
+                  "There was an error posting the transaction. Wrong amount."
+              };
+            } else {
+              let authorization = satstreetToken;
+              let url = "https://bitgo.satstreetservices.com/withdrawal";
+              let options = {
+                method: "POST",
+                url: url,
+                headers: {
+                  Authorization: authorization
+                },
+                json: true
+              };
 
-//               options.body = {
-//                 walletId: "5df0646eb1138b4807c67ce3a37d9eea",
-//                 sendAmount: totalAmount,
-//                 sendAddress: toAddress
-//               };
+              options.body = {
+                walletId: "5df0646eb1138b4807c67ce3a37d9eea",
+                sendAmount: totalAmount,
+                sendAddress: toAddress
+              };
 
-//               return rp(options)
-//                 .then(function(response) {
-//                   console.log("Withdraw Response", response);
+              return rp(options)
+                .then(function (response) {
+                  console.log("Withdraw Response", response);
 
-//                   let withdrawalData = {
-//                     email: email,
-//                     address: toAddress,
-//                     amount: totalAmount,
-//                     transactionID: "",
-//                     date: new Date()
-//                   };
+                  let withdrawalData = {
+                    email: email,
+                    address: toAddress,
+                    amount: totalAmount,
+                    transactionID: "",
+                    date: new Date()
+                  };
 
-//                   return admin
-//                     .firestore()
-//                     .collection("withdrawals")
-//                     .add(withdrawalData)
-//                     .then(writeResult => {
-//                       return { success: true };
-//                     })
-//                     .catch(err => {
-//                       return {
-//                         success: false,
-//                         error:
-//                           "There was an error posting the transaction. Please try again later."
-//                       };
-//                     });
-//                 })
-//                 .catch(function(error) {
-//                   console.log("Error is", error);
-//                   return {
-//                     success: false,
-//                     error:
-//                       "There was an error posting the withdrawal. Please try again later."
-//                   };
-//                 });
-//             }
-//           } else {
-//             return { success: false, error: "Not authorized" };
-//           }
-//         })
-//         .catch(err => {
-//           return { success: false, error: "Not authorized" };
-//         });
-//     }
-//   });
-// });
+                  return admin
+                    .firestore()
+                    .collection("withdrawals")
+                    .add(withdrawalData)
+                    .then(writeResult => {
+                      return { success: true };
+                    })
+                    .catch(err => {
+                      return {
+                        success: false,
+                        error:
+                          "There was an error posting the transaction. Please try again later."
+                      };
+                    });
+                })
+                .catch(function (error) {
+                  console.log("Error is", error);
+                  return {
+                    success: false,
+                    error:
+                      "There was an error posting the withdrawal. Please try again later."
+                  };
+                });
+            }
+          } else {
+            return { success: false, error: "Not authorized" };
+          }
+        })
+        .catch(err => {
+          return { success: false, error: "Not authorized" };
+        });
+    }
+  });
+});
 
 exports.getSentTransactions = functions.https.onCall((data, context) => {
   const token = data.token;

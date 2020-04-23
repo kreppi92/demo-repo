@@ -8,6 +8,7 @@
     "@material-ui/lab": "^4.0.0-alpha.36",
     "@react-pdf/renderer": "^1.6.8",
     "@react-pdf/styled-components": "^1.4.0",
+    "axios": "^0.19.2",
     "bitcoin-units": "^0.3.0",
     "classnames": "^2.2.6",
     "clsx": "^1.0.4",

@@ -38,7 +38,7 @@ export const palette = {
 };
 
 export const mainTheme = createMuiTheme({
-  shadows: ["none"],
+  shadows: [...new Array(10).fill("")],
 
   palette: {
     primary: {
