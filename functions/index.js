@@ -5,7 +5,6 @@ const bcrypt = require("bcrypt");
 var rp = require("request-promise");
 var bitcoinConverter = require("bitcoin-units");
 var crypto = require("crypto");
-var geoip = require('geoip-lite');
 
 const jwtToken = functions.config().jwt.token;
 const sendgridKey = functions.config().sendgrid.key;
