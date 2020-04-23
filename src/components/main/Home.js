@@ -166,8 +166,8 @@ class Home extends Component {
       const locale = (await axios.get('https://ipapi.co/json/')).data
       if (locale.in_eu === true) {
         this.setState({
-          currencyOption: 3,
-          currency: currencies[3],
+          currencyOption: 2,
+          currency: currencies[2],
         });
       } else if (locale.country === "CA") {
         this.setState({
