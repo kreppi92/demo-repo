@@ -15,6 +15,8 @@ import closeIcon from "../../images/close.svg";
 import CustomSnackbar from "../shared/CustomSnackbar";
 import Footer from "./Footer";
 import Wallet from "./Wallet";
+import axios from 'axios'
+
 
 var store = require("store");
 
@@ -143,6 +145,7 @@ const styles = {
 
 const currencies = ["USD", "CAD", "EUR"];
 
+
 class Home extends Component {
   componentWillMount() {
     if (!store.get("token")) {
@@ -153,10 +156,33 @@ class Home extends Component {
   state = {
     isExpanded: false,
     selectedOption: options[1],
-    currency: currencies[0],
-    currencyOption: 0,
+    currency: null,
+    currencyOption: null,
     snackbarIsOpen: false,
   };
+
+  componentDidMount() {
+    const getUserCountry = async () => {
+      const locale = (await axios.get('https://ipapi.co/json/')).data
+      if (locale.in_eu === true) {
+        this.setState({
+          currencyOption: 3,
+          currency: currencies[3],
+        });
+      } else if (locale.country === "CA") {
+        this.setState({
+          currencyOption: 1,
+          currency: currencies[1],
+        });
+      } else {
+        this.setState({
+          currencyOption: 0,
+          currency: currencies[0],
+        });
+      }
+    }
+    getUserCountry()
+  }
 
   handleCurrencyChange = (name) => (event) => {
     this.setState({
@@ -226,14 +252,14 @@ class Home extends Component {
                     />
                   </IconButton>
                 ) : (
-                  <IconButton
-                    aria-label="menu"
-                    className={classes.menuIcon}
-                    onClick={this.handleMenuClick}
-                  >
-                    <img src={menuIcon} className={classes.iconButton} alt="" />
-                  </IconButton>
-                )}
+                    <IconButton
+                      aria-label="menu"
+                      className={classes.menuIcon}
+                      onClick={this.handleMenuClick}
+                    >
+                      <img src={menuIcon} className={classes.iconButton} alt="" />
+                    </IconButton>
+                  )}
               </Mobile>
               <Default>
                 <div className={classes.menuOptionsContainer}>
@@ -315,15 +341,15 @@ class Home extends Component {
                   }.bind(this)
                 )
               ) : (
-                <Divider className={classes.divider} />
-              )}
+                  <Divider className={classes.divider} />
+                )}
             </Mobile>
             <Default>
               <Divider className={classes.divider} />
             </Default>
 
             <div className={classes.mainContent}>
-              <Wallet currency={currency} type={selectedOption} />
+              {currency && <Wallet currency={currency} type={selectedOption} />}
             </div>
 
             <div className={classes.footer}>
@@ -331,8 +357,8 @@ class Home extends Component {
             </div>
           </div>
         ) : (
-          <div />
-        )}
+            <div />
+          )}
         <CustomSnackbar
           variant={"info"}
           message={"Coming soon!"}

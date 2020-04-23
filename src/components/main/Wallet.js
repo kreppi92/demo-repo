@@ -25,6 +25,7 @@ import { saveAs } from "file-saver";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Certificate from "./Certificate";
 import Earn from "./Earn";
+
 var bitcoinConverter = require("bitcoin-units");
 var currencyFormatter = require("currency-formatter");
 var QRCode = require("qrcode.react");
@@ -479,6 +480,7 @@ class Wallet extends Component {
       this.getWalletAddress(store.get("token"));
     }
     this.getEarns();
+    console.log(this.props)
   }
 
   getEarns = () => {
@@ -1159,61 +1161,61 @@ class Wallet extends Component {
         {type === "Earn" ? (
           <Earn />
         ) : (
-          <div className={classes.container}>
-            {address !== "" ? (
-              <Paper className={classes.paperOptions}>
-                <div className={classes.contentContainer}>
-                  <div className={classes.paddingContainer}>
-                    <Typography variant="h4" gutterBottom>
-                      {balance.toLocaleString()} Sats
+            <div className={classes.container}>
+              {address !== "" ? (
+                <Paper className={classes.paperOptions}>
+                  <div className={classes.contentContainer}>
+                    <div className={classes.paddingContainer}>
+                      <Typography variant="h4" gutterBottom>
+                        {balance.toLocaleString()} Sats
                     </Typography>
-                    <Typography variant="h6" gutterBottom>
-                      {btcBalance.toLocaleString()} BTC - {formattedCurrency}
-                    </Typography>
-                    <Paper className={classes.referrals}>
-                      <Typography variant="h6" component="h3">
-                        Referrals
+                      <Typography variant="h6" gutterBottom>
+                        {btcBalance.toLocaleString()} BTC - {formattedCurrency}
                       </Typography>
-                      {!!referralCount ? (
-                        <React.Fragment>
-                          <Typography variant="body2" component="p">
-                            {referralCount} total referrals
+                      <Paper className={classes.referrals}>
+                        <Typography variant="h6" component="h3">
+                          Referrals
+                      </Typography>
+                        {!!referralCount ? (
+                          <React.Fragment>
+                            <Typography variant="body2" component="p">
+                              {referralCount} total referrals
                           </Typography>
-                          <Typography variant="body2" component="p">
-                            {referralMonthlyCount} monthly referrals
+                            <Typography variant="body2" component="p">
+                              {referralMonthlyCount} monthly referrals
                           </Typography>
-                          <Typography variant="body2" component="p">
-                            #{referralRank} rank on Satstreet
+                            <Typography variant="body2" component="p">
+                              #{referralRank} rank on Satstreet
                           </Typography>
-                        </React.Fragment>
-                      ) : (
-                        <Typography variant="body2" component="p">
-                          No referrals yet. Add the first referral by sending
-                          some sats to a new user!
-                        </Typography>
-                      )}
-                    </Paper>
-                    <div className={classes.qrButtonContainer}>
-                      <Button
-                        className={classes.qrButton}
-                        size="small"
-                        variant={"contained"}
-                        color="primary"
-                        onClick={this.handleAddFundsModal}
-                      >
-                        Add funds
+                          </React.Fragment>
+                        ) : (
+                            <Typography variant="body2" component="p">
+                              No referrals yet. Add the first referral by sending
+                              some sats to a new user!
+                            </Typography>
+                          )}
+                      </Paper>
+                      <div className={classes.qrButtonContainer}>
+                        <Button
+                          className={classes.qrButton}
+                          size="small"
+                          variant={"contained"}
+                          color="primary"
+                          onClick={this.handleAddFundsModal}
+                        >
+                          Add funds
                       </Button>
-                      <Button
-                        className={classes.qrButton}
-                        size="small"
-                        variant={"contained"}
-                        color="primary"
-                        onClick={this.handleSendFunds}
-                      >
-                        Send
+                        <Button
+                          className={classes.qrButton}
+                          size="small"
+                          variant={"contained"}
+                          color="primary"
+                          onClick={this.handleSendFunds}
+                        >
+                          Send
                       </Button>
 
-                      {/* <Button
+                        {/* <Button
                         className={classes.qrButton}
                         size="small"
                         variant={"contained"}
@@ -1223,173 +1225,99 @@ class Wallet extends Component {
                         Withdraw
                       </Button> */}
 
-                      <Button
-                        className={classes.qrButton}
-                        size="small"
-                        variant={"contained"}
-                        color="secondary"
-                        onClick={this.handleViewTransactions}
-                      >
-                        View activity
-                      </Button>
-
-                      <CopyToClipboard text={referralUrl}>
                         <Button
-                          className={classes.shareButton}
+                          className={classes.qrButton}
                           size="small"
                           variant={"contained"}
                           color="secondary"
-                          onClick={this.handleCopyShareUrl}
+                          onClick={this.handleViewTransactions}
                         >
-                          Refer a friend
+                          View activity
+                      </Button>
+
+                        <CopyToClipboard text={referralUrl}>
+                          <Button
+                            className={classes.shareButton}
+                            size="small"
+                            variant={"contained"}
+                            color="secondary"
+                            onClick={this.handleCopyShareUrl}
+                          >
+                            Refer a friend
                         </Button>
-                      </CopyToClipboard>
+                        </CopyToClipboard>
+                      </div>
                     </div>
+                    {/* <Chart currency={currency} /> */}
                   </div>
-                  {/* <Chart currency={currency} /> */}
-                </div>
-              </Paper>
-            ) : (
-              <Paper className={classes.paperOptionsEmpty}>
-                <CircularProgress
-                  className={classes.circularProgress}
-                  variant="indeterminate"
-                  disableShrink
-                  size={24}
-                  thickness={4}
-                />
-              </Paper>
-            )}
-
-            <Paper className={classes.paperGrid}>
-              {isLoading ? (
-                <div className={classes.loadingHolder}>
-                  <CircularProgress
-                    className={classes.circularProgress}
-                    variant="indeterminate"
-                    disableShrink
-                    size={24}
-                    thickness={4}
-                  />
-                </div>
+                </Paper>
               ) : (
-                earns.map((earn, index) => {
-                  return (
-                    <div className={classes.outerBox} key={index}>
-                      <div className={classes.innerBox}>
-                        <img
-                          src={earn.imageUrl}
-                          className={classes.image}
-                          alt=""
-                        />
-                        <div className={classes.titleBox}>{earn.reward}</div>
-                        <div className={classes.subtitleBox}>
-                          {earn.preMessaging}
-                          <span className={classes.bold}>
-                            {" "}
-                            {earn.satValue}{" "}
-                          </span>
-                          {earn.postMessaging}
-                        </div>
-                        <Button
-                          className={classes.button}
-                          size="small"
-                          fullWidth
-                          variant={"contained"}
-                          color="primary"
-                          onClick={this.handleClickLink(index)}
-                        >
-                          Earn
-                        </Button>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
-            </Paper>
-
-            <Dialog open={addFundsOpen}>
-              <div className={classes.dialogContent}>
-                <div className={classes.dialogTitleContainer}>
-                  Add Funds
-                  <IconButton
-                    aria-label="menu"
-                    className={classes.closeIcon}
-                    onClick={this.handleAddFundsModal}
-                  >
-                    <img
-                      src={closeIcon}
-                      className={classes.iconButton}
-                      alt=""
+                  <Paper className={classes.paperOptionsEmpty}>
+                    <CircularProgress
+                      className={classes.circularProgress}
+                      variant="indeterminate"
+                      disableShrink
+                      size={24}
+                      thickness={4}
                     />
-                  </IconButton>
-                </div>
-                <Typography variant="h4" align="center">
-                  Deposit Bitcoin
-                </Typography>
-                <div className={classes.dialogContentCentered}>
-                  <img
-                    src={bitgoLogo}
-                    className={classes.bitgoImage}
-                    alt="Bitgo logo"
-                  />
-                  <QRCode
-                    className={classes.qrCode}
-                    color={palette.blue[0]}
-                    size={160}
-                    value={address}
-                  />
-                  <div className={classes.address}>{address}</div>
-                  <CopyToClipboard text={address}>
-                    <a
-                      className={classes.link}
-                      href={"#"}
-                      onClick={this.handleCopyCode}
-                    >
-                      Copy
-                    </a>
-                  </CopyToClipboard>
-                </div>
-                <Typography variant="h4" gutterBottom align="center">
-                  Buy Bitcoin
-                </Typography>
-                <div className={classes.affiliateLinks}>
-                  {earns.slice(0, 4).map((earn, index) => (
-                    <div
-                      className={classes.earnRow}
-                      onClick={this.handleClickLink(index)}
-                    >
-                      <div className={classes.earnCell}>
-                        <img
-                          src={earn.imageUrl}
-                          className={classes.image}
-                          alt=""
-                        />
-                      </div>
-                      <div className={classes.earnCell}>Earn {earn.reward}</div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Dialog>
-            <Dialog
-              onClose={this.handleWithdrawDialogClose}
-              open={withdrawDialogOpen}
-              disableBackdropClick
-            >
-              <div className={classes.dialogContent}>
-                {pendingWithdrawal ? (
-                  <div className={classes.dialogTitleContainer}>
-                    Confirm withdrawal
-                    <div />
+                  </Paper>
+                )}
+
+              <Paper className={classes.paperGrid}>
+                {isLoading ? (
+                  <div className={classes.loadingHolder}>
+                    <CircularProgress
+                      className={classes.circularProgress}
+                      variant="indeterminate"
+                      disableShrink
+                      size={24}
+                      thickness={4}
+                    />
                   </div>
                 ) : (
+                    earns.map((earn, index) => {
+                      return (
+                        <div className={classes.outerBox} key={index}>
+                          <div className={classes.innerBox}>
+                            <img
+                              src={earn.imageUrl}
+                              className={classes.image}
+                              alt=""
+                            />
+                            <div className={classes.titleBox}>{earn.reward}</div>
+                            <div className={classes.subtitleBox}>
+                              {earn.preMessaging}
+                              <span className={classes.bold}>
+                                {" "}
+                                {earn.satValue}{" "}
+                              </span>
+                              {earn.postMessaging}
+                            </div>
+                            <Button
+                              className={classes.button}
+                              size="small"
+                              fullWidth
+                              variant={"contained"}
+                              color="primary"
+                              onClick={this.handleClickLink(index)}
+                            >
+                              Earn
+                        </Button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+              </Paper>
+
+              <Dialog open={addFundsOpen}>
+                <div className={classes.dialogContent}>
                   <div className={classes.dialogTitleContainer}>
-                    Withdraw
-                    <IconButton
-                      aria-label="close"
+                    Add Funds
+                  <IconButton
+                      aria-label="menu"
                       className={classes.closeIcon}
-                      onClick={this.handleWithdrawDialogClose}
+                      onClick={this.handleAddFundsModal}
                     >
                       <img
                         src={closeIcon}
@@ -1398,124 +1326,323 @@ class Wallet extends Component {
                       />
                     </IconButton>
                   </div>
-                )}
-
-                <TextField
-                  fullWidth
-                  disabled={pendingWithdrawal}
-                  error={withdrawAddressError}
-                  className={classes.textField}
-                  id="outlined-withdraw-address"
-                  label="Bitcoin Address"
-                  type="text"
-                  helperText={withdrawAddressHelperText}
-                  value={withdrawAddress}
-                  onChange={this.handleChange("withdrawAddress")}
-                  variant="outlined"
-                />
-
-                <TextField
-                  fullWidth
-                  disabled={pendingWithdrawal}
-                  error={withdrawAmountError}
-                  className={classes.textField}
-                  id="outlined-withdraw-amount"
-                  label="Amount in Sats"
-                  type="text"
-                  helperText={withdrawAmountHelperText}
-                  value={withdrawAmount}
-                  onChange={this.handleChange("withdrawAmount")}
-                  variant="outlined"
-                />
-
-                {pendingWithdrawal ? (
-                  <div className={classes.currencySummary}>
-                    All withdrawals are charged a 1% processing fee.
+                  <Typography variant="h4" align="center">
+                    Deposit Bitcoin
+                </Typography>
+                  <div className={classes.dialogContentCentered}>
+                    <img
+                      src={bitgoLogo}
+                      className={classes.bitgoImage}
+                      alt="Bitgo logo"
+                    />
+                    <QRCode
+                      className={classes.qrCode}
+                      color={palette.blue[0]}
+                      size={160}
+                      value={address}
+                    />
+                    <div className={classes.address}>{address}</div>
+                    <CopyToClipboard text={address}>
+                      <a
+                        className={classes.link}
+                        href={"#"}
+                        onClick={this.handleCopyCode}
+                      >
+                        Copy
+                    </a>
+                    </CopyToClipboard>
                   </div>
-                ) : (
+                  <Typography variant="h4" gutterBottom align="center">
+                    Buy Bitcoin
+                </Typography>
+                  <div className={classes.affiliateLinks}>
+                    {earns.slice(0, 4).map((earn, index) => (
+                      <div
+                        className={classes.earnRow}
+                        onClick={this.handleClickLink(index)}
+                      >
+                        <div className={classes.earnCell}>
+                          <img
+                            src={earn.imageUrl}
+                            className={classes.image}
+                            alt=""
+                          />
+                        </div>
+                        <div className={classes.earnCell}>Earn {earn.reward}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </Dialog>
+              <Dialog
+                onClose={this.handleWithdrawDialogClose}
+                open={withdrawDialogOpen}
+                disableBackdropClick
+              >
+                <div className={classes.dialogContent}>
+                  {pendingWithdrawal ? (
+                    <div className={classes.dialogTitleContainer}>
+                      Confirm withdrawal
+                      <div />
+                    </div>
+                  ) : (
+                      <div className={classes.dialogTitleContainer}>
+                        Withdraw
+                        <IconButton
+                          aria-label="close"
+                          className={classes.closeIcon}
+                          onClick={this.handleWithdrawDialogClose}
+                        >
+                          <img
+                            src={closeIcon}
+                            className={classes.iconButton}
+                            alt=""
+                          />
+                        </IconButton>
+                      </div>
+                    )}
+
+                  <TextField
+                    fullWidth
+                    disabled={pendingWithdrawal}
+                    error={withdrawAddressError}
+                    className={classes.textField}
+                    id="outlined-withdraw-address"
+                    label="Bitcoin Address"
+                    type="text"
+                    helperText={withdrawAddressHelperText}
+                    value={withdrawAddress}
+                    onChange={this.handleChange("withdrawAddress")}
+                    variant="outlined"
+                  />
+
+                  <TextField
+                    fullWidth
+                    disabled={pendingWithdrawal}
+                    error={withdrawAmountError}
+                    className={classes.textField}
+                    id="outlined-withdraw-amount"
+                    label="Amount in Sats"
+                    type="text"
+                    helperText={withdrawAmountHelperText}
+                    value={withdrawAmount}
+                    onChange={this.handleChange("withdrawAmount")}
+                    variant="outlined"
+                  />
+
+                  {pendingWithdrawal ? (
+                    <div className={classes.currencySummary}>
+                      All withdrawals are charged a 1% processing fee.
+                    </div>
+                  ) : (
+                      <div className={classes.currencySummary}>
+                        {bitcoinConverter(parseInt(withdrawAmount), "satoshi")
+                          .to("BTC")
+                          .toString()}{" "}
+                    BTC -{" "}
+                        {currencyFormatter.format(
+                          rate *
+                          bitcoinConverter(
+                            parseInt(withdrawAmount),
+                            "satoshi"
+                          ).to("BTC"),
+                          { code: currency }
+                        )}
+                      </div>
+                    )}
+
+                  {pendingWithdrawal ? (
+                    <div>
+                      <Button
+                        className={classes.confirmButton}
+                        size="large"
+                        variant={"contained"}
+                        fullWidth
+                        onClick={this.handleConfirmWithdrawal}
+                      >
+                        {isLoading ? (
+                          <CircularProgress
+                            variant="indeterminate"
+                            disableShrink
+                            size={24}
+                            thickness={4}
+                          />
+                        ) : (
+                            "Confirm withdrawal"
+                          )}
+                      </Button>
+
+                      <Button
+                        disabled={isLoading}
+                        className={classes.cancelButton}
+                        size="large"
+                        variant={"contained"}
+                        fullWidth
+                        onClick={this.handleCancelWithdrawal}
+                      >
+                        Cancel
+                    </Button>
+                    </div>
+                  ) : (
+                      <div>
+                        <Button
+                          className={classes.sendButton}
+                          size="large"
+                          variant={"contained"}
+                          color="primary"
+                          fullWidth
+                          onClick={this.handleProcessWithdrawal}
+                        >
+                          Withdraw
+                    </Button>
+                      </div>
+                    )}
+                </div>
+              </Dialog>
+
+              <Dialog
+                onClose={this.handleSendDialogClose}
+                open={sendDialogOpen}
+                disableBackdropClick
+              >
+                <div className={classes.dialogContent}>
+                  {pendingConfirmation ? (
+                    <div className={classes.dialogTitleContainer}>
+                      Confirm transaction
+                      <div />
+                    </div>
+                  ) : (
+                      <div className={classes.dialogTitleContainer}>
+                        Send
+                        <IconButton
+                          aria-label="menu"
+                          className={classes.closeIcon}
+                          onClick={this.handleSendDialogClose}
+                        >
+                          <img
+                            src={closeIcon}
+                            className={classes.iconButton}
+                            alt=""
+                          />
+                        </IconButton>
+                      </div>
+                    )}
+                  <TextField
+                    fullWidth
+                    disabled={pendingConfirmation}
+                    error={emailError}
+                    className={classes.textField}
+                    id="outlined-email"
+                    label="Email"
+                    name="email"
+                    type="email"
+                    helperText={emailHelperText}
+                    value={email}
+                    onChange={this.handleChange("email")}
+                    variant="outlined"
+                  />
+
+                  <TextField
+                    fullWidth
+                    disabled={pendingConfirmation}
+                    error={amountError}
+                    className={classes.textField}
+                    id="outlined-amount"
+                    label="Amount in Sats"
+                    name="amount"
+                    helperText={amountHelperText}
+                    value={amount}
+                    onChange={this.handleChange("amount")}
+                    variant="outlined"
+                  />
+
                   <div className={classes.currencySummary}>
-                    {bitcoinConverter(parseInt(withdrawAmount), "satoshi")
+                    {bitcoinConverter(parseInt(amount), "satoshi")
                       .to("BTC")
                       .toString()}{" "}
-                    BTC -{" "}
+                  BTC -{" "}
                     {currencyFormatter.format(
                       rate *
-                        bitcoinConverter(
-                          parseInt(withdrawAmount),
-                          "satoshi"
-                        ).to("BTC"),
+                      bitcoinConverter(parseInt(amount), "satoshi").to("BTC"),
                       { code: currency }
                     )}
                   </div>
-                )}
 
-                {pendingWithdrawal ? (
-                  <div>
-                    <Button
-                      className={classes.confirmButton}
-                      size="large"
-                      variant={"contained"}
-                      fullWidth
-                      onClick={this.handleConfirmWithdrawal}
-                    >
-                      {isLoading ? (
-                        <CircularProgress
-                          variant="indeterminate"
-                          disableShrink
-                          size={24}
-                          thickness={4}
-                        />
-                      ) : (
-                        "Confirm withdrawal"
-                      )}
+                  {pendingConfirmation ? (
+                    <div>
+                      <Button
+                        className={classes.confirmButton}
+                        size="large"
+                        variant={"contained"}
+                        fullWidth
+                        onClick={this.handleConfirmTransaction}
+                      >
+                        {isLoading ? (
+                          <CircularProgress
+                            variant="indeterminate"
+                            disableShrink
+                            size={24}
+                            thickness={4}
+                          />
+                        ) : (
+                            "Confirm transaction"
+                          )}
+                      </Button>
+
+                      <Button
+                        disabled={isLoading}
+                        className={classes.cancelButton}
+                        size="large"
+                        variant={"contained"}
+                        fullWidth
+                        onClick={this.handleCancelTransaction}
+                      >
+                        Cancel
+                    </Button>
+                    </div>
+                  ) : (
+                      <div>
+                        <Button
+                          className={classes.sendButton}
+                          size="large"
+                          variant={"contained"}
+                          color="primary"
+                          fullWidth
+                          onClick={this.handleSendEmail}
+                        >
+                          Send email
                     </Button>
 
-                    <Button
-                      disabled={isLoading}
-                      className={classes.cancelButton}
-                      size="large"
-                      variant={"contained"}
-                      fullWidth
-                      onClick={this.handleCancelWithdrawal}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Button
-                      className={classes.sendButton}
-                      size="large"
-                      variant={"contained"}
-                      color="primary"
-                      fullWidth
-                      onClick={this.handleProcessWithdrawal}
-                    >
-                      Withdraw
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </Dialog>
+                        <div className={classes.textSeperator}>Or</div>
 
-            <Dialog
-              onClose={this.handleSendDialogClose}
-              open={sendDialogOpen}
-              disableBackdropClick
-            >
-              <div className={classes.dialogContent}>
-                {pendingConfirmation ? (
+                        <Button
+                          className={classes.sendButton}
+                          size="large"
+                          variant={"contained"}
+                          color="primary"
+                          fullWidth
+                          onClick={this.handleDownloadGiftReceipt}
+                        >
+                          Download gift receipt
+                    </Button>
+                      </div>
+                    )}
+                </div>
+              </Dialog>
+
+              <Dialog
+                fullWidth
+                onClose={this.handleTransactionDialogClose}
+                open={transactionDialogOpen}
+                disableBackdropClick
+              >
+                <div className={classes.dialogContent}>
                   <div className={classes.dialogTitleContainer}>
-                    Confirm transaction
-                    <div />
-                  </div>
-                ) : (
-                  <div className={classes.dialogTitleContainer}>
-                    Send
-                    <IconButton
+                    Transactions
+                  <IconButton
                       aria-label="menu"
                       className={classes.closeIcon}
-                      onClick={this.handleSendDialogClose}
+                      onClick={this.handleTransactionDialogClose}
                     >
                       <img
                         src={closeIcon}
@@ -1524,172 +1651,47 @@ class Wallet extends Component {
                       />
                     </IconButton>
                   </div>
-                )}
-                <TextField
-                  fullWidth
-                  disabled={pendingConfirmation}
-                  error={emailError}
-                  className={classes.textField}
-                  id="outlined-email"
-                  label="Email"
-                  name="email"
-                  type="email"
-                  helperText={emailHelperText}
-                  value={email}
-                  onChange={this.handleChange("email")}
-                  variant="outlined"
-                />
 
-                <TextField
-                  fullWidth
-                  disabled={pendingConfirmation}
-                  error={amountError}
-                  className={classes.textField}
-                  id="outlined-amount"
-                  label="Amount in Sats"
-                  name="amount"
-                  helperText={amountHelperText}
-                  value={amount}
-                  onChange={this.handleChange("amount")}
-                  variant="outlined"
-                />
+                  <ToggleButtonGroup
+                    value={transactionListType}
+                    exclusive
+                    onChange={this.handleTransactionSwitch}
+                  >
+                    <ToggleButton className={classes.toggleButton} value="sent">
+                      Sent
+                  </ToggleButton>
+                    <ToggleButton
+                      className={classes.toggleButton}
+                      value="received"
+                    >
+                      Received
+                  </ToggleButton>
+                    <ToggleButton
+                      className={classes.toggleButton}
+                      value="deposits"
+                    >
+                      Deposits
+                  </ToggleButton>
+                    <ToggleButton
+                      className={classes.toggleButton}
+                      value="withdrawals"
+                    >
+                      Withdrawals
+                  </ToggleButton>
+                  </ToggleButtonGroup>
 
-                <div className={classes.currencySummary}>
-                  {bitcoinConverter(parseInt(amount), "satoshi")
-                    .to("BTC")
-                    .toString()}{" "}
-                  BTC -{" "}
-                  {currencyFormatter.format(
-                    rate *
-                      bitcoinConverter(parseInt(amount), "satoshi").to("BTC"),
-                    { code: currency }
-                  )}
+                  {this.getTransactions()}
                 </div>
+              </Dialog>
 
-                {pendingConfirmation ? (
-                  <div>
-                    <Button
-                      className={classes.confirmButton}
-                      size="large"
-                      variant={"contained"}
-                      fullWidth
-                      onClick={this.handleConfirmTransaction}
-                    >
-                      {isLoading ? (
-                        <CircularProgress
-                          variant="indeterminate"
-                          disableShrink
-                          size={24}
-                          thickness={4}
-                        />
-                      ) : (
-                        "Confirm transaction"
-                      )}
-                    </Button>
-
-                    <Button
-                      disabled={isLoading}
-                      className={classes.cancelButton}
-                      size="large"
-                      variant={"contained"}
-                      fullWidth
-                      onClick={this.handleCancelTransaction}
-                    >
-                      Cancel
-                    </Button>
-                  </div>
-                ) : (
-                  <div>
-                    <Button
-                      className={classes.sendButton}
-                      size="large"
-                      variant={"contained"}
-                      color="primary"
-                      fullWidth
-                      onClick={this.handleSendEmail}
-                    >
-                      Send email
-                    </Button>
-
-                    <div className={classes.textSeperator}>Or</div>
-
-                    <Button
-                      className={classes.sendButton}
-                      size="large"
-                      variant={"contained"}
-                      color="primary"
-                      fullWidth
-                      onClick={this.handleDownloadGiftReceipt}
-                    >
-                      Download gift receipt
-                    </Button>
-                  </div>
-                )}
-              </div>
-            </Dialog>
-
-            <Dialog
-              fullWidth
-              onClose={this.handleTransactionDialogClose}
-              open={transactionDialogOpen}
-              disableBackdropClick
-            >
-              <div className={classes.dialogContent}>
-                <div className={classes.dialogTitleContainer}>
-                  Transactions
-                  <IconButton
-                    aria-label="menu"
-                    className={classes.closeIcon}
-                    onClick={this.handleTransactionDialogClose}
-                  >
-                    <img
-                      src={closeIcon}
-                      className={classes.iconButton}
-                      alt=""
-                    />
-                  </IconButton>
-                </div>
-
-                <ToggleButtonGroup
-                  value={transactionListType}
-                  exclusive
-                  onChange={this.handleTransactionSwitch}
-                >
-                  <ToggleButton className={classes.toggleButton} value="sent">
-                    Sent
-                  </ToggleButton>
-                  <ToggleButton
-                    className={classes.toggleButton}
-                    value="received"
-                  >
-                    Received
-                  </ToggleButton>
-                  <ToggleButton
-                    className={classes.toggleButton}
-                    value="deposits"
-                  >
-                    Deposits
-                  </ToggleButton>
-                  <ToggleButton
-                    className={classes.toggleButton}
-                    value="withdrawals"
-                  >
-                    Withdrawals
-                  </ToggleButton>
-                </ToggleButtonGroup>
-
-                {this.getTransactions()}
-              </div>
-            </Dialog>
-
-            <CustomSnackbar
-              variant={snackbarVariant}
-              message={snackbarMessage}
-              open={snackbarIsOpen}
-              onSnackBarClose={this.onSnackBarClose}
-            />
-          </div>
-        )}
+              <CustomSnackbar
+                variant={snackbarVariant}
+                message={snackbarMessage}
+                open={snackbarIsOpen}
+                onSnackBarClose={this.onSnackBarClose}
+              />
+            </div>
+          )}
       </div>
     );
   }
