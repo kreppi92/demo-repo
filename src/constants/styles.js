@@ -77,22 +77,17 @@ export const mainTheme = createMuiTheme({
       root: {
         textTransform: "none",
         letterSpacing: 0.5,
-        height: "56px",
         boxShadow: "none",
         fontWeight: "700",
         fontSize: 14,
-        textShadow: "none"
+        textShadow: "none",
       },
-
       sizeLarge: {
-        fontSize: 18,
+        // fontSize: 18,
         fontWeight: "700",
-        color: "white"
+        minHeight: "50px"
       },
-
-      sizeSmall: {
-        fontSize: 16,
-        fontWeight: "700",
+      containedPrimary: {
         color: "white"
       }
     },
@@ -101,7 +96,7 @@ export const mainTheme = createMuiTheme({
         width: "100%",
         margin: "20px 0 0 0",
         backgroundColor: "#f3f3f3",
-        letterSpacing: 0.5
+        letterSpacing: 0.5,
       }
     },
     MuiTypography: {
@@ -129,7 +124,6 @@ export const mainTheme = createMuiTheme({
     },
     MuiFormControl: {
       root: {
-        marginTop: 20,
         letterSpacing: 0.5
       }
     },

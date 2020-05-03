@@ -70,7 +70,10 @@ const styles = {
   },
 
   menuOptionsContainer: {
-    margin: "0 20px 0 0",
+    margin: "20px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center"
   },
 
   iconButton: {
@@ -115,6 +118,9 @@ const styles = {
     minHeight: "100vh",
     flexDirection: "column",
     width: "100%",
+    "@media (min-width:780px)": {
+      marginTop: "100px",
+    },
   },
 
   selectedButton: {
@@ -267,7 +273,7 @@ class Home extends Component {
                     function (option, i) {
                       if (i === 0) {
                         return (
-                          <FormControl className={classes.select}>
+                          <FormControl>
                             <Select
                               disableUnderline
                               value={currencyOption}

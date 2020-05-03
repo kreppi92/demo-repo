@@ -465,6 +465,7 @@ const Landing = () => {
               <Button
                 variant="outlined"
                 color="primary"
+                size="large"
                 className={classes.link}
                 component={Link}
                 to={"/create_account"}
@@ -474,6 +475,7 @@ const Landing = () => {
               <Button
                 // variant="outlined"
                 color="primary"
+                size="large"
                 className={classes.link}
                 component={Link}
                 to={"/signin"}
