@@ -162,7 +162,7 @@ const Chart = (props) => {
     options: {
       chart: {
         type: "area",
-        height: 150,
+        height: 200,
         toolbar: {
           show: false,
         },
@@ -189,9 +189,9 @@ const Chart = (props) => {
           format: "dd MMM yy HH:mm",
         },
         y: {
-          formatter: (value) => `$${value.toLocaleString()}`,
+          //   formatter: (value) => formatCurrency({ value, currency }),
           title: {
-            formatter: () => "Price",
+            formatter: () => `Price (${currency})`,
           },
         },
       },
@@ -205,7 +205,10 @@ const Chart = (props) => {
           enabled: false,
         },
         labels: {
-          show: false,
+          style: {
+            colors: "#c1c1c1",
+          },
+          //   show: false,
         },
         axisBorder: {
           show: false,
@@ -213,12 +216,16 @@ const Chart = (props) => {
       },
       yaxis: {
         type: "",
+        tickAmount: 3,
         tooltip: {
           enabled: false,
         },
         labels: {
-          show: false,
-          formatter: (val) => val.toFixed(2),
+          style: {
+            colors: "#c1c1c1",
+          },
+          //   show: false,
+          formatter: (val) => parseFloat(val.toFixed(0)).toLocaleString(),
         },
       },
     },
@@ -288,7 +295,7 @@ const Chart = (props) => {
               options={options.options}
               series={options.series}
               type="area"
-              height={150}
+              height={200}
             />
           </div>
         </>
