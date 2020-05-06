@@ -12,6 +12,7 @@ import Privacy from './components/main/Privacy'
 import Terms from './components/main/Terms'
 import Home from './components/main/Home'
 import Landing from './components/main/Landing'
+import Chart from './components/main/Chart2'
 
 ReactDOM.render((
   <MuiThemeProvider theme={mainTheme}>
@@ -24,6 +25,7 @@ ReactDOM.render((
         <Route path='/reset_password' component={() => <ResetPassword />} />
         <Route path='/terms' component={() => <Terms />} />
         <Route path='/privacy' component={() => <Privacy />} />
+        <Route path='/chart' component={() => <Chart />} />
         <Route path='/home' component={() => <Home />} />
       </Switch>
     </BrowserRouter>
