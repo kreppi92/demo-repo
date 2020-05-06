@@ -23,9 +23,9 @@ import { pdf } from "@react-pdf/renderer";
 import { saveAs } from "file-saver";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import Certificate from "./Certificate";
-import Chart from "./Chart2"
-import currencyFormatter from "currency-formatter"
-import { formatCurrencyWithRate } from '../shared/utils'
+import Chart from "./Chart2";
+import currencyFormatter from "currency-formatter";
+import { formatCurrencyWithRate } from "../shared/utils";
 
 var bitcoinConverter = require("bitcoin-units");
 
@@ -201,7 +201,7 @@ const styles = {
     borderColor: palette.gray[0],
     padding: "10px",
     margin: "0 20px 20px 20px",
-    boxSizing: "border-box"
+    boxSizing: "border-box",
   },
 
   paperGrid: {
@@ -357,7 +357,7 @@ const styles = {
 
   circularProgress: {
     color: palette.blue[0],
-    margin: "150px auto"
+    margin: "150px auto",
   },
 
   button: {
@@ -429,8 +429,8 @@ const styles = {
   },
   singleLine: {
     lineHeight: 1.5,
-    display: "block"
-  }
+    display: "block",
+  },
 };
 
 class Wallet extends Component {
@@ -486,7 +486,6 @@ class Wallet extends Component {
       this.getWalletAddress(store.get("token"));
     }
     this.getEarns();
-    console.log(this.props)
   }
 
   getEarns = () => {
@@ -1151,7 +1150,7 @@ class Wallet extends Component {
       addFundsOpen,
       earns,
       referralCount,
-      referralRank
+      referralRank,
     } = this.state;
     const { classes, type } = this.props;
 
@@ -1166,7 +1165,11 @@ class Wallet extends Component {
                 <div className={classes.contentContainer}>
                   <div style={{ width: "100%" }}>
                     <Paper>
-                      {currency ? <Chart currency={currency} /> : <CircularProgress />}
+                      {currency ? (
+                        <Chart currency={currency} />
+                      ) : (
+                        <CircularProgress />
+                      )}
                     </Paper>
                   </div>
                   <div className={classes.paddingContainer}>
@@ -1176,25 +1179,43 @@ class Wallet extends Component {
                       </Typography>
                       <Typography variant="h4" className={classes.singleLine}>
                         {balance.toLocaleString()} Sats
-                    </Typography>
-                      <Typography variant="overline" display="block" className={classes.singleLine}>
-                        {btcBalance.toLocaleString()} BTC - {formatCurrencyWithRate({ value: btcBalance, rate, currency })}
+                      </Typography>
+                      <Typography
+                        variant="overline"
+                        display="block"
+                        className={classes.singleLine}
+                      >
+                        {btcBalance.toLocaleString()} BTC -{" "}
+                        {formatCurrencyWithRate({
+                          value: btcBalance,
+                          rate,
+                          currency,
+                        })}
                       </Typography>
                       {!!referralCount ? (
                         <React.Fragment>
-                          <Typography variant="overline" className={classes.singleLine}>
+                          <Typography
+                            variant="overline"
+                            className={classes.singleLine}
+                          >
                             {referralCount} total referrals
                           </Typography>
-                          <Typography variant="overline" className={classes.singleLine}>
+                          <Typography
+                            variant="overline"
+                            className={classes.singleLine}
+                          >
                             #{referralRank} rank on Satstreet
                           </Typography>
                         </React.Fragment>
                       ) : (
-                          <Typography variant="overline" className={classes.singleLine}>
-                            No referrals yet. Add the first referral by sending
-                            some sats to a new user!
-                          </Typography>
-                        )}
+                        <Typography
+                          variant="overline"
+                          className={classes.singleLine}
+                        >
+                          No referrals yet. Add the first referral by sending
+                          some sats to a new user!
+                        </Typography>
+                      )}
                     </Paper>
                     <div className={classes.qrButtonContainer}>
                       <Button
@@ -1207,7 +1228,6 @@ class Wallet extends Component {
                       </Button>
                       <Button
                         className={classes.qrButton}
-
                         variant={"contained"}
                         color="primary"
                         onClick={this.handleSendFunds}
@@ -1217,7 +1237,6 @@ class Wallet extends Component {
 
                       <Button
                         className={classes.qrButton}
-
                         variant={"contained"}
                         color="primary"
                         onClick={this.handleWithdrawFunds}
@@ -1227,7 +1246,6 @@ class Wallet extends Component {
 
                       <Button
                         className={classes.qrButton}
-
                         variant={"contained"}
                         color="secondary"
                         onClick={this.handleViewTransactions}
@@ -1238,7 +1256,6 @@ class Wallet extends Component {
                       <CopyToClipboard text={referralUrl}>
                         <Button
                           className={classes.shareButton}
-
                           variant={"contained"}
                           color="secondary"
                           onClick={this.handleCopyShareUrl}
@@ -1252,16 +1269,16 @@ class Wallet extends Component {
                 </div>
               </Paper>
             ) : (
-                <Paper className={classes.paperOptionsEmpty}>
-                  <CircularProgress
-                    className={classes.circularProgress}
-                    variant="indeterminate"
-                    disableShrink
-                    size={24}
-                    thickness={4}
-                  />
-                </Paper>
-              )}
+              <Paper className={classes.paperOptionsEmpty}>
+                <CircularProgress
+                  className={classes.circularProgress}
+                  variant="indeterminate"
+                  disableShrink
+                  size={24}
+                  thickness={4}
+                />
+              </Paper>
+            )}
 
             <Paper className={classes.paperGrid}>
               {isLoading ? (
@@ -1273,39 +1290,38 @@ class Wallet extends Component {
                   thickness={4}
                 />
               ) : (
-                  earns.map((earn, index) => {
-                    return (
-                      <div className={classes.outerBox} key={index}>
-                        <div className={classes.innerBox}>
-                          <img
-                            src={earn.imageUrl}
-                            className={classes.image}
-                            alt=""
-                          />
-                          <div className={classes.titleBox}>{earn.reward}</div>
-                          <div className={classes.subtitleBox}>
-                            {earn.preMessaging}
-                            <span className={classes.bold}>
-                              {" "}
-                              {earn.satValue}{" "}
-                            </span>
-                            {earn.postMessaging}
-                          </div>
-                          <Button
-                            className={classes.button}
-
-                            fullWidth
-                            variant={"contained"}
-                            color="primary"
-                            onClick={this.handleClickLink(index)}
-                          >
-                            Earn
-                        </Button>
+                earns.map((earn, index) => {
+                  return (
+                    <div className={classes.outerBox} key={index}>
+                      <div className={classes.innerBox}>
+                        <img
+                          src={earn.imageUrl}
+                          className={classes.image}
+                          alt=""
+                        />
+                        <div className={classes.titleBox}>{earn.reward}</div>
+                        <div className={classes.subtitleBox}>
+                          {earn.preMessaging}
+                          <span className={classes.bold}>
+                            {" "}
+                            {earn.satValue}{" "}
+                          </span>
+                          {earn.postMessaging}
                         </div>
+                        <Button
+                          className={classes.button}
+                          fullWidth
+                          variant={"contained"}
+                          color="primary"
+                          onClick={this.handleClickLink(index)}
+                        >
+                          Earn
+                        </Button>
                       </div>
-                    );
-                  })
-                )}
+                    </div>
+                  );
+                })
+              )}
             </Paper>
 
             <Dialog open={addFundsOpen}>
@@ -1384,21 +1400,21 @@ class Wallet extends Component {
                     <div />
                   </div>
                 ) : (
-                    <div className={classes.dialogTitleContainer}>
-                      Withdraw
-                      <IconButton
-                        aria-label="close"
-                        className={classes.closeIcon}
-                        onClick={this.handleWithdrawDialogClose}
-                      >
-                        <img
-                          src={closeIcon}
-                          className={classes.iconButton}
-                          alt=""
-                        />
-                      </IconButton>
-                    </div>
-                  )}
+                  <div className={classes.dialogTitleContainer}>
+                    Withdraw
+                    <IconButton
+                      aria-label="close"
+                      className={classes.closeIcon}
+                      onClick={this.handleWithdrawDialogClose}
+                    >
+                      <img
+                        src={closeIcon}
+                        className={classes.iconButton}
+                        alt=""
+                      />
+                    </IconButton>
+                  </div>
+                )}
 
                 <TextField
                   fullWidth
@@ -1433,21 +1449,21 @@ class Wallet extends Component {
                     All withdrawals are charged a 1% processing fee.
                   </div>
                 ) : (
-                    <div className={classes.currencySummary}>
-                      {bitcoinConverter(parseInt(withdrawAmount), "satoshi")
-                        .to("BTC")
-                        .toString()}{" "}
+                  <div className={classes.currencySummary}>
+                    {bitcoinConverter(parseInt(withdrawAmount), "satoshi")
+                      .to("BTC")
+                      .toString()}{" "}
                     BTC -{" "}
-                      {currencyFormatter.format(
-                        rate *
+                    {currencyFormatter.format(
+                      rate *
                         bitcoinConverter(
                           parseInt(withdrawAmount),
                           "satoshi"
                         ).to("BTC"),
-                        { code: currency }
-                      )}
-                    </div>
-                  )}
+                      { code: currency }
+                    )}
+                  </div>
+                )}
 
                 {pendingWithdrawal ? (
                   <div>
@@ -1466,8 +1482,8 @@ class Wallet extends Component {
                           thickness={4}
                         />
                       ) : (
-                          "Confirm withdrawal"
-                        )}
+                        "Confirm withdrawal"
+                      )}
                     </Button>
 
                     <Button
@@ -1482,19 +1498,19 @@ class Wallet extends Component {
                     </Button>
                   </div>
                 ) : (
-                    <div>
-                      <Button
-                        className={classes.sendButton}
-                        size="large"
-                        variant={"contained"}
-                        color="primary"
-                        fullWidth
-                        onClick={this.handleProcessWithdrawal}
-                      >
-                        Withdraw
+                  <div>
+                    <Button
+                      className={classes.sendButton}
+                      size="large"
+                      variant={"contained"}
+                      color="primary"
+                      fullWidth
+                      onClick={this.handleProcessWithdrawal}
+                    >
+                      Withdraw
                     </Button>
-                    </div>
-                  )}
+                  </div>
+                )}
               </div>
             </Dialog>
 
@@ -1510,21 +1526,21 @@ class Wallet extends Component {
                     <div />
                   </div>
                 ) : (
-                    <div className={classes.dialogTitleContainer}>
-                      Send
-                      <IconButton
-                        aria-label="menu"
-                        className={classes.closeIcon}
-                        onClick={this.handleSendDialogClose}
-                      >
-                        <img
-                          src={closeIcon}
-                          className={classes.iconButton}
-                          alt=""
-                        />
-                      </IconButton>
-                    </div>
-                  )}
+                  <div className={classes.dialogTitleContainer}>
+                    Send
+                    <IconButton
+                      aria-label="menu"
+                      className={classes.closeIcon}
+                      onClick={this.handleSendDialogClose}
+                    >
+                      <img
+                        src={closeIcon}
+                        className={classes.iconButton}
+                        alt=""
+                      />
+                    </IconButton>
+                  </div>
+                )}
                 <TextField
                   fullWidth
                   disabled={pendingConfirmation}
@@ -1561,7 +1577,7 @@ class Wallet extends Component {
                   BTC -{" "}
                   {currencyFormatter.format(
                     rate *
-                    bitcoinConverter(parseInt(amount), "satoshi").to("BTC"),
+                      bitcoinConverter(parseInt(amount), "satoshi").to("BTC"),
                     { code: currency }
                   )}
                 </div>
@@ -1583,8 +1599,8 @@ class Wallet extends Component {
                           thickness={4}
                         />
                       ) : (
-                          "Confirm transaction"
-                        )}
+                        "Confirm transaction"
+                      )}
                     </Button>
 
                     <Button
@@ -1599,32 +1615,32 @@ class Wallet extends Component {
                     </Button>
                   </div>
                 ) : (
-                    <div>
-                      <Button
-                        className={classes.sendButton}
-                        size="large"
-                        variant={"contained"}
-                        color="primary"
-                        fullWidth
-                        onClick={this.handleSendEmail}
-                      >
-                        Send email
+                  <div>
+                    <Button
+                      className={classes.sendButton}
+                      size="large"
+                      variant={"contained"}
+                      color="primary"
+                      fullWidth
+                      onClick={this.handleSendEmail}
+                    >
+                      Send email
                     </Button>
 
-                      <div className={classes.textSeperator}>Or</div>
+                    <div className={classes.textSeperator}>Or</div>
 
-                      <Button
-                        className={classes.sendButton}
-                        size="large"
-                        variant={"contained"}
-                        color="primary"
-                        fullWidth
-                        onClick={this.handleDownloadGiftReceipt}
-                      >
-                        Download gift receipt
+                    <Button
+                      className={classes.sendButton}
+                      size="large"
+                      variant={"contained"}
+                      color="primary"
+                      fullWidth
+                      onClick={this.handleDownloadGiftReceipt}
+                    >
+                      Download gift receipt
                     </Button>
-                    </div>
-                  )}
+                  </div>
+                )}
               </div>
             </Dialog>
 
