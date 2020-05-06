@@ -161,6 +161,7 @@ const Chart = (props) => {
     ],
     options: {
       chart: {
+        id: `${Math.random()}`,
         type: "area",
         height: 200,
         toolbar: {
@@ -189,9 +190,9 @@ const Chart = (props) => {
           format: "dd MMM yy HH:mm",
         },
         y: {
-          //   formatter: (value) => formatCurrency({ value, currency }),
+          formatter: (value) => formatCurrency({ value, currency }),
           title: {
-            formatter: () => `Price (${currency})`,
+            formatter: () => `Price`,
           },
         },
       },
