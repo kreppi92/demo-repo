@@ -44,15 +44,16 @@ const useStyles = makeStyles({
   image: {
     maxWidth: "125px",
     height: "75px",
-    margin: "10px",
+    margin: "20px 10px",
     objectFit: "scale-down",
   },
 
   titleBox: {
     fontSize: "16px",
     fontWeight: 600,
-    padding: 20,
+    padding: "20px",
     margin: "5px 10px 10px 10px",
+    flexGrow: 1,
   },
 
   button: {

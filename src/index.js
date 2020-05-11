@@ -28,7 +28,7 @@ ReactDOM.render(
         <Route path="/terms" component={() => <Terms />} />
         <Route path="/privacy" component={() => <Privacy />} />
         <Route path="/chart" component={() => <Chart />} />
-        <Route path="/wallet" component={() => <Layout component={Wallet} />} />
+        <Route path="/home" component={() => <Layout component={Wallet} />} />
         <Route
           path="/education"
           component={() => <Layout component={Education} />}

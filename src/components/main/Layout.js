@@ -18,7 +18,7 @@ import Footer from "./Footer";
 import axios from "axios";
 import store from "store";
 
-const options = ["Currency", "Wallet", "Education", "Sign out"];
+const options = ["Currency", "Home", "Education", "Sign out"];
 
 const Mobile = ({ children }) => {
   const isMobile = useMediaQuery({ maxWidth: 767 });

@@ -188,7 +188,7 @@ class Signin extends Component {
         if (result.data.success) {
           store.set("token", result.data.token);
           this.displaySnackbar("success", "Successfully signed in.");
-          window.location = "/wallet";
+          window.location = "/home";
         } else {
           this.displaySnackbar("error", result.data.error);
         }

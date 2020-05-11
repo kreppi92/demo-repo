@@ -15,6 +15,10 @@ const useStyles = makeStyles((theme) => ({
     minHeight: "652px",
     minWidth: "300px",
     width: "100%",
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "flex-start",
+    padding: 5,
 
     "@media (min-width:780px)": {
       border: "1px solid",
@@ -38,23 +42,13 @@ const useStyles = makeStyles((theme) => ({
       width: "80%",
     },
   },
-
-  contentContainer: {
-    display: "flex",
-    justifyContent: "left",
-    flexDirection: "row",
-    flexWrap: "wrap",
-    alignItems: "center",
-    boxSizing: "border-box",
-    padding: 5,
-  },
 }));
 
 const Education = () => {
   const classes = useStyles();
   const [state, setState] = useState({
     educations: [],
-    isLoading: false,
+    isLoading: true,
   });
 
   const { isLoading, educations } = state;
@@ -85,21 +79,19 @@ const Education = () => {
     <div className={classes.holdingContainer}>
       <div className={classes.container}>
         <Paper className={classes.paperOptions}>
-          <div className={classes.contentContainer}>
-            {isLoading ? (
-              <CircularProgress
-                className={classes.circularProgress}
-                variant="indeterminate"
-                disableShrink
-                size={24}
-                thickness={4}
-              />
-            ) : (
-              educations.map((education, index) => {
-                return <EducationCard {...education} key={index} />;
-              })
-            )}
-          </div>
+          {isLoading ? (
+            <CircularProgress
+              className={classes.circularProgress}
+              variant="indeterminate"
+              disableShrink
+              size={24}
+              thickness={4}
+            />
+          ) : (
+            educations.map((education, index) => {
+              return <EducationCard {...education} key={index} />;
+            })
+          )}
         </Paper>
       </div>
     </div>
