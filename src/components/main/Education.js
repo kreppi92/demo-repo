@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
 
   contentContainer: {
     display: "flex",
-    justifyContent: "center",
+    justifyContent: "left",
     flexDirection: "row",
     flexWrap: "wrap",
     alignItems: "center",
