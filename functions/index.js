@@ -14,7 +14,6 @@ const campaignKey = functions.config().campaign.key;
 
 admin.initializeApp();
 
-
 exports.generateCode = functions.https.onCall((data, context) => {
   const email = data.email.toLowerCase();
   const generatedCode = Math.floor(Math.random() * 899999 + 100000).toString();
@@ -543,7 +542,7 @@ exports.withdrawFunds = functions.https.onCall((data, context) => {
               return {
                 success: false,
                 error:
-                  "There was an error posting the transaction. Wrong amount."
+                  "There was an error posting the transaction. Wrong amount.",
               };
             } else {
               let authorization = satstreetToken;
@@ -552,15 +551,15 @@ exports.withdrawFunds = functions.https.onCall((data, context) => {
                 method: "POST",
                 url: url,
                 headers: {
-                  Authorization: authorization
+                  Authorization: authorization,
                 },
-                json: true
+                json: true,
               };
 
               options.body = {
                 walletId: "5df0646eb1138b4807c67ce3a37d9eea",
                 sendAmount: totalAmount,
-                sendAddress: toAddress
+                sendAddress: toAddress,
               };
 
               return rp(options)
@@ -572,21 +571,21 @@ exports.withdrawFunds = functions.https.onCall((data, context) => {
                     address: toAddress,
                     amount: totalAmount,
                     transactionID: "",
-                    date: new Date()
+                    date: new Date(),
                   };
 
                   return admin
                     .firestore()
                     .collection("withdrawals")
                     .add(withdrawalData)
-                    .then(writeResult => {
+                    .then((writeResult) => {
                       return { success: true };
                     })
-                    .catch(err => {
+                    .catch((err) => {
                       return {
                         success: false,
                         error:
-                          "There was an error posting the transaction. Please try again later."
+                          "There was an error posting the transaction. Please try again later.",
                       };
                     });
                 })
@@ -595,7 +594,7 @@ exports.withdrawFunds = functions.https.onCall((data, context) => {
                   return {
                     success: false,
                     error:
-                      "There was an error posting the withdrawal. Please try again later."
+                      "There was an error posting the withdrawal. Please try again later.",
                   };
                 });
             }
@@ -603,7 +602,7 @@ exports.withdrawFunds = functions.https.onCall((data, context) => {
             return { success: false, error: "Not authorized" };
           }
         })
-        .catch(err => {
+        .catch((err) => {
           return { success: false, error: "Not authorized" };
         });
     }
@@ -1469,6 +1468,41 @@ exports.getEarn = functions.https.onCall((data, context) => {
             earns.push(earn);
           });
           return { success: true, earns: earns };
+        })
+        .catch((err) => {
+          return {
+            success: false,
+            error:
+              "There was an error connecting to our server. Please try again later.",
+          };
+        });
+    }
+  });
+});
+
+exports.getLearn = functions.https.onCall((data, context) => {
+  const token = data.token;
+
+  return jwt.verify(token, jwtToken, function (err, decoded) {
+    if (err) {
+      return { success: false, error: "Not authorized" };
+    } else {
+      return admin
+        .firestore()
+        .collection("education")
+        .get()
+        .then(function (querySnapshot) {
+          let educations = [];
+          querySnapshot.forEach(function (doc) {
+            const learn = {
+              imageUrl: doc.data().imageUrl,
+              order: doc.data().order,
+              link: doc.data().link,
+              title: doc.data().title,
+            };
+            educations.push(learn);
+          });
+          return { success: true, educations };
         })
         .catch((err) => {
           return {

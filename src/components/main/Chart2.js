@@ -283,7 +283,7 @@ const Chart = (props) => {
             <ButtonGroup size="small" className={classes.dateRangeSelector}>
               {timeRange.map((button) => (
                 <Button
-                  key={button.labelu}
+                  key={button.label}
                   onClick={() => setDays(button.value)}
                   color="primary"
                   variant={days === button.value ? "contained" : "outlined"}

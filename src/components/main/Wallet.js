@@ -26,11 +26,9 @@ import Certificate from "./Certificate";
 import Chart from "./Chart2";
 import currencyFormatter from "currency-formatter";
 import { formatCurrencyWithRate } from "../shared/utils";
-
-var bitcoinConverter = require("bitcoin-units");
-
-var QRCode = require("qrcode.react");
-var store = require("store");
+import store from "store";
+import bitcoinConverter from "bitcoin-units";
+import QRCode from "qrcode.react";
 
 const EMAIL = "email";
 const GIFT = "gift";
