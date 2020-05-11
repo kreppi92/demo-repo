@@ -59,10 +59,6 @@ const Education = () => {
 
   const { isLoading, educations } = state;
 
-  const handleClickLink = (link) => {
-    window.open(link, "_blank");
-  };
-
   const getLearns = () => {
     setState({ isLoading: true });
     const getLearn = Firebase.functions().httpsCallable("getLearn");
